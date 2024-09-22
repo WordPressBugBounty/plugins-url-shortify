@@ -1,0 +1,239 @@
+/* purgecss start ignore */
+@tailwind base;
+
+a {
+    @apply text-indigo-600;
+}
+
+a:hover {
+    @apply text-indigo-500;
+}
+
+img {
+    @apply border-0;
+}
+
+@tailwind components;
+
+li.menu-top div.wp-menu-image img {
+    display: initial;
+    border-style: none;
+}
+
+.kc-us-primary-button {
+    @apply inline-flex justify-center rounded-md border border-transparent px-4 py-2 bg-white text-sm leading-5 font-medium text-white bg-indigo-600 transition ease-in-out duration-150;
+}
+
+.kc-us-primary-button:hover {
+    @apply bg-indigo-500 text-white;
+}
+
+.kc-us-primary-button:focus {
+    @apply outline-none;
+}
+
+.kc-us-title-button {
+    @apply text-sm rounded-md border border-indigo-600 leading-5 font-medium;
+}
+
+.form-checkbox {
+    content: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+}
+
+.form-radio {
+    content: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+}
+
+.form-checkbox:checked, .form-radio:checked {
+    @apply text-indigo-600 !important;
+}
+
+.wp-list-table input[type=checkbox]:checked, .wp-list-table input[type=radio]:checked {
+    @apply text-indigo-600 !important;
+}
+
+.wp-list-table input[type=checkbox]:checked:before {
+    content: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M5.707 7.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4a1 1 0 0 0-1.414-1.414L7 8.586 5.707 7.293z'/%3e%3c/svg%3e");
+}
+
+.form-select {
+    @apply text-sm border-gray-400 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3e%3cpath d='M7 7l3-3 3 3m0 6l-3 3-3-3' stroke='%239fa6b2' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e") !important;
+}
+
+.form-select:focus, input[type="number"]:focus {
+    @apply outline-none border-blue-300 !important;
+}
+
+.kc-us-check-toggle:checked ~ .kc-us-toggle-line {
+    @apply bg-indigo-600;
+}
+
+.kc-us-check-toggle:checked ~ .kc-us-toggle-dot {
+    @apply transform translate-x-full;
+}
+
+.kc-us-items-lists table.fixed {
+    @apply static;
+}
+
+.kc-us-helper-text {
+    @apply italic text-sm font-normal text-gray-400 leading-snug
+}
+
+.wp-core-ui .button, .wp-core-ui .button-secondary {
+    @apply text-sm rounded-md border border-gray-600 leading-5 font-medium text-indigo-600;
+}
+
+.wp-core-ui .button-primary {
+    @apply text-sm rounded-md border leading-5 font-medium bg-indigo-600 text-white transition ease-in-out duration-150;
+}
+
+.wp-core-ui .button:hover {
+    @apply border-indigo-600 text-indigo-500;
+}
+
+.wp-heading-inline .page-title-action {
+    @apply px-2 py-2 pt-2 mx-2 text-sm rounded-md border border-indigo-600 leading-5 font-medium text-indigo-600;
+}
+
+.wp-heading-inline .page-title-action:hover {
+    @apply border-indigo-500 text-indigo-500;
+}
+
+p.search-box-group {
+    @apply mx-2 float-right;
+}
+
+p.search-box .kc-us-links-search,
+p.search-box .kc-us-groups-search {
+    @apply leading-normal;
+}
+
+/*Overrides for Tailwind CSS */
+
+/*Form fields*/
+.dataTables_wrapper select,
+.dataTables_wrapper .dataTables_filter input {
+    color: #4a5568; 			/*text-gray-700*/
+    padding-left: 1rem; 		/*pl-4*/
+    padding-right: 1rem; 		/*pl-4*/
+    padding-top: .5rem; 		/*pl-2*/
+    padding-bottom: .5rem; 		/*pl-2*/
+    line-height: 1.25; 			/*leading-tight*/
+    border-width: 2px; 			/*border-2*/
+    border-radius: .25rem;
+    border-color: #edf2f7; 		/*border-gray-200*/
+    background-color: #edf2f7; 	/*bg-gray-200*/
+}
+
+/*Row Hover*/
+table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
+    background-color: #ebf4ff;	/*bg-indigo-100*/
+}
+
+/*Pagination Buttons*/
+.dataTables_wrapper .dataTables_paginate .paginate_button		{
+    font-weight: 700;				/*font-bold*/
+    border-radius: .25rem;			/*rounded*/
+    border: 1px solid transparent;	/*border border-transparent*/
+}
+
+/*Pagination Buttons - Current selected */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current	{
+    color: #fff !important;				/*text-white*/
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06); 	/*shadow*/
+    font-weight: 700;					/*font-bold*/
+    border-radius: .25rem;				/*rounded*/
+    background: #667eea !important;		/*bg-indigo-500*/
+    border: 1px solid transparent;		/*border border-transparent*/
+}
+
+/*Pagination Buttons - Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover		{
+    color: #fff !important;				/*text-white*/
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);	 /*shadow*/
+    font-weight: 700;					/*font-bold*/
+    border-radius: .25rem;				/*rounded*/
+    background: #667eea !important;		/*bg-indigo-500*/
+    border: 1px solid transparent;		/*border border-transparent*/
+}
+
+/*Add padding to bottom border */
+table.dataTable.no-footer {
+    border-bottom: 1px solid #e2e8f0;	/*border-b-1 border-gray-300*/
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+/*Change colour of responsive icon*/
+table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
+    background-color: #667eea !important; /*bg-indigo-500*/
+}
+
+.wp-core-ui .button, .wp-core-ui .button-secondary {
+    @apply text-sm rounded-md border text-indigo-500 leading-5 font-medium text-indigo-600;
+}
+
+.wp-core-ui .button-primary {
+    @apply text-sm rounded-md border leading-5 font-medium text-indigo-500 text-white transition ease-in-out duration-150;
+}
+
+.wp-core-ui .button-primary:hover {
+    @apply border-gray-600 text-gray-500;
+}
+
+.wp-core-ui .button:hover {
+    @apply border-gray-600 text-gray-500;
+}
+
+.wp-core-ui select, .wp-core-ui .search-box input[name="s"]{
+    @apply rounded-md;
+}
+
+.wp-core-ui #poststuff select, .wp-core-ui #bulk-action-selector-top, .wp-core-ui #filter-by-date, .wp-core-ui #search-submit, .wp-core-ui #doaction, .wp-core-ui #doaction2, .wp-core-ui #post-query-submit {
+    @apply cursor-pointer leading-5 text-gray-600 bg-transparent text-sm;
+}
+
+.wp-core-ui #search-submit{
+    @apply ml-1.5;
+}
+
+
+.wp-core-ui #search-submit:hover, .wp-core-ui #doaction:hover, .wp-core-ui #doaction2:hover .wp-core-ui #post-query-submit:hover {
+    @apply bg-gray-100 border-gray-500;
+}
+
+.wp-core-ui #search-submit:focus, .wp-core-ui #doaction:focus, .wp-core-ui #doaction2:focus .wp-core-ui #post-query-submit:focus {
+    @apply outline-none;
+}
+
+.kc-us-items-lists table.fixed {
+    @apply mt-4 mb-4;
+
+}
+
+
+/* Switch */
+.kc-us-check-toggle:checked ~ .kc-us-mail-toggle-line {
+    @apply bg-indigo-600;
+}
+
+.kc-us-check-toggle:checked ~ .kc-us-mail-toggle-dot {
+    @apply transform translate-x-full;
+}
+
+.kc-us-mail-toggle-line{
+    @apply w-9 h-5 block bg-gray-300 rounded-full shadow-inner;
+}
+.kc-us-mail-toggle-dot {
+    @apply w-3.5 h-3.5 ml-1 absolute inset-y-0 block transition-all duration-300 ease-in-out bg-white rounded-full shadow;
+}
+.kc-us-mail-toggle-dot:focus-within{
+
+}
+
+
+/* purgecss end ignore */
+
+@tailwind utilities;

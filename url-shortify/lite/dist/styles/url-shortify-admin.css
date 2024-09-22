@@ -1,0 +1,224 @@
+/**
+ * All of the CSS for your dashboard-specific functionality should be
+ * included in this file.
+ */
+
+
+.kc-us-items-lists-groups #created_at, .kc-us-items-lists-groups .column-created_at {
+    margin-right: 10px;
+}
+
+.kc-us-items-lists-groups #clicks, .kc-us-items-lists-groups #links {
+    width: 20%;
+}
+
+
+/* Frappe Chart CSS */
+
+
+/* Remove background horizontal lines from chart also remove label from X-axis */
+.frappe-chart .x.axis .line-vertical,
+.frappe-chart .x.axis text {
+    display: none;
+}
+
+
+/* Progress Bar - Start */
+.meter {
+    height: 30px;
+    position: relative;
+    background: #f3efe6;
+    overflow: hidden;
+}
+
+.meter span {
+    display: block;
+    height: 100%;
+}
+
+.progress {
+    background-color: #5850ec;
+    animation: progressBar 3s ease-in-out;
+    animation-fill-mode: both;
+    color: #FFEBE8;
+}
+
+@keyframes progressBar {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+/* Progress Bar - End */
+
+/* QR Code */
+.kc-us-qr-code .qr {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1px;
+    width: 50%;
+}
+
+/* Align search box with bulk action */
+
+.tablenav {
+    padding-top: 0px !important;
+    clear: none !important;
+}
+
+
+.kc-us-mail-toggle-dot{
+    margin-top: 0.19rem !important;
+    width: 0.85rem !important;
+    height: 0.8rem !important;
+}
+.kc-us-mail-toggle-line{
+    height: 1.2rem !important;
+}
+
+
+/* Social Share */
+
+.social .fbtn {
+    width: 50px;
+    display: inline-block;
+    color: #fff;
+    text-align: center;
+    line-height:18px;
+    float: left;
+}
+.social .fa {
+    padding:15px 0px;
+}
+
+.facebook {
+    background-color: #3b5998;
+}
+
+.gplus {
+    background-color: #dd4b39;
+}
+
+.twitter {
+    background-color: #55acee;
+}
+
+.stumbleupon {
+    background-color: #eb4924;
+}
+
+.pinterest {
+    background-color: #cc2127;
+}
+
+.linkedin {
+    background-color: #0077b5;
+}
+
+.buffer {
+    background-color: #323b43;
+}
+
+.whatsapp {
+    background-color: #25D366;
+}
+
+.pinterest {
+    background-color: #c8232c;
+}
+
+.telegram {
+    background-color: #0088cc;
+}
+
+.vkontakte {
+    background-color: #4c75a3;
+}
+
+.hackernews {
+    background-color: #ff6600;
+}
+
+.tumblr {
+    background-color: #34465d;
+}
+
+.line {
+    background-color: #00c300;
+}
+
+.email, .svg_qrcode {
+    background-color: #787878;
+}
+
+.qrcode {
+    background-color: #000000;
+}
+
+.share-button.sharer {
+    height: 20px;
+}
+
+.share-button.sharer .social.active.top {
+    transform: scale(1) translateY(-10px);
+}
+
+.share-button.sharer .social.active.bottom {
+    transform: scale(1) translateY(10px);
+}
+
+.share-button.sharer .social.active {
+    opacity: 1;
+    transition: all 0.4s ease 0s;
+    visibility: visible;
+}
+.share-button.sharer .social.networks-5 {
+
+}
+.share-button.sharer .social.top {
+    margin-top: -80px;
+    transform-origin: 0 0 0;
+}
+.share-button.sharer .social {
+    margin-left: -200px;
+    opacity: 0;
+    transition: all 0.4s ease 0s;
+    visibility: hidden;
+}
+
+.us-social {
+    display: none;
+}
+
+.column-title {
+    width: 20%;
+}
+
+p.search-box, .search-box #form-search-input, .search-box #search-submit {
+    margin: 0;
+}
+
+/** Tooltip Custom CSS - START */
+.kc-us-tooltip:hover .kc-us-tooltip-text {
+    visibility: visible;
+}
+
+.kc-us-tooltip .kc-us-tooltip-text  {
+    bottom: 25px;
+    transform: translate(-50%,0%);
+    left: 50%;
+    opacity: 0.9;
+}
+
+.kc-us-tooltip .kc-us-tooltip-text svg  {
+    left: 50%;
+    transform: translate(-50%, 0px);
+}
+
+.bulkactions input.kc-us-date-picker {
+    line-height: 1;
+}
+/** Tooltip Custom CSS - END */
