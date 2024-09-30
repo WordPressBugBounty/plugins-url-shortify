@@ -25,9 +25,9 @@ class Promo {
 	/**
 	 * Get Valid Promotions.
 	 *
-	 * @since 1.5.12.2
 	 * @return string[]
 	 *
+	 * @since 1.5.12.2
 	 */
 	public function get_valid_promotions() {
 		return [
@@ -35,7 +35,8 @@ class Promo {
 			'welcome_offer',
 			'anniversary_offer',
 			'june_2024_promotion',
-            'price_increase_notification'
+			'price_increase_notification',
+			'pre_launch_offer',
 		];
 	}
 
@@ -58,8 +59,8 @@ class Promo {
 					if ( 'lifetime' === sanitize_text_field( Helper::get_data( $_GET, 'billing_cycle', '' ) ) ) {
 						wp_safe_redirect( US()->get_pricing_url( 'lifetime' ) );
 					} elseif ( (boolean) Helper::get_data( $_GET, 'landing', false ) ) {
-                        $pricing = Helper::get_data( $_GET, 'pricing', false );
-                        wp_safe_redirect( US()->get_landing_page_url($pricing) );
+						$pricing = Helper::get_data( $_GET, 'pricing', false );
+						wp_safe_redirect( US()->get_landing_page_url( $pricing ) );
 					} else {
 						wp_safe_redirect( US()->get_pricing_url() );
 					}
@@ -97,39 +98,63 @@ class Promo {
 			'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
 		];
 
-        $month_end_sale_data = [
-            'start_date'                    => '2022-07-26',
-            'end_date'                      => '2022-08-02',
-            'total_links'                   => 1,
-            'start_after_installation_days' => 2,
-            'promotion'                     => 'jully_2022_month_end_promotion',
-            'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.', 'url-shortify' ),
-            'coupon_message'                => sprintf( __( 'Use coupon code <b class="text-green-800 px-1 py-1 text-xl">%s</b> to get flat <b class="text-2xl">$30</b> off on any plan', 'url-shortify' ), 'WELCOME30' ),
-        ];
+		$month_end_sale_data = [
+			'start_date'                    => '2022-07-26',
+			'end_date'                      => '2022-08-02',
+			'total_links'                   => 1,
+			'start_after_installation_days' => 2,
+			'promotion'                     => 'jully_2022_month_end_promotion',
+			'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.',
+				'url-shortify' ),
+			'coupon_message'                => sprintf( __( 'Use coupon code <b class="text-green-800 px-1 py-1 text-xl">%s</b> to get flat <b class="text-2xl">$30</b> off on any plan',
+				'url-shortify' ), 'WELCOME30' ),
+		];
 
-        $initial_upgrade_banner_data = [
-            'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.', 'url-shortify' ),
-            'total_links'                   => 3,
-            'start_after_installation_days' => 9,
-            'end_before_installation_days'  => 15,
-        ];
+		$initial_upgrade_banner_data = [
+			'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.',
+				'url-shortify' ),
+			'total_links'                   => 3,
+			'start_after_installation_days' => 9,
+			'end_before_installation_days'  => 15,
+		];
 
-        $welcome_offer_data = [
-            'total_links'                   => 3,
-            'start_after_installation_days' => 18,
-            'end_before_installation_days'  => 27,
-            'promotion'                     => 'welcome_offer',
-            'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.', 'url-shortify' ),
-            'coupon_message'                => sprintf( __( 'Use coupon code <b class="text-green-800 px-1 py-1 text-xl">%s</b> to get flat <b class="text-2xl">$30</b> off on any plan', 'url-shortify' ), 'WELCOME30' ),
-        ];
+		$welcome_offer_data = [
+			'total_links'                   => 3,
+			'start_after_installation_days' => 18,
+			'end_before_installation_days'  => 27,
+			'promotion'                     => 'welcome_offer',
+			'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.',
+				'url-shortify' ),
+			'coupon_message'                => sprintf( __( 'Use coupon code <b class="text-green-800 px-1 py-1 text-xl">%s</b> to get flat <b class="text-2xl">$30</b> off on any plan',
+				'url-shortify' ), 'WELCOME30' ),
+		];
 
-        $regular_upgrade_banner_data = [
-            'message'     => __( 'Unlock the Full Power of Historical Data with an Upgraded Plugin Plan! Upgrade Today to Access All Historical Data.', 'url-shortify' ),
-            'total_links' => 2,
-        ];
+		$regular_upgrade_banner_data = [
+			'message'     => __( 'Unlock the Full Power of Historical Data with an Upgraded Plugin Plan! Upgrade Today to Access All Historical Data.',
+				'url-shortify' ),
+			'total_links' => 2,
+		];
 
-        // Promotion.
-		if ( Helper::can_show_promotion( $price_increase_notification) ) {
+		$pre_launch_offer = [
+			'title'                         => "<b class='text-red-600 text-xl'>" . __( '🚀 Pre-launch Offer',
+					'update-urls' ) . "</b>",
+			'total_links'                   => 1,
+			'start_date'                    => '2024-09-20',
+			'end_date'                      => '2024-10-03',
+			'start_after_installation_days' => 0,
+			'pricing_url'                   => 'https://kaizencoders.com/social-linkz/',
+			'promotion'                     => 'pre_launch_offer',
+			'message'                       => __( '<p class="text-xl">Get <b>Update URLs</b> & <b>Social Linkz</b> (newly launched) PRO for Lifetime at Just $49 until <b class="text-red-600 text-xl">September 30, 2024</b></p>',
+				'update-urls' ),
+			'coupon_message'                => '',
+			'show_plan'                    => 'free',
+		];
+
+
+		// Promotion.
+		if ( Helper::can_show_promotion( $pre_launch_offer ) ) {
+			$this->show_promotion( 'pre_launch_offer', $pre_launch_offer );
+		} elseif ( Helper::can_show_promotion( $price_increase_notification ) ) {
 			$this->show_promotion( 'price_increase_notification', $price_increase_notification );
 		} elseif ( Helper::can_show_promotion( $month_end_sale_data ) ) {
 			$this->show_promotion( 'month_end_sale', $month_end_sale_data );
@@ -145,10 +170,10 @@ class Promo {
 	/**
 	 * Show Promotion.
 	 *
-	 * @since 1.5.12.2
-	 *
 	 * @param $data      array
 	 * @param $promotion string
+	 *
+	 * @since 1.5.12.2
 	 *
 	 */
 	public function show_promotion( $promotion, $data ) {
@@ -184,11 +209,11 @@ class Promo {
 	/**
 	 * Is Promo displayed and dismissed by user?
 	 *
-	 * @since 1.5.12.2
-	 *
 	 * @param $promo
 	 *
 	 * @return bool
+	 *
+	 * @since 1.5.12.2
 	 *
 	 */
 	public function is_promotion_dismissed( $promotion ) {

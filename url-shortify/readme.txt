@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.6.2
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -467,7 +467,7 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-**1.10.1 **
+**1.10.2 **
 
 * New: Add `get_the_shorturl()` method to generate short url of a current post, page etc..
 * New: Set Redirect URL after link expire. **[PRO]**
@@ -476,12 +476,17 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Changelog ==
 
-**1.10.1 [2024-09-20]**
+**1.10.2 [2024-09-26]**
 
 * New: Add `get_the_shorturl()` method to generate short url of a current post, page etc..
 * New: Set Redirect URL after link expire. **[PRO]**
-* Update: .POT file.
 * Update: Minor enhancements.
+* Update: .POT file.
+
+**1.10.1 [2024-09-20]**
+
+* Update: Minor enhancements.
+* Update: .POT file.
 
 **1.9.7 [2024-09-16]**
 
