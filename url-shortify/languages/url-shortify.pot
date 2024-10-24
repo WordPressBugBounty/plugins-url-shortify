@@ -2,29 +2,28 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 1.10.0\n"
+"Project-Id-Version: URL Shortify 1.10.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-09-20T15:55:15+00:00\n"
+"POT-Creation-Date: 2024-10-24T20:04:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
 
 #. Plugin Name of the plugin
 #: lite/includes/Admin.php:241
-#: lite/includes/Admin/Templates/other-products.php:13
+#: lite/includes/Admin/Templates/other-products.php:24
 #: lite/includes/Helper.php:398
 #: lite/language.php:4
 msgid "URL Shortify"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: lite/language.php:6
-msgid "http://wordpress.org/plugins/url-shortify"
+msgid "https://kaizencoders.com/url-shortify"
 msgstr ""
 
 #. Description of the plugin
@@ -63,7 +62,7 @@ msgstr ""
 #: lite/includes/Admin/Groups_Table.php:63
 #: lite/includes/Admin/Groups_Table.php:164
 #: lite/includes/Admin/Links_Table.php:213
-#: lite/includes/Admin/Templates/link-form.php:238
+#: lite/includes/Admin/Templates/link-form.php:240
 #: lite/includes/Helper.php:2545
 #: lite/language.php:15
 msgid "Groups"
@@ -138,7 +137,7 @@ msgid "Reports"
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:78
-#: lite/includes/Admin/Templates/link-form.php:164
+#: lite/includes/Admin/Templates/link-form.php:166
 #: lite/language.php:21
 msgid "Redirection"
 msgstr ""
@@ -828,24 +827,24 @@ msgstr ""
 msgid "Please enter Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1290
+#: lite/includes/Admin/Links_Table.php:1289
 #: lite/language.php:82
 msgid "Please enter valid Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1293
+#: lite/includes/Admin/Links_Table.php:1292
 msgid "Short URL already exists. Please use different Short URL."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1305
+#: lite/includes/Admin/Links_Table.php:1304
 msgid "Your link rotations weights should be equal or less than 100%"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1315
+#: lite/includes/Admin/Links_Table.php:1314
 msgid "Split test is enable. Please select goal link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1372
+#: lite/includes/Admin/Links_Table.php:1371
 #: lite/language.php:83
 msgid "Search Links"
 msgstr ""
@@ -908,7 +907,7 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/api-key-form.php:250
 #: lite/includes/Admin/Templates/group-form.php:70
-#: lite/includes/Admin/Templates/link-form.php:465
+#: lite/includes/Admin/Templates/link-form.php:467
 #: lite/language.php:113
 #: pro/includes/Admin/Templates/domain-form.php:56
 #: pro/includes/Admin/Templates/tracking-pixel-form.php:163
@@ -1186,67 +1185,71 @@ msgstr ""
 msgid "Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:138
+#: lite/includes/Admin/Templates/link-form.php:127
+msgid "You can not modify this target URL because this is attached to <a href=\"%s\" target=\"_blank\">this</a> post, page or custom post type."
+msgstr ""
+
+#: lite/includes/Admin/Templates/link-form.php:140
 #: lite/includes/Admin/Templates/widgets/dashboard-widget.php:24
 #: lite/language.php:123
 msgid "Short URL"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:200
+#: lite/includes/Admin/Templates/link-form.php:202
 #: lite/includes/Common/Export.php:85
 #: lite/language.php:124
 #: pro/includes/Admin/Domains_Table.php:36
 msgid "Domain"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:222
+#: lite/includes/Admin/Templates/link-form.php:224
 #: lite/language.php:125
 msgid "Select on which domain should this short link be accessible."
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:224
+#: lite/includes/Admin/Templates/link-form.php:226
 #: lite/language.php:126
 msgid "Want to use shortlinks with custom domains? <a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:269
+#: lite/includes/Admin/Templates/link-form.php:271
 #: lite/language.php:127
 msgid "No Group found. <a href=\"%s\">Create a new Group</a> and add link to group."
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:332
+#: lite/includes/Admin/Templates/link-form.php:334
 #: pro/includes/Actions.php:1727
 msgid "Dynamic Redirection"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:350
+#: lite/includes/Admin/Templates/link-form.php:352
 msgid "Want to redirect to different URLs's based on geo location, browser, os, device. Or do you want to rotate links and split test? <a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:371
+#: lite/includes/Admin/Templates/link-form.php:373
 #: lite/language.php:128
 #: pro/includes/Actions.php:302
 msgid "Expiration Date"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:388
+#: lite/includes/Admin/Templates/link-form.php:390
 #: lite/language.php:129
 msgid "Set expiry date of the link with PRO version. <a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:410
+#: lite/includes/Admin/Templates/link-form.php:412
 #: lite/language.php:130
 #: pro/includes/Actions.php:429
 #: pro/Templates/password.php:11
 msgid "Password"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:427
+#: lite/includes/Admin/Templates/link-form.php:429
 #: lite/language.php:131
 msgid "Protect your short link with password using PRO version. <a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-form.php:442
+#: lite/includes/Admin/Templates/link-form.php:444
 #: lite/language.php:132
 msgid "Notes"
 msgstr ""
@@ -1259,51 +1262,83 @@ msgstr ""
 msgid "Export Links"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:15
+#: lite/includes/Admin/Templates/other-products.php:14
+msgid "Social Linkz"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:16
+msgid "Lightweight and fast social media sharing plugin"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:26
 msgid "Simple, Powerful and Easy URL Shortener Plugin For WordPress"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:23
+#: lite/includes/Admin/Templates/other-products.php:35
 msgid "Update URLs"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:25
+#: lite/includes/Admin/Templates/other-products.php:37
 msgid "Quick and Easy way to search old links and replace them with new links in WordPress"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:33
+#: lite/includes/Admin/Templates/other-products.php:46
+msgid "Logify"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:48
+msgid "Simple and Easy To Use Activity Log Plugin For WordPress"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:58
+msgid "Magic Link"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:60
+msgid "Simple, Easy and Secure one click login for WordPress."
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:70
+msgid "Zapify"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:72
+msgid "Transform your WordPress experience by automating repetitive tasks effortlessly"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:82
 msgid "Utilitify"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:35
+#: lite/includes/Admin/Templates/other-products.php:84
 msgid "Supercharge Your WordPress Site With Powerpack WordPress Utilities"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:75
+#: lite/includes/Admin/Templates/other-products.php:133
 msgid "Status"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:77
+#: lite/includes/Admin/Templates/other-products.php:135
 msgid "Active"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:79
+#: lite/includes/Admin/Templates/other-products.php:138
 msgid "Inactive"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:81
+#: lite/includes/Admin/Templates/other-products.php:141
 msgid "Not Installed"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:95
+#: lite/includes/Admin/Templates/other-products.php:157
 msgid "Buy Now"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:98
+#: lite/includes/Admin/Templates/other-products.php:161
 msgid "Install"
 msgstr ""
 
-#: lite/includes/Admin/Templates/other-products.php:103
+#: lite/includes/Admin/Templates/other-products.php:167
 msgid "Activate"
 msgstr ""
 
@@ -1784,30 +1819,42 @@ msgstr ""
 msgid "At the %1$s of <b>%2$s</b>"
 msgstr ""
 
-#: lite/includes/Promo.php:82
-msgid "Important Announcement"
-msgstr ""
-
-#: lite/includes/Promo.php:90
-msgid "<p class=\"text-xl\">Buy an annual/lifetime URL Shortify PRO plan at the old price until <b class=\"text-red-600 text-xl\">September 2, 2024</b></p>"
+#: lite/includes/Promo.php:84
+msgid "Holiday Prep Sale"
 msgstr ""
 
 #: lite/includes/Promo.php:92
+msgid "<p class=\"text-xl\">Buy an annual/lifetime URL Shortify PRO plan at <b class=\"text-2xl\">flat 30%</b> discount until <b class=\"text-red-600 text-xl\">November 2, 2024</b></p>"
+msgstr ""
+
+#: lite/includes/Promo.php:94
+msgid "Use Coupon Code - <b>HOLIDAY</b>"
+msgstr ""
+
+#: lite/includes/Promo.php:101
+msgid "Important Announcement"
+msgstr ""
+
+#: lite/includes/Promo.php:109
+msgid "<p class=\"text-xl\">Buy an annual/lifetime URL Shortify PRO plan at the old price until <b class=\"text-red-600 text-xl\">September 2, 2024</b></p>"
+msgstr ""
+
+#: lite/includes/Promo.php:111
 msgid "Starting September 2, our updated pricing will apply to all our subscription plans... <b><a href=\"%s\" target=\"_blank\">Learn More</a></b>"
 msgstr ""
 
-#: lite/includes/Promo.php:106
-#: lite/includes/Promo.php:111
-#: lite/includes/Promo.php:122
+#: lite/includes/Promo.php:125
+#: lite/includes/Promo.php:132
+#: lite/includes/Promo.php:144
 msgid "Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data."
 msgstr ""
 
-#: lite/includes/Promo.php:107
-#: lite/includes/Promo.php:123
+#: lite/includes/Promo.php:127
+#: lite/includes/Promo.php:146
 msgid "Use coupon code <b class=\"text-green-800 px-1 py-1 text-xl\">%s</b> to get flat <b class=\"text-2xl\">$30</b> off on any plan"
 msgstr ""
 
-#: lite/includes/Promo.php:127
+#: lite/includes/Promo.php:151
 msgid "Unlock the Full Power of Historical Data with an Upgraded Plugin Plan! Upgrade Today to Access All Historical Data."
 msgstr ""
 
@@ -1817,6 +1864,10 @@ msgstr ""
 
 #: lite/includes/Settings.php:213
 msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: lite/language.php:6
+msgid "http://wordpress.org/plugins/url-shortify"
 msgstr ""
 
 #: lite/language.php:18
@@ -1894,7 +1945,7 @@ msgid "Hacker News"
 msgstr ""
 
 #: lite/language.php:170
-#: pro/includes/Actions.php:2269
+#: pro/includes/Actions.php:2271
 #: pro/includes/Settings.php:80
 msgid "QR Code"
 msgstr ""
@@ -2132,119 +2183,119 @@ msgstr ""
 msgid "Goal Link"
 msgstr ""
 
-#: pro/includes/Actions.php:2178
+#: pro/includes/Actions.php:2180
 msgid "Enable Nofollow"
 msgstr ""
 
-#: pro/includes/Actions.php:2179
+#: pro/includes/Actions.php:2181
 msgid "Disable Nofollow"
 msgstr ""
 
-#: pro/includes/Actions.php:2180
+#: pro/includes/Actions.php:2182
 msgid "Enable Parameters Forwarding"
 msgstr ""
 
-#: pro/includes/Actions.php:2181
+#: pro/includes/Actions.php:2183
 msgid "Disable Parameters Forwarding"
 msgstr ""
 
-#: pro/includes/Actions.php:2182
+#: pro/includes/Actions.php:2184
 msgid "Enable Tracking"
 msgstr ""
 
-#: pro/includes/Actions.php:2183
+#: pro/includes/Actions.php:2185
 msgid "Disable Tracking"
 msgstr ""
 
-#: pro/includes/Actions.php:2184
+#: pro/includes/Actions.php:2186
 msgid "Enable Sponsored"
 msgstr ""
 
-#: pro/includes/Actions.php:2185
+#: pro/includes/Actions.php:2187
 msgid "Disable Sponsored"
 msgstr ""
 
-#: pro/includes/Actions.php:2186
+#: pro/includes/Actions.php:2188
 msgid "Add Expiry"
 msgstr ""
 
-#: pro/includes/Actions.php:2187
+#: pro/includes/Actions.php:2189
 msgid "Reset Stats"
 msgstr ""
 
-#: pro/includes/Actions.php:2204
+#: pro/includes/Actions.php:2206
 msgid "Bookmarklet"
 msgstr ""
 
-#: pro/includes/Actions.php:2359
+#: pro/includes/Actions.php:2361
 msgid "Generate Short Link"
 msgstr ""
 
-#: pro/includes/Actions.php:2405
+#: pro/includes/Actions.php:2407
 msgid "Short links generated for %d posts successfully!."
 msgstr ""
 
-#: pro/includes/Actions.php:2423
+#: pro/includes/Actions.php:2425
 msgid "Additional Link Parameters"
 msgstr ""
 
-#: pro/includes/Actions.php:2425
+#: pro/includes/Actions.php:2427
 msgid "Nofollow (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2426
+#: pro/includes/Actions.php:2428
 msgid "Nofollow (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2427
+#: pro/includes/Actions.php:2429
 msgid "Sponsored (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2428
+#: pro/includes/Actions.php:2430
 msgid "Sponsored (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2429
+#: pro/includes/Actions.php:2431
 msgid "Parameter Forwarding (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2430
+#: pro/includes/Actions.php:2432
 msgid "Parameter Forwarding (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2431
+#: pro/includes/Actions.php:2433
 msgid "Tracking (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2432
+#: pro/includes/Actions.php:2434
 msgid "Tracking (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:2438
+#: pro/includes/Actions.php:2440
 msgid "Password Protected Links"
 msgstr ""
 
-#: pro/includes/Actions.php:2440
+#: pro/includes/Actions.php:2442
 msgid "Yes"
 msgstr ""
 
-#: pro/includes/Actions.php:2441
+#: pro/includes/Actions.php:2443
 msgid "No"
 msgstr ""
 
-#: pro/includes/Actions.php:2447
+#: pro/includes/Actions.php:2449
 msgid "Time Bound Links"
 msgstr ""
 
-#: pro/includes/Actions.php:2449
+#: pro/includes/Actions.php:2451
 msgid "Expired Links"
 msgstr ""
 
-#: pro/includes/Actions.php:2450
+#: pro/includes/Actions.php:2452
 msgid "Non-Expired Links"
 msgstr ""
 
-#: pro/includes/Actions.php:2451
+#: pro/includes/Actions.php:2453
 msgid "Expiration Date Not Set"
 msgstr ""
 
@@ -2451,7 +2502,7 @@ msgid "Roles"
 msgstr ""
 
 #: pro/includes/Settings.php:426
-msgid "Auto replace short URL tag?"
+msgid "Auto replace short URL tag in content?"
 msgstr ""
 
 #: pro/includes/Settings.php:430

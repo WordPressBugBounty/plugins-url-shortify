@@ -12,7 +12,7 @@ $kaizencoders_url = 'https://kaizencoders.com';
 $plugins = [
 	[
 		'title'       => __( 'Social Linkz', 'url-shortify' ),
-		'logo'        => 'https://ps.w.org/social-linkz/assets/icon-256x256.png?rev=2906612',
+		'logo'        => 'https://ps.w.org/social-linkz/assets/icon-256x256.png',
 		'desc'        => __( 'Lightweight and fast social media sharing plugin', 'url-shortify' ),
 		'name'        => 'social-linkz/social-linkz.php',
 		'install_url' => admin_url( 'plugin-install.php?s=social-likz&tab=search&type=term' ),
@@ -22,7 +22,7 @@ $plugins = [
 	],
 	[
 		'title'       => __( 'URL Shortify', 'url-shortify' ),
-		'logo'        => 'https://ps.w.org/url-shortify/assets/icon-256x256.png?rev=2906612',
+		'logo'        => 'https://ps.w.org/url-shortify/assets/icon-256x256.png',
 		'desc'        => __( 'Simple, Powerful and Easy URL Shortener Plugin For WordPress', 'url-shortify' ),
 		'name'        => 'url-shortify/url-shortify.php',
 		'install_url' => admin_url( 'plugin-install.php?s=url+shortify&tab=search&type=term' ),
@@ -33,7 +33,7 @@ $plugins = [
 
 	[
 		'title'       => __( 'Update URLs', 'url-shortify' ),
-		'logo'        => 'https://ps.w.org/update-urls/assets/icon-256x256.png?rev=2906612',
+		'logo'        => 'https://ps.w.org/update-urls/assets/icon-256x256.png',
 		'desc'        => __( 'Quick and Easy way to search old links and replace them with new links in WordPress',
 			'url-shortify' ),
 		'name'        => 'update-urls/update-urls.php',
@@ -42,10 +42,45 @@ $plugins = [
 		'is_premium'  => false,
 		'slug'        => 'update-urls',
 	],
+	[
+		'title'       => __( 'Logify', 'url-shortify' ),
+		'logo'        => 'https://ps.w.org/logify/assets/icon-256x256.png',
+		'desc'        => __( 'Simple and Easy To Use Activity Log Plugin For WordPress',
+			'url-shortify' ),
+		'name'        => 'logify/logify.php',
+		'install_url' => admin_url( 'plugin-install.php?s=logify&tab=search&type=term' ),
+		'plugin_url'  => 'https://wordpress.org/plugins/logify/',
+		'is_premium'  => false,
+		'slug'        => 'logify',
+	],
+
+	[
+		'title'       => __( 'Magic Link', 'url-shortify' ),
+		'logo'        => 'https://ps.w.org/magic-link/assets/icon-256x256.png',
+		'desc'        => __( 'Simple, Easy and Secure one click login for WordPress.',
+			'url-shortify' ),
+		'name'        => 'magic-link/magic-link.php',
+		'install_url' => admin_url( 'plugin-install.php?s=magic-link&tab=search&type=term' ),
+		'plugin_url'  => 'https://wordpress.org/plugins/magic-link/',
+		'is_premium'  => false,
+		'slug'        => 'magic-link',
+	],
+
+	[
+		'title'       => __( 'Zapify', 'url-shortify' ),
+		'logo'        => 'https://ps.w.org/zapify/assets/icon-256x256.png?rev=3171937',
+		'desc'        => __( 'Transform your WordPress experience by automating repetitive tasks effortlessly',
+			'url-shortify' ),
+		'name'        => 'zapify/zapify.php',
+		'install_url' => admin_url( 'plugin-install.php?s=zapify&tab=search&type=term' ),
+		'plugin_url'  => 'https://wordpress.org/plugins/zapify/',
+		'is_premium'  => false,
+		'slug'        => 'zapify',
+	],
 
 	[
 		'title'       => __( 'Utilitify', 'url-shortify' ),
-		'logo'        => 'https://ps.w.org/utilitify/assets/icon-256x256.png?rev=2906612',
+		'logo'        => 'https://ps.w.org/utilitify/assets/icon-256x256.png',
 		'desc'        => __( 'Supercharge Your WordPress Site With Powerpack WordPress Utilities', 'url-shortify' ),
 		'name'        => 'utilitify/utilitify.php',
 		'install_url' => admin_url( 'plugin-install.php?s=utilitify&tab=search&type=term' ),

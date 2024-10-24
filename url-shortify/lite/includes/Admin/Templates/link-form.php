@@ -111,18 +111,20 @@ $settings = array(
                                 </div>
                             </div>
                             <div class="flex w-4/5">
-                                <div class="w-full h-10 mt-4 mb-4 ml-16 mr-4">
+                                <div class="w-full h-10 mt-4 mb-10 ml-16 mr-4">
                                     <div class="relative h-10">
 										<?php if ( empty( Helper::get_data( $form_data, 'cpt_id', '' ) ) ) { ?>
                                             <textarea id="about" rows="2" cols="53"
                                                       class="block w-2/3 transition duration-150 ease-in-out border-gray-400 form-textarea sm:text-sm sm:leading-5"
-                                                      name="form_data[url]"><?php echo esc_url(Helper::get_data( $form_data, 'url', '' )); ?></textarea>
+                                                      name="form_data[url]"><?php echo Helper::get_data( $form_data, 'url', '' ); ?></textarea>
 										<?php } else { ?>
-                                            <span class="inline-flex items-center px-3 py-3 text-gray-500 bg-gray-200 border border-gray-400 rounded-l-md sm:text-sm">
-											<?php echo esc_url( Helper::get_data( $form_data, 'url', '' ) ); ?>
+                                            <div class="inline-flex items-center px-3 py-3 text-gray-500 bg-gray-200 border border-gray-400 rounded-md sm:text-sm">
+											<?php echo Helper::get_data( $form_data, 'url', '' ); ?>
 											  <input type="hidden" name="form_data[url]"
                                                      value="<?php echo esc_url( Helper::get_data( $form_data, 'url', '' ) ); ?>"/>
-										</span>
+										    </div>
+
+                                            <p class="field-desciption mb-10 text-xs italic font-normal leading-snug text-gray-500 helper mt-2"><?php echo sprintf(__('You can not modify this target URL because this is attached to <a href="%s" target="_blank">this</a> post, page or custom post type.', 'url-shortify'),esc_url( Helper::get_data( $form_data, 'url', '' )), esc_url( Helper::get_data( $form_data, 'url', '' ) )); ?></p>
 
 										<?php } ?>
                                     </div>

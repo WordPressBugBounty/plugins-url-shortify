@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.6.2
-Stable tag: 1.10.2
+Stable tag: 1.10.3
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -287,6 +287,10 @@ If you like this plugin then consider checking out our other solutions:
 
 > Easily place social share icon on your posts, pages etc..
 
+[Logify](https://wordpress.org/plugins/logify/) - Simple & Easy to use activity log plugin for monitor & record system changes
+
+[Magic Link](https://wordpress.org/plugins/magic-link/) - Simple, Easy and Secure one click login for WordPress
+
 [Utilitify](https://wordpress.org/plugins/utilitify/) - Supercharge Your WordPress Site With Power Pack WordPress Utilities
 
 > It’s a simple & neat plugin which helps you to customize your WordPress setup in a very elegant way.
@@ -467,14 +471,19 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-**1.10.2 **
+**1.10.3 **
 
-* New: Add `get_the_shorturl()` method to generate short url of a current post, page etc..
-* New: Set Redirect URL after link expire. **[PRO]**
-* Update: .POT file.
-* Update: Minor enhancements.
+* New: Add deep link support.
+* Update: Assets.
+* Update: .POT file
 
 == Changelog ==
+
+**1.10.3 [2024-10-25]**
+
+* New: Add deep link support.
+* Update: Assets.
+* Update: .POT file
 
 **1.10.2 [2024-09-26]**
 

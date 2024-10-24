@@ -391,7 +391,7 @@ class Links extends Base_DB {
 
 		$form_data = [
 			'name'              => Helper::get_data( $data, 'name', '', true ),
-			'url'               => esc_url_raw( Helper::get_data( $data, 'url', '' ) ),
+			'url'               => Helper::get_data( $data, 'url', '' ),
 			'slug'              => trim( $slug, '/' ),
 			'redirect_type'     => Helper::get_data( $data, 'redirect_type', $default_redirection_type, true ),
 			'description'       => sanitize_textarea_field( Helper::get_data( $data, 'description', '' ) ),

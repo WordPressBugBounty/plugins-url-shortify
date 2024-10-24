@@ -37,6 +37,7 @@ class Promo {
 			'june_2024_promotion',
 			'price_increase_notification',
 			'pre_launch_offer',
+			'helloween_offer',
 		];
 	}
 
@@ -79,6 +80,23 @@ class Promo {
 	 * @since 1.5.12.2
 	 */
 	public function handle_promotions() {
+		$helloween_offer = [
+			'title'                         => "<b class='text-red-600 text-xl'>" . __( 'Holiday Prep Sale',
+					'url-shortify' ) . "</b>",
+			'start_date'                    => '2024-10-24',
+			'end_date'                      => '2024-11-02',
+			'total_links'                   => 1,
+			'start_after_installation_days' => 0,
+			'pricing_url'                   => US()->get_pricing_url( 'yearly' ),
+			'promotion'                     => 'helloween_offer',
+			'message'                       => __( '<p class="text-xl">Buy an annual/lifetime URL Shortify PRO plan at <b class="text-2xl">flat 30%</b> discount until <b class="text-red-600 text-xl">November 2, 2024</b></p>',
+				'url-shortify' ),
+			'coupon_message'                => __( 'Use Coupon Code - <b>HOLIDAY</b>', 'url-shortify' ),
+			'show_upgrade'                  => true,
+			'show_plan'                     => 'free',
+			'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
+		];
+
 		$price_increase_notification = [
 			'title'                         => "<b class='text-red-600 text-xl'>" . __( 'Important Announcement',
 					'url-shortify' ) . "</b>",
@@ -147,12 +165,14 @@ class Promo {
 			'message'                       => __( '<p class="text-xl">Get <b>Update URLs</b> & <b>Social Linkz</b> (newly launched) PRO for Lifetime at Just $49 until <b class="text-red-600 text-xl">September 30, 2024</b></p>',
 				'update-urls' ),
 			'coupon_message'                => '',
-			'show_plan'                    => 'free',
+			'show_plan'                     => 'free',
 		];
 
 
 		// Promotion.
 		if ( Helper::can_show_promotion( $pre_launch_offer ) ) {
+			$this->show_promotion( 'helloween_offer', $helloween_offer );
+		} elseif ( Helper::can_show_promotion( $pre_launch_offer ) ) {
 			$this->show_promotion( 'pre_launch_offer', $pre_launch_offer );
 		} elseif ( Helper::can_show_promotion( $price_increase_notification ) ) {
 			$this->show_promotion( 'price_increase_notification', $price_increase_notification );

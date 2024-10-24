@@ -830,4 +830,27 @@ class Utils {
 
 		return bin2hex( openssl_random_pseudo_bytes( 20 ) );
 	}
+
+	/**
+	 * Check if URL is valid or not.
+	 *
+	 * @param $url
+	 * @param $allow_deep_link
+	 *
+	 * @return bool
+	 */
+	public static function validate_url( $url = '', $allow_deep_link = false ) {
+		// Validate a normal URL
+		if ( preg_match( "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",
+			$url ) ) {
+			return true;
+		}
+
+		if ( $allow_deep_link ) {
+			// Check if it's a deep link
+			return preg_match( '/^[a-zA-Z]+:\/\/.+$/', $url ) === 1;
+		}
+
+		return false;
+	}
 }

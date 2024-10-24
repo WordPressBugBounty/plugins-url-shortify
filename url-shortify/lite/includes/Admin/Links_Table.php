@@ -1285,8 +1285,7 @@ class Links_Table extends US_List_Table {
 			if ( empty( $target_url ) ) {
 				$messages[] = __( 'Please enter Target URL', 'url-shortify' );
 				$error      = true;
-			} elseif ( ! preg_match( "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",
-				$target_url ) ) {
+			} elseif ( ! Utils::validate_url($target_url, true) ) {
 				$messages[] = __( 'Please enter valid Target URL', 'url-shortify' );
 				$error      = true;
 			} elseif ( $no_equal_slug && Utils::is_slug_exists( $slug ) ) {
