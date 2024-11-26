@@ -31,6 +31,7 @@ class Promo {
 	 */
 	public function get_valid_promotions() {
 		return [
+			'bfcm_2024_offer',
 			'initial_upgrade',
 			'welcome_offer',
 			'anniversary_offer',
@@ -80,40 +81,22 @@ class Promo {
 	 * @since 1.5.12.2
 	 */
 	public function handle_promotions() {
-		$helloween_offer = [
-			'title'                         => "<b class='text-red-600 text-xl'>" . __( 'Holiday Prep Sale',
+		$bfcm_2024_offer = [
+			'title'                         => "<b class='text-red-600 text-xl'>" . __( 'BFCM Sale is live',
 					'url-shortify' ) . "</b>",
-			'start_date'                    => '2024-10-24',
-			'end_date'                      => '2024-11-02',
+			'start_date'                    => '2024-11-20',
+			'end_date'                      => '2024-12-08',
 			'total_links'                   => 1,
 			'start_after_installation_days' => 0,
 			'pricing_url'                   => US()->get_pricing_url( 'yearly' ),
-			'promotion'                     => 'helloween_offer',
-			'message'                       => __( '<p class="text-xl">Buy an annual/lifetime URL Shortify PRO plan at <b class="text-2xl">flat 30%</b> discount until <b class="text-red-600 text-xl">November 2, 2024</b></p>',
+			'promotion'                     => 'bfcm_2024_offer',
+			'message'                       => __( '<p class="text-xl">Buy an annual/lifetime URL Shortify PRO plan at <b class="text-2xl">flat 50%</b> discount until <b class="text-red-600 text-xl">December 6, 2024</b></p>',
 				'url-shortify' ),
-			'coupon_message'                => __( 'Use Coupon Code - <b>HOLIDAY</b>', 'url-shortify' ),
+			'coupon_message'                => __( 'Use Coupon Code - <b>BFCM2024</b>', 'url-shortify' ),
 			'show_upgrade'                  => true,
 			'show_plan'                     => 'free',
 			'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
-		];
-
-		$price_increase_notification = [
-			'title'                         => "<b class='text-red-600 text-xl'>" . __( 'Important Announcement',
-					'url-shortify' ) . "</b>",
-			'start_date'                    => '2024-08-20',
-			'end_date'                      => '2024-09-03',
-			'total_links'                   => 1,
-			'start_after_installation_days' => 0,
-			'pricing_url'                   => US()->get_pricing_url( 'yearly' ),
-			'promotion'                     => 'price_increase_notification',
-			'message'                       => __( '<p class="text-xl">Buy an annual/lifetime URL Shortify PRO plan at the old price until <b class="text-red-600 text-xl">September 2, 2024</b></p>',
-				'url-shortify' ),
-			'coupon_message'                => sprintf( __( 'Starting September 2, our updated pricing will apply to all our subscription plans... <b><a href="%s" target="_blank">Learn More</a></b>',
-				'url-shortify' ),
-				'https://docs.kaizencoders.com/announcements/important-buy-an-annual-lifetime-url-shortify-pro-plan-at-the-old-price-until-september-2-2024?utm_source=plugin&utm_medium=notification&utm_campaign=price_increase_august_2024' ),
-			'show_upgrade'                  => false,
-			'show_plan'                     => 'free',
-			'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
+			'banner'                        => true
 		];
 
 		$month_end_sale_data = [
@@ -153,29 +136,9 @@ class Promo {
 			'total_links' => 2,
 		];
 
-		$pre_launch_offer = [
-			'title'                         => "<b class='text-red-600 text-xl'>" . __( '🚀 Pre-launch Offer',
-					'update-urls' ) . "</b>",
-			'total_links'                   => 1,
-			'start_date'                    => '2024-09-20',
-			'end_date'                      => '2024-10-03',
-			'start_after_installation_days' => 0,
-			'pricing_url'                   => 'https://kaizencoders.com/social-linkz/',
-			'promotion'                     => 'pre_launch_offer',
-			'message'                       => __( '<p class="text-xl">Get <b>Update URLs</b> & <b>Social Linkz</b> (newly launched) PRO for Lifetime at Just $49 until <b class="text-red-600 text-xl">September 30, 2024</b></p>',
-				'update-urls' ),
-			'coupon_message'                => '',
-			'show_plan'                     => 'free',
-		];
-
-
 		// Promotion.
-		if ( Helper::can_show_promotion( $pre_launch_offer ) ) {
-			$this->show_promotion( 'helloween_offer', $helloween_offer );
-		} elseif ( Helper::can_show_promotion( $pre_launch_offer ) ) {
-			$this->show_promotion( 'pre_launch_offer', $pre_launch_offer );
-		} elseif ( Helper::can_show_promotion( $price_increase_notification ) ) {
-			$this->show_promotion( 'price_increase_notification', $price_increase_notification );
+		if ( Helper::can_show_promotion( $bfcm_2024_offer ) ) {
+			$this->show_promotion( 'bfcm_2024_offer', $bfcm_2024_offer );
 		} elseif ( Helper::can_show_promotion( $month_end_sale_data ) ) {
 			$this->show_promotion( 'month_end_sale', $month_end_sale_data );
 		} elseif ( Helper::can_show_promotion( $initial_upgrade_banner_data ) ) {

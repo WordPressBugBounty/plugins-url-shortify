@@ -3,7 +3,7 @@
         'name' => 'kaizen-coders/url-shortify',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '125b82d7d2dab9d5c74301fc20a792fcbcbb5f99',
+        'reference' => '26439adbe31c79b8b1163a1ee69661a4d3181fec',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'kaizen-coders/url-shortify' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '125b82d7d2dab9d5c74301fc20a792fcbcbb5f99',
+            'reference' => '26439adbe31c79b8b1163a1ee69661a4d3181fec',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

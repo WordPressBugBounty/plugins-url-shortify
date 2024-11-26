@@ -20,7 +20,7 @@ class Helper {
 	/**
 	 * Whether given user is an administrator.
 	 *
-	 * @param  \WP_User  $user  The given user.
+	 * @param \WP_User $user The given user.
 	 *
 	 * @return bool
 	 */
@@ -39,11 +39,11 @@ class Helper {
 	/**
 	 * What type of request is this?
 	 *
-	 * @since 1.0.0
-	 *
-	 * @param  string  $type  admin, ajax, cron, cli or frontend.
+	 * @param string $type admin, ajax, cron, cli or frontend.
 	 *
 	 * @return bool
+	 * @since 1.0.0
+	 *
 	 */
 	public function request( $type ) {
 		switch ( $type ) {
@@ -80,9 +80,9 @@ class Helper {
 	/**
 	 * Is admin
 	 *
+	 * @return boolean
 	 * @since 1.0.0
 	 *
-	 * @return boolean
 	 */
 	public function is_admin_backend() {
 		return is_user_logged_in() && is_admin();
@@ -91,9 +91,9 @@ class Helper {
 	/**
 	 * Is ajax
 	 *
+	 * @return boolean
 	 * @since 1.0.0
 	 *
-	 * @return boolean
 	 */
 	public function is_ajax() {
 		return ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) || defined( 'DOING_AJAX' );
@@ -102,9 +102,9 @@ class Helper {
 	/**
 	 * Is rest
 	 *
+	 * @return boolean
 	 * @since 1.0.0
 	 *
-	 * @return boolean
 	 */
 	public function is_rest() {
 		return defined( 'REST_REQUEST' );
@@ -113,9 +113,9 @@ class Helper {
 	/**
 	 * Is cron
 	 *
+	 * @return boolean
 	 * @since 1.0.0
 	 *
-	 * @return boolean
 	 */
 	public function is_cron() {
 		return ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) || defined( 'DOING_CRON' );
@@ -124,9 +124,9 @@ class Helper {
 	/**
 	 * Is frontend
 	 *
+	 * @return boolean
 	 * @since 1.0.0
 	 *
-	 * @return boolean
 	 */
 	public function is_frontend() {
 		return ( ! $this->is_admin_backend() || ! $this->is_ajax() ) && ! $this->is_cron() && ! $this->is_rest();
@@ -135,9 +135,9 @@ class Helper {
 	/**
 	 * Is cli
 	 *
+	 * @return boolean
 	 * @since 1.0.0
 	 *
-	 * @return boolean
 	 */
 	public function is_cli() {
 		return defined( 'WP_CLI' ) && WP_CLI;
@@ -146,11 +146,12 @@ class Helper {
 	/**
 	 * Define constant
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param $value
 	 *
 	 * @param $name
+	 *
+	 * @since 1.0.0
+	 *
 	 */
 	public static function maybe_define_constant( $name, $value ) {
 		if ( ! defined( $name ) ) {
@@ -191,11 +192,11 @@ class Helper {
 	/**
 	 * Format date time
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param $date
 	 *
 	 * @return string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public static function format_date_time( $date ) {
@@ -265,11 +266,11 @@ class Helper {
 	 *
 	 * Handles both IPv4 and IPv6 addresses.
 	 *
-	 * @since 1.5.0
-	 *
 	 * @param $ip
 	 *
 	 * @return false|mixed
+	 *
+	 * @since 1.5.0
 	 *
 	 */
 	public static function is_ip_address( $ip ) {
@@ -285,8 +286,8 @@ class Helper {
 	/**
 	 * Get GMT Offset
 	 *
-	 * @param  bool  $in_seconds
-	 * @param  null  $timestamp
+	 * @param bool $in_seconds
+	 * @param null $timestamp
 	 *
 	 * @return float|int
 	 *
@@ -336,9 +337,9 @@ class Helper {
 	 * Insert a value or key/value pair before a specific key in an array.  If key doesn't exist, value is prepended
 	 * to the beginning of the array.
 	 *
-	 * @param  array  $array
-	 * @param  string  $key
-	 * @param  array  $new
+	 * @param array $array
+	 * @param string $key
+	 * @param array $new
 	 *
 	 * @return array
 	 */
@@ -388,9 +389,9 @@ class Helper {
 	/**
 	 * Get all Plugin admin screens
 	 *
-	 * @since 1.0.0
 	 * @return array|mixed|void
 	 *
+	 * @since 1.0.0
 	 */
 	public static function get_plugin_admin_screens() {
 
@@ -418,11 +419,11 @@ class Helper {
 	/**
 	 * Is es admin screen?
 	 *
-	 * @since 1.0.0
-	 *
-	 * @param  string  $screen_id  Admin screen id
+	 * @param string $screen_id Admin screen id
 	 *
 	 * @return bool
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public static function is_plugin_admin_screen( $screen_id = '' ) {
@@ -449,9 +450,9 @@ class Helper {
 	/**
 	 * Get Current Screen Id
 	 *
-	 * @since 1.0.0
 	 * @return string
 	 *
+	 * @since 1.0.0
 	 */
 	public static function get_current_screen_id() {
 
@@ -469,15 +470,15 @@ class Helper {
 	/**
 	 * Get data from array
 	 *
-	 * @since 1.0.0
+	 * @param string $var
+	 * @param string $default
+	 * @param bool $clean
 	 *
-	 * @param  string  $var
-	 * @param  string  $default
-	 * @param  bool  $clean
-	 *
-	 * @param  array  $array
+	 * @param array $array
 	 *
 	 * @return array|string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public static function get_data( $array = [], $var = '', $default = '', $clean = false ) {
@@ -515,14 +516,14 @@ class Helper {
 	/**
 	 * Get POST | GET data from $_REQUEST
 	 *
-	 * @since 1.0.0
+	 * @param string $default
+	 * @param bool $clean
 	 *
-	 * @param  string  $default
-	 * @param  bool  $clean
-	 *
-	 * @param  string  $var
+	 * @param string $var
 	 *
 	 * @return array|string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public static function get_request_data( $var = '', $default = '', $clean = true ) {
@@ -532,14 +533,14 @@ class Helper {
 	/**
 	 * Get POST data from $_POST
 	 *
-	 * @since 1.0.0
+	 * @param string $default
+	 * @param bool $clean
 	 *
-	 * @param  string  $default
-	 * @param  bool  $clean
-	 *
-	 * @param  string  $var
+	 * @param string $var
 	 *
 	 * @return array|string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public static function get_post_data( $var = '', $default = '', $clean = true ) {
@@ -549,11 +550,11 @@ class Helper {
 	/**
 	 * Get Current blog url with or without prefix.
 	 *
+	 * @return string
+	 *
 	 * @since    1.0.0
 	 *
 	 * @modified 1.5.12
-	 * @return string
-	 *
 	 */
 	public static function get_blog_url( $with_prefix = false ) {
 		$blog_id = null;
@@ -587,7 +588,7 @@ class Helper {
 	/**
 	 * Get slug with prefix.
 	 *
-	 * @param  string  $slug
+	 * @param string $slug
 	 *
 	 * @return string
 	 *
@@ -608,9 +609,9 @@ class Helper {
 	/**
 	 * Get link prefix.
 	 *
-	 * @since 1.7.5
 	 * @return array|data|string
 	 *
+	 * @since 1.7.5
 	 */
 	public static function get_link_prefix() {
 		$settings = US()->get_settings();
@@ -623,13 +624,13 @@ class Helper {
 	/**
 	 * Get short link
 	 *
-	 * @since 1.0.0
+	 * @param array $link_data
 	 *
-	 * @param  array  $link_data
-	 *
-	 * @param  string  $slug
+	 * @param string $slug
 	 *
 	 * @return string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public static function get_short_link( $slug = '', $link_data = [] ) {
@@ -650,11 +651,11 @@ class Helper {
 	/**
 	 * Get short link by link id
 	 *
-	 * @since 1.2.10
-	 *
-	 * @param  string  $id
+	 * @param string $id
 	 *
 	 * @return string
+	 *
+	 * @since 1.2.10
 	 *
 	 */
 	public static function get_short_link_by_id( $id = '' ) {
@@ -670,9 +671,9 @@ class Helper {
 	/**
 	 * Get redirection types
 	 *
-	 * @since 1.0.0
 	 * @return mixed|void
 	 *
+	 * @since 1.0.0
 	 */
 	public static function get_redirection_types() {
 
@@ -694,9 +695,9 @@ class Helper {
 	/**
 	 * Get link prefixes
 	 *
-	 * @since 1.5.7
 	 * @return array
 	 *
+	 * @since 1.5.7
 	 */
 	public static function get_link_prefixes() {
 
@@ -718,9 +719,9 @@ class Helper {
 	/**
 	 * Get custom domains
 	 *
-	 * @since 1.3.8
 	 * @return array|void
 	 *
+	 * @since 1.3.8
 	 */
 	public static function get_domains() {
 
@@ -742,8 +743,8 @@ class Helper {
 	/**
 	 * Get custom domains.
 	 *
-	 * @since 1.8
 	 * @return array
+	 * @since 1.8
 	 */
 	public static function get_domains_for_select() {
 		$domains = [
@@ -762,14 +763,14 @@ class Helper {
 	/**
 	 * Create Copy Link HTML
 	 *
-	 * @since 1.1.3
-	 *
 	 * @param        $id
-	 * @param  string  $html
+	 * @param string $html
 	 *
 	 * @param        $link
 	 *
 	 * @return string
+	 *
+	 * @since 1.1.3
 	 *
 	 */
 	public static function create_copy_short_link_html( $link, $id, $html = '' ) {
@@ -785,11 +786,11 @@ class Helper {
 	/**
 	 * Create Link Stats URL
 	 *
-	 * @since 1.1.3
-	 *
-	 * @param  int  $link_id
+	 * @param int $link_id
 	 *
 	 * @return string|void
+	 *
+	 * @since 1.1.3
 	 *
 	 */
 	public static function create_link_stats_url( $link_id = 0 ) {
@@ -804,15 +805,15 @@ class Helper {
 	/**
 	 * Prpare clicks column
 	 *
-	 * @since    1.1.3
-	 *
-	 * @modified 1.2.4
-	 *
-	 * @param  string  $stats_url
+	 * @param string $stats_url
 	 *
 	 * @param        $link_ids
 	 *
 	 * @return string
+	 *
+	 * @since    1.1.3
+	 *
+	 * @modified 1.2.4
 	 *
 	 */
 	public static function prepare_clicks_column( $link_ids, $stats_url = '' ) {
@@ -825,14 +826,14 @@ class Helper {
 	/**
 	 * Prepare clicks column with given data.
 	 *
-	 * @since 1.9.0
-	 *
 	 * @param $total_clicks
 	 * @param $stas_url
 	 *
 	 * @param $unique_clicks
 	 *
 	 * @return string
+	 *
+	 * @since 1.9.0
 	 *
 	 */
 	public static function prepare_clicks_column_with_data( $unique_clicks, $total_clicks, $stats_url ) {
@@ -847,13 +848,13 @@ class Helper {
 	/**
 	 * Get link action url
 	 *
-	 * @since 1.1.5
+	 * @param string $action
 	 *
-	 * @param  string  $action
-	 *
-	 * @param  null  $link_id
+	 * @param null $link_id
 	 *
 	 * @return string
+	 *
+	 * @since 1.1.5
 	 *
 	 */
 	public static function get_link_action_url( $link_id = null, $action = 'edit' ) {
@@ -867,13 +868,13 @@ class Helper {
 	/**
 	 * Get Group action url
 	 *
-	 * @since 1.1.7
+	 * @param string $action
 	 *
-	 * @param  string  $action
-	 *
-	 * @param  null  $group_id
+	 * @param null $group_id
 	 *
 	 * @return string
+	 *
+	 * @since 1.1.7
 	 *
 	 */
 	public static function get_group_action_url( $group_id = null, $action = 'edit' ) {
@@ -887,9 +888,9 @@ class Helper {
 	/**
 	 * Get max upload file size.
 	 *
-	 * @since 1.6.0
 	 * @return int
 	 *
+	 * @since 1.6.0
 	 */
 	public static function get_max_upload_size() {
 		// Allowed maximum 5MB file size.
@@ -899,13 +900,13 @@ class Helper {
 	/**
 	 * Get Group action url
 	 *
-	 * @since 1.3.8
+	 * @param string $action
 	 *
-	 * @param  string  $action
-	 *
-	 * @param  null  $group_id
+	 * @param null $group_id
 	 *
 	 * @return string
+	 *
+	 * @since 1.3.8
 	 *
 	 */
 	public static function get_domain_action_url( $id = null, $action = 'edit' ) {
@@ -919,13 +920,13 @@ class Helper {
 	/**
 	 * Get Tracking Pixel action URL.
 	 *
-	 * @since 1.8.9
-	 *
 	 * @param $action
 	 *
 	 * @param $id
 	 *
 	 * @return string
+	 *
+	 * @since 1.8.9
 	 *
 	 */
 	public static function get_tracking_pixel_action_url( $id = null, $action = 'edit' ) {
@@ -939,13 +940,13 @@ class Helper {
 	/**
 	 * Get UTM Presets action url
 	 *
-	 * @since 1.3.8
+	 * @param string $action
 	 *
-	 * @param  string  $action
-	 *
-	 * @param  null  $group_id
+	 * @param null $group_id
 	 *
 	 * @return string
+	 *
+	 * @since 1.3.8
 	 *
 	 */
 	public static function get_utm_presets_action_url( $id = null, $action = 'edit' ) {
@@ -959,14 +960,14 @@ class Helper {
 	/**
 	 * Get action url
 	 *
-	 * @since 1.1.7
+	 * @param string $type
+	 * @param string $action
 	 *
-	 * @param  string  $type
-	 * @param  string  $action
-	 *
-	 * @param  null  $id
+	 * @param null $id
 	 *
 	 * @return string
+	 *
+	 * @since 1.1.7
 	 *
 	 */
 	public static function get_action_url( $id = null, $type = 'links', $action = 'edit' ) {
@@ -1017,11 +1018,11 @@ class Helper {
 	/**
 	 * Get Start & End date based on $days
 	 *
-	 * @since 1.1.6
-	 *
-	 * @param  int  $days
+	 * @param int $days
 	 *
 	 * @return array
+	 *
+	 * @since 1.1.6
 	 *
 	 */
 	public static function get_start_and_end_date_from_last_days( $days = 7 ) {
@@ -1038,13 +1039,13 @@ class Helper {
 	/**
 	 * Return string with specific length
 	 *
-	 * @since 1.2.0
-	 *
 	 * @param $length
 	 *
 	 * @param $x
 	 *
 	 * @return string
+	 *
+	 * @since 1.2.0
 	 *
 	 */
 	public static function str_limit( $x, $length ) {
@@ -1060,11 +1061,11 @@ class Helper {
 	/**
 	 * Get Post Type from Post ID
 	 *
-	 * @since 1.2.5
-	 *
-	 * @param  int  $cpt_id
+	 * @param int $cpt_id
 	 *
 	 * @return string
+	 *
+	 * @since 1.2.5
 	 *
 	 */
 	public static function get_cpt_type_from_cpt_id( $cpt_id = 0 ) {
@@ -1086,11 +1087,11 @@ class Helper {
 	/**
 	 * Get CPT Info
 	 *
-	 * @since 1.2.5
-	 *
-	 * @param  string  $cpt_type
+	 * @param string $cpt_type
 	 *
 	 * @return array
+	 *
+	 * @since 1.2.5
 	 *
 	 */
 	public static function get_cpt_info( $cpt_type = '' ) {
@@ -1154,9 +1155,9 @@ class Helper {
 	/**
 	 * Get all cpts.
 	 *
-	 * @since 1.7.2
 	 * @return array
 	 *
+	 * @since 1.7.2
 	 */
 	public static function get_all_cpts() {
 		$custom_post_types = self::get_all_cpt_data();
@@ -1168,7 +1169,7 @@ class Helper {
 			}
 		}
 
-        ksort( $cpt_array );
+		ksort( $cpt_array );
 
 		return $cpt_array;
 	}
@@ -1176,13 +1177,13 @@ class Helper {
 	/**
 	 * Check whether ip fall into excluded ips
 	 *
-	 * @since 1.3.0
-	 *
 	 * @param $range
 	 *
 	 * @param $ip
 	 *
 	 * @return bool
+	 *
+	 * @since 1.3.0
 	 *
 	 */
 	public static function is_ip_in_range( $ip, $range ) {
@@ -1252,13 +1253,13 @@ class Helper {
 	/**
 	 * Prpeare Social share widget
 	 *
-	 * @since 1.3.2
+	 * @param string $share_icon_size
 	 *
-	 * @param  string  $share_icon_size
-	 *
-	 * @param  null  $link_id
+	 * @param null $link_id
 	 *
 	 * @return string
+	 *
+	 * @since 1.3.2
 	 *
 	 */
 	public static function get_social_share_widget( $link_id = null, $share_icon_size = '1' ) {
@@ -1294,9 +1295,9 @@ class Helper {
 	/**
 	 * Check Pretty Links Exists
 	 *
-	 * @since 1.3.4
 	 * @return bool|int
 	 *
+	 * @since 1.3.4
 	 */
 	public static function is_pretty_links_table_exists() {
 		global $wpdb;
@@ -1309,9 +1310,9 @@ class Helper {
 	/**
 	 * Check MTS Short Links Exists
 	 *
-	 * @since 1.3.4
 	 * @return bool|int
 	 *
+	 * @since 1.3.4
 	 */
 	public static function is_mts_short_links_table_exists() {
 		global $wpdb;
@@ -1324,9 +1325,9 @@ class Helper {
 	/**
 	 * Check Easy 301 Redirect Plugin Installed
 	 *
-	 * @since 1.3.4
 	 * @return bool|int
 	 *
+	 * @since 1.3.4
 	 */
 	public static function is_301_redirect_table_exists() {
 		global $wpdb;
@@ -1339,9 +1340,9 @@ class Helper {
 	/**
 	 * Check Simple 301 Redirect plugin installed
 	 *
-	 * @since 1.4.8
 	 * @return bool
 	 *
+	 * @since 1.4.8
 	 */
 	public static function is_simple_301_redirect_plugin_installed() {
 		$plugins = Tracker::get_active_plugins();
@@ -1356,9 +1357,9 @@ class Helper {
 	/**
 	 * Check Simple 301 Redirect plugin installed
 	 *
-	 * @since 1.4.8
 	 * @return bool
 	 *
+	 * @since 1.4.8
 	 */
 	public static function is_thirstry_affiliates_installed() {
 		$plugins = Tracker::get_active_plugins();
@@ -1373,9 +1374,9 @@ class Helper {
 	/**
 	 * Check Shorten URL Plugin Installed.
 	 *
-	 * @since 1.3.4
 	 * @return bool|int
 	 *
+	 * @since 1.3.4
 	 */
 	public static function is_shorten_url_table_exists() {
 		global $wpdb;
@@ -1388,8 +1389,8 @@ class Helper {
 	/**
 	 * Check Redirection Plugin Installed.
 	 *
-	 * @since 1.8.6
 	 * @return bool|int
+	 * @since 1.8.6
 	 */
 	public static function is_redirection_installed() {
 		global $wpdb;
@@ -1402,9 +1403,9 @@ class Helper {
 	/**
 	 * Gets the current action selected from the bulk actions dropdown.
 	 *
+	 * @return string|false The action name. False if no action was selected.
 	 * @since 1.3.4
 	 *
-	 * @return string|false The action name. False if no action was selected.
 	 */
 	public static function get_current_action() {
 		if ( isset( $_REQUEST['filter_action'] ) && ! empty( $_REQUEST['filter_action'] ) ) {
@@ -1425,13 +1426,13 @@ class Helper {
 	/**
 	 * Get group string
 	 *
-	 * @since 1.3.7
-	 *
 	 * @param $groups
 	 *
 	 * @param $group_ids
 	 *
 	 * @return string
+	 *
+	 * @since 1.3.7
 	 *
 	 */
 	public static function get_group_str_from_ids( $group_ids, $groups ) {
@@ -1472,11 +1473,11 @@ class Helper {
 	/**
 	 * Is request coming from specific domain?
 	 *
-	 * @since 1.3.8
-	 *
 	 * @param $domain
 	 *
 	 * @return bool
+	 *
+	 * @since 1.3.8
 	 *
 	 */
 	public static function is_request_from_specific_domain( $domain ) {
@@ -1491,13 +1492,13 @@ class Helper {
 	/**
 	 * Can show promotion message?
 	 *
-	 * @since 1.4.4
+	 * @param boolean $force
 	 *
-	 * @param  boolean  $force
-	 *
-	 * @param  array  $meta
+	 * @param array $meta
 	 *
 	 * @return bool
+	 *
+	 * @since 1.4.4
 	 *
 	 */
 	public static function can_show_promotion( $conditions = [], $force = false ) {
@@ -1562,21 +1563,21 @@ class Helper {
 
 		$since_installed = ceil( ( time() - $installed_on ) / 86400 );
 
-		if ( $since_installed >= $start_after_installation_days && $since_installed <= $end_before_installation_days ) {
-			return true;
+		if ( ( $since_installed < $start_after_installation_days ) || ( $since_installed > $end_before_installation_days ) ) {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
 	 * Prepare Tooltip html
 	 *
-	 * @since 1.4.7
-	 *
-	 * @param  string  $tooltip_text
+	 * @param string $tooltip_text
 	 *
 	 * @return string
+	 *
+	 * @since 1.4.7
 	 *
 	 */
 	public static function get_tooltip_html( $tooltip_text = '' ) {
@@ -1600,9 +1601,9 @@ class Helper {
 	/**
 	 * Can tools submenu menu visible.
 	 *
-	 * @since 1.5.9
 	 * @return bool
 	 *
+	 * @since 1.5.9
 	 */
 	public static function can_show_tools_menu() {
 		return true;
@@ -1611,9 +1612,9 @@ class Helper {
 	/**
 	 * Get links json filename
 	 *
-	 * @since 1.5.1
 	 * @return string
 	 *
+	 * @since 1.5.1
 	 */
 	public static function get_links_json_filename() {
 		$hash = Option::get( 'plugin_secret' );
@@ -1624,9 +1625,9 @@ class Helper {
 	/**
 	 * Is links json file exists
 	 *
-	 * @since 1.5.1
 	 * @return bool
 	 *
+	 * @since 1.5.1
 	 */
 	public static function is_links_json_file_exists() {
 		$links_json_file = self::get_links_json_filename();
@@ -1637,9 +1638,9 @@ class Helper {
 	/**
 	 * Get all links from Json
 	 *
-	 * @since 1.5.1
 	 * @return mixed
 	 *
+	 * @since 1.5.1
 	 */
 	public static function get_links_from_json() {
 		$links_json_file = self::get_links_json_filename();
@@ -1650,11 +1651,11 @@ class Helper {
 	/**
 	 * Get link data based on request uri
 	 *
-	 * @since 1.5.1
-	 *
-	 * @param  string  $request_uri
+	 * @param string $request_uri
 	 *
 	 * @return array|bool|data|object|string|null
+	 *
+	 * @since 1.5.1
 	 *
 	 */
 	public static function get_link_data( $request_uri = '' ) {
@@ -1682,13 +1683,13 @@ class Helper {
 	/**
 	 * Get link data if is short link
 	 *
-	 * @since 1.5.0
-	 *
-	 * @param  bool  $check_domain
+	 * @param bool $check_domain
 	 *
 	 * @param      $url
 	 *
 	 * @return array|bool
+	 *
+	 * @since 1.5.0
 	 *
 	 */
 	public static function is_us_link( $url, $check_domain = true ) {
@@ -1778,9 +1779,9 @@ class Helper {
 	/**
 	 * Get upgrade banner.
 	 *
-	 * @since 1.5.15
 	 * @return void
 	 *
+	 * @since 1.5.15
 	 */
 	public static function get_upgrade_banner( $query_strings = [], $show_coupon = false, $data = [] ) {
 		$message        = Helper::get_data( $data, 'message', '' );
@@ -1789,26 +1790,40 @@ class Helper {
 		$pricing_url    = Helper::get_data( $data, 'pricing_url', US()->get_landing_page_url() );
 		$dismiss_url    = Helper::get_data( $data, 'dismiss_url', US()->get_landing_page_url() );
 		$show_upgrade   = Helper::get_data( $data, 'show_upgrade', true );
+		$is_banner      = Helper::get_data( $data, 'banner', false );
+
 
 		if ( $query_strings ) {
 			$pricing_url = add_query_arg( $query_strings, $pricing_url );
 			$dismiss_url = add_query_arg( $query_strings, $dismiss_url );
 		}
 
-		?>
+		if ( $is_banner ) {
 
-        <div class="rounded-md bg-green-50 p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                              clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-green-800"><?php echo $title; ?></h3>
-                    <div class="mt-2 text-sm">
+			$banner_image = KC_US_PLUGIN_ASSETS_DIR_URL . '/images/promo/bfcm_2024_offer.png';
+
+			?>
+            <div class="rounded-md flex justify-center">
+                <a href="<?php echo $pricing_url; ?>" target="_blank"><img src="<?php echo $banner_image; ?>"
+                                                                           title="BFCM Promotion"></a>
+            </div>
+
+            <?php } else {
+            ?>
+
+
+            <div class="rounded-md bg-green-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800"><?php echo $title; ?></h3>
+                        <div class="mt-2 text-sm">
                         <span class="text-base">
                                  <?php echo $message; ?>
 
@@ -1817,36 +1832,37 @@ class Helper {
 		                        <?php echo $coupon_message;
 	                        } ?>
                         </span>
-                    </div>
-                    <div class="mt-4">
-                        <div class="-mx-2 -my-1.5 flex">
-							<?php if ( $show_upgrade ) { ?>
+                        </div>
+                        <div class="mt-4">
+                            <div class="-mx-2 -my-1.5 flex">
+								<?php if ( $show_upgrade ) { ?>
+                                    <button type="button"
+                                            class="rounded-md border-2 border-green-800 bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50">
+                                        <a href="<?php echo esc_url( $pricing_url ); ?>"
+                                           class="text-green-800 hover:text-green-800">Upgrade
+                                            Now</a></button>
+								<?php } ?>
                                 <button type="button"
-                                        class="rounded-md border-2 border-green-800 bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50">
-                                    <a href="<?php echo esc_url( $pricing_url ); ?>"
-                                       class="text-green-800 hover:text-green-800">Upgrade
-                                        Now</a></button>
-							<?php } ?>
-                            <button type="button"
-                                    class="ml-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-800 focus:outline-none focus:ring-2">
-                                <a href="<?php echo esc_url( $dismiss_url ); ?>" class="text-red-500">Dismiss</a>
-                            </button>
+                                        class="ml-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-800 focus:outline-none focus:ring-2">
+                                    <a href="<?php echo esc_url( $dismiss_url ); ?>" class="text-red-500">Dismiss</a>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-		<?php
+			<?php
+		}
 	}
 
 	/**
 	 * Is promotion dismissed?
 	 *
-	 * @since 1.5.15
-	 *
 	 * @param $promotion
 	 *
 	 * @return bool
+	 *
+	 * @since 1.5.15
 	 *
 	 */
 	public static function is_promotion_dismissed( $promotion ) {
@@ -1862,13 +1878,13 @@ class Helper {
 	/**
 	 * Prepare group dropdown options.
 	 *
-	 * @since 1.6.1
-	 *
 	 * @param $default_label
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.6.1
 	 *
 	 */
 	public static function prepare_group_dropdown_options( $selected = '', $default_label = 'Select Group' ) {
@@ -1908,13 +1924,13 @@ class Helper {
 	/**
 	 * Prepare custom dropdown options.
 	 *
-	 * @since 1.7.5
-	 *
 	 * @param $default_label
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.7.5
 	 *
 	 */
 	public static function prepare_domains_dropdown_options( $selected = '' ) {
@@ -1950,9 +1966,9 @@ class Helper {
 	/**
 	 * Allowed HTML Tags esc function.
 	 *
-	 * @since 1.6.1
 	 * @return array
 	 *
+	 * @since 1.6.1
 	 */
 	public static function allowed_html_tags_in_esc() {
 		$context_allowed_tags = wp_kses_allowed_html( 'post' );
@@ -2093,9 +2109,9 @@ class Helper {
 	/**
 	 * Get dynamic redirect types.
 	 *
-	 * @since 1.7.4
 	 * @return array
 	 *
+	 * @since 1.7.4
 	 */
 	public static function get_dynamic_redirect_types() {
 		return [
@@ -2109,13 +2125,13 @@ class Helper {
 	/**
 	 * Prepare country dropdown options.
 	 *
-	 * @since 1.7.4
-	 *
 	 * @param $any
 	 *
 	 * @param $selected
 	 *
 	 * @return void
+	 *
+	 * @since 1.7.4
 	 *
 	 */
 	public static function prepare_country_dropdown_options( $selected = '', $default = true ) {
@@ -2159,13 +2175,13 @@ class Helper {
 	/**
 	 * Prepare device dropdown options.
 	 *
-	 * @since 1.7.4
-	 *
 	 * @param $default
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.7.4
 	 *
 	 */
 	public static function prepare_device_dropdown_options( $selected = '', $default = true ) {
@@ -2207,11 +2223,11 @@ class Helper {
 	/**
 	 * Get weight dropdown options.
 	 *
-	 * @since 1.9.1
-	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 * @since 1.9.1
+	 *
 	 */
 	public static function prepare_weight_dropdown_options( $selected = '' ) {
 		$weight_options = [];
@@ -2246,13 +2262,13 @@ class Helper {
 	/**
 	 * Get browser dropdown options.
 	 *
-	 * @since 1.7.4
-	 *
 	 * @param $default
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.7.4
 	 *
 	 */
 	public static function prepare_browser_dropdown_options( $selected = '', $default = true ) {
@@ -2295,13 +2311,13 @@ class Helper {
 	/**
 	 * Get OS dropdown options.
 	 *
-	 * @since 1.7.4
-	 *
 	 * @param $default
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.7.4
 	 *
 	 */
 	public static function prepare_os_dropdown_options( $selected = '', $default = true ) {
@@ -2343,11 +2359,11 @@ class Helper {
 	/**
 	 * Auto Generate Short Link based on provided data or default settings.
 	 *
-	 * @since 1.7.5
-	 *
 	 * @param $data
 	 *
 	 * @return string
+	 *
+	 * @since 1.7.5
 	 *
 	 */
 	public static function generate_short_link( $data = [] ) {
@@ -2405,9 +2421,9 @@ class Helper {
 	/**
 	 * Get tracking pixel types.
 	 *
-	 * @since 1.8.9
 	 * @return array
 	 *
+	 * @since 1.8.9
 	 */
 	public static function get_tracking_pixel_types() {
 		return [
@@ -2427,13 +2443,13 @@ class Helper {
 	/**
 	 * Prepare tracking pixel types dropdown.
 	 *
-	 * @since 1.8.9
-	 *
 	 * @param $default
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.8.9
 	 *
 	 */
 	public static function prepare_traking_pixel_types_dropdown_options( $selected = '', $default = 'facebook' ) {
@@ -2468,13 +2484,13 @@ class Helper {
 	/**
 	 * Prepare custom dropdown options for short links selection.
 	 *
-	 * @since 1.9.1
-	 *
 	 * @param $selected
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 * @since 1.9.1
+	 *
 	 */
 	public static function prepare_short_links_dropdown_options( $selected = '', $default = true ) {
 
@@ -2515,13 +2531,13 @@ class Helper {
 	/**
 	 * Prepare Links Filters Dropdown.
 	 *
-	 * @since 1.9.3
-	 *
 	 * @param $default
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.9.3
 	 *
 	 */
 	public static function prepare_links_filters_dropdown_options( $selected = '', $default = true ) {
@@ -2535,7 +2551,7 @@ class Helper {
 		$group_options = [];
 		$groups        = US()->db->groups->get_all_id_name_map();
 		if ( ! empty( $groups ) ) {
-            asort($groups);
+			asort( $groups );
 			$groups['none'] = __( 'Not in Any Group', 'url-shortify' );
 			foreach ( $groups as $key => $value ) {
 				$group_options[ 'group_id_' . $key ] = esc_html( $value );
@@ -2597,11 +2613,11 @@ class Helper {
 	/**
 	 * Get Users by roles.
 	 *
-	 * @since 1.9.5
-	 *
 	 * @param $roles
 	 *
 	 * @return array
+	 *
+	 * @since 1.9.5
 	 *
 	 */
 	public static function get_users_by_roles( $roles ) {
@@ -2637,13 +2653,13 @@ class Helper {
 	/**
 	 * Prepare User dropdown Options.
 	 *
-	 * @since 1.9.5
-	 *
 	 * @param $default
 	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.9.5
 	 *
 	 */
 	public static function prepare_user_dropdown_options( $selected = '', $default = true ) {
@@ -2694,9 +2710,9 @@ class Helper {
 	/**
 	 * Get API Permissions.
 	 *
-	 * @since 1.9.5
 	 * @return array
 	 *
+	 * @since 1.9.5
 	 */
 	public static function get_api_permissions() {
 		return [
@@ -2709,11 +2725,11 @@ class Helper {
 	/**
 	 * Prepare API Permissions Dropdown Options.
 	 *
-	 * @since 1.9.5
-	 *
 	 * @param $selected
 	 *
 	 * @return string
+	 *
+	 * @since 1.9.5
 	 *
 	 */
 	public static function prepare_api_permissions_dropdown_options( $selected = '' ) {
@@ -2760,9 +2776,9 @@ class Helper {
 	/**
 	 * Handle Key Download.
 	 *
-	 * @since 1.9.5
 	 * @return false|void
 	 *
+	 * @since 1.9.5
 	 */
 	public static function handle_key_download( $id, $ck ) {
 		$info = self::prepare_key_download( $id, $ck );
@@ -2787,9 +2803,9 @@ class Helper {
 	/**
 	 * Prepare Key Download.
 	 *
-	 * @since 1.9.5
 	 * @return array|false
 	 *
+	 * @since 1.9.5
 	 */
 	public static function prepare_key_download( $id, $ck ) {
 		$key_id       = (int) $id;
@@ -2819,48 +2835,48 @@ class Helper {
 	}
 
 	/**
-     * Check API Key has specific permissions.
-     *
-     * @since 1.9.5
-     *
+	 * Check API Key has specific permissions.
+	 *
 	 * @param $api_key
 	 * @param $method
 	 *
 	 * @return bool
+	 * @since 1.9.5
+	 *
 	 */
-    public static function has_permissions($api_key, $method) {
-	    $permissions = Helper::get_data($api_key, 'permissions');
+	public static function has_permissions( $api_key, $method ) {
+		$permissions = Helper::get_data( $api_key, 'permissions' );
 
-	    switch ( $method ) {
-		    case 'HEAD':
-		    case 'GET':
-			    $ret = ( 'read' === $permissions || 'read_write' === $permissions );
-			    break;
+		switch ( $method ) {
+			case 'HEAD':
+			case 'GET':
+				$ret = ( 'read' === $permissions || 'read_write' === $permissions );
+				break;
 
-		    case 'POST':
-		    case 'PUT':
-		    case 'PATCH':
-		    case 'DELETE':
-			    $ret = ( 'write' === $permissions || 'read_write' === $permissions );
-			    break;
+			case 'POST':
+			case 'PUT':
+			case 'PATCH':
+			case 'DELETE':
+				$ret = ( 'write' === $permissions || 'read_write' === $permissions );
+				break;
 
-		    case 'OPTIONS':
-			    $ret = true;
-			    break;
+			case 'OPTIONS':
+				$ret = true;
+				break;
 
-		    default:
-			    $ret = false;
-	    }
+			default:
+				$ret = false;
+		}
 
-	    return $ret;
-    }
+		return $ret;
+	}
 
 	/**
-     * Get display position options.
-     *
+	 * Get display position options.
+	 *
 	 * @return array
-     *
-     * @since 1.9.5
+	 *
+	 * @since 1.9.5
 	 */
 	public static function get_link_display_position_options() {
 		$cpt_array = [
@@ -2870,32 +2886,32 @@ class Helper {
 
 		$cpt_array = apply_filters( 'kc_us_get_custom_post_types', $cpt_array );
 
-        ksort( $cpt_array );
+		ksort( $cpt_array );
 
 		$cpt_array['excerpt'] = __( 'Excerpt', 'url-shortify' );
 
-        $options = [];
+		$options = [];
 		foreach ( $cpt_array as $key => $value ) {
 			foreach ( [ 'top', 'bottom' ] as $position ) {
-				$options[ $position . '_' . $key ] = sprintf(__( 'At the %1$s of <b>%2$s</b>', 'url-shortify' ), $position,
+				$options[ $position . '_' . $key ] = sprintf( __( 'At the %1$s of <b>%2$s</b>', 'url-shortify' ), $position,
 					$value );
 			}
 		}
 
 
-        return $options;
+		return $options;
 
 	}
 
 	/**
-     * Generate Post Short URL.
-     *
+	 * Generate Post Short URL.
+	 *
 	 * @param $post
 	 * @param $auto_create_short_link
 	 *
 	 * @return string
-     *
-     * @since 1.10.0
+	 *
+	 * @since 1.10.0
 	 */
 	public static function get_post_short_url( $post, $auto_create_short_link = false ) {
 		$short_url = '';

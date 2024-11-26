@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 1.10.3\n"
+"Project-Id-Version: URL Shortify 1.10.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-24T20:04:26+00:00\n"
+"POT-Creation-Date: 2024-11-26T11:23:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: lite/includes/Admin.php:241
 #: lite/includes/Admin/Templates/other-products.php:24
-#: lite/includes/Helper.php:398
+#: lite/includes/Helper.php:399
 #: lite/language.php:4
 msgid "URL Shortify"
 msgstr ""
@@ -63,7 +63,7 @@ msgstr ""
 #: lite/includes/Admin/Groups_Table.php:164
 #: lite/includes/Admin/Links_Table.php:213
 #: lite/includes/Admin/Templates/link-form.php:240
-#: lite/includes/Helper.php:2545
+#: lite/includes/Helper.php:2561
 #: lite/language.php:15
 msgid "Groups"
 msgstr ""
@@ -279,14 +279,14 @@ msgid "Use the Cloudflare \"CF-Connecting-IP\" HTTP header to get a visitor IP. 
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:256
-#: lite/includes/Helper.php:2867
+#: lite/includes/Helper.php:2883
 #: lite/language.php:203
 #: pro/includes/Settings.php:416
 msgid "Posts"
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:257
-#: lite/includes/Helper.php:2868
+#: lite/includes/Helper.php:2884
 #: lite/language.php:204
 #: pro/includes/Settings.php:417
 msgid "Pages"
@@ -1611,250 +1611,238 @@ msgstr ""
 msgid "Your Weekly URL Shortify Link Summary for %s"
 msgstr ""
 
-#: lite/includes/Helper.php:680
+#: lite/includes/Helper.php:681
 msgid "307 (Temporary)"
 msgstr ""
 
-#: lite/includes/Helper.php:681
+#: lite/includes/Helper.php:682
 msgid "302 (Temporary)"
 msgstr ""
 
-#: lite/includes/Helper.php:682
+#: lite/includes/Helper.php:683
 msgid "301 (Permanent)"
 msgstr ""
 
-#: lite/includes/Helper.php:704
+#: lite/includes/Helper.php:705
 msgid "-- No Prefix --"
 msgstr ""
 
-#: lite/includes/Helper.php:705
+#: lite/includes/Helper.php:706
 msgid "recommends"
 msgstr ""
 
-#: lite/includes/Helper.php:706
+#: lite/includes/Helper.php:707
 msgid "go"
 msgstr ""
 
-#: lite/includes/Helper.php:735
+#: lite/includes/Helper.php:736
 msgid "All my domains"
 msgstr ""
 
-#: lite/includes/Helper.php:777
-#: lite/includes/Helper.php:780
+#: lite/includes/Helper.php:778
+#: lite/includes/Helper.php:781
 #: lite/language.php:146
 msgid "Copy"
 msgstr ""
 
-#: lite/includes/Helper.php:842
+#: lite/includes/Helper.php:843
 #: lite/language.php:147
 msgid "Unique Clicks / Total Clicks"
 msgstr ""
 
-#: lite/includes/Helper.php:1101
+#: lite/includes/Helper.php:1102
 #: lite/language.php:148
 msgid "Post"
 msgstr ""
 
-#: lite/includes/Helper.php:1106
+#: lite/includes/Helper.php:1107
 #: lite/language.php:149
 msgid "Page"
 msgstr ""
 
-#: lite/includes/Helper.php:1111
+#: lite/includes/Helper.php:1112
 #: lite/language.php:150
 msgid "WooCommerce"
 msgstr ""
 
-#: lite/includes/Helper.php:1116
+#: lite/includes/Helper.php:1117
 #: lite/language.php:151
 msgid "Easy Digital Download"
 msgstr ""
 
-#: lite/includes/Helper.php:1121
+#: lite/includes/Helper.php:1122
 #: lite/language.php:152
 msgid "Events Manager"
 msgstr ""
 
-#: lite/includes/Helper.php:1126
+#: lite/includes/Helper.php:1127
 #: lite/language.php:153
 msgid "The Events Calendar"
 msgstr ""
 
-#: lite/includes/Helper.php:1131
+#: lite/includes/Helper.php:1132
 #: lite/language.php:154
 msgid "Betterdocs"
 msgstr ""
 
-#: lite/includes/Helper.php:1136
+#: lite/includes/Helper.php:1137
 #: lite/language.php:155
 msgid "WordPress Knowledgebase"
 msgstr ""
 
-#: lite/includes/Helper.php:1141
+#: lite/includes/Helper.php:1142
 #: lite/language.php:156
 msgid "Modern Events"
 msgstr ""
 
-#: lite/includes/Helper.php:2102
+#: lite/includes/Helper.php:2118
 msgid "Off"
 msgstr ""
 
-#: lite/includes/Helper.php:2103
+#: lite/includes/Helper.php:2119
 msgid "Geo Location"
 msgstr ""
 
-#: lite/includes/Helper.php:2104
+#: lite/includes/Helper.php:2120
 msgid "Technology"
 msgstr ""
 
-#: lite/includes/Helper.php:2105
+#: lite/includes/Helper.php:2121
 msgid "Link Rotation"
 msgstr ""
 
-#: lite/includes/Helper.php:2125
+#: lite/includes/Helper.php:2141
 msgid "Any Country"
 msgstr ""
 
-#: lite/includes/Helper.php:2174
-#: lite/includes/Helper.php:2261
-#: lite/includes/Helper.php:2310
+#: lite/includes/Helper.php:2190
+#: lite/includes/Helper.php:2277
+#: lite/includes/Helper.php:2326
 msgid "Any"
 msgstr ""
 
-#: lite/includes/Helper.php:2414
+#: lite/includes/Helper.php:2430
 #: lite/language.php:161
 #: pro/includes/Actions.php:1126
 msgid "Facebook"
 msgstr ""
 
-#: lite/includes/Helper.php:2415
+#: lite/includes/Helper.php:2431
 msgid "Google Tag Manager"
 msgstr ""
 
-#: lite/includes/Helper.php:2416
+#: lite/includes/Helper.php:2432
 #: lite/language.php:162
 #: pro/includes/Actions.php:1133
 msgid "Twitter"
 msgstr ""
 
-#: lite/includes/Helper.php:2417
+#: lite/includes/Helper.php:2433
 #: lite/language.php:164
 #: pro/includes/Actions.php:1147
 msgid "Linkedin"
 msgstr ""
 
-#: lite/includes/Helper.php:2418
+#: lite/includes/Helper.php:2434
 #: lite/language.php:165
 #: pro/includes/Actions.php:1154
 msgid "Pinterest"
 msgstr ""
 
-#: lite/includes/Helper.php:2419
+#: lite/includes/Helper.php:2435
 msgid "Adwords"
 msgstr ""
 
-#: lite/includes/Helper.php:2420
+#: lite/includes/Helper.php:2436
 msgid "Bing"
 msgstr ""
 
-#: lite/includes/Helper.php:2421
+#: lite/includes/Helper.php:2437
 msgid "Quora"
 msgstr ""
 
-#: lite/includes/Helper.php:2422
+#: lite/includes/Helper.php:2438
 msgid "Adroll"
 msgstr ""
 
-#: lite/includes/Helper.php:2423
+#: lite/includes/Helper.php:2439
 msgid "Nexus Segment"
 msgstr ""
 
-#: lite/includes/Helper.php:2482
+#: lite/includes/Helper.php:2498
 msgid "Select Link"
 msgstr ""
 
-#: lite/includes/Helper.php:2530
+#: lite/includes/Helper.php:2546
 msgid "All Links"
 msgstr ""
 
-#: lite/includes/Helper.php:2539
+#: lite/includes/Helper.php:2555
 msgid "Not in Any Group"
 msgstr ""
 
-#: lite/includes/Helper.php:2559
+#: lite/includes/Helper.php:2575
 msgid "Redirect Types"
 msgstr ""
 
-#: lite/includes/Helper.php:2652
+#: lite/includes/Helper.php:2668
 msgid "Select User"
 msgstr ""
 
-#: lite/includes/Helper.php:2703
+#: lite/includes/Helper.php:2719
 msgid "Read"
 msgstr ""
 
-#: lite/includes/Helper.php:2704
+#: lite/includes/Helper.php:2720
 msgid "Write"
 msgstr ""
 
-#: lite/includes/Helper.php:2705
+#: lite/includes/Helper.php:2721
 msgid "Read & Write"
 msgstr ""
 
 #. Translators: %s = Consumer Key.
-#: lite/includes/Helper.php:2780
+#: lite/includes/Helper.php:2796
 msgid "Consumer Key: %s"
 msgstr ""
 
 #. Translators: %s = Consumer Secret.
-#: lite/includes/Helper.php:2783
+#: lite/includes/Helper.php:2799
 msgid "Consumer Secret: %s"
 msgstr ""
 
-#: lite/includes/Helper.php:2875
+#: lite/includes/Helper.php:2891
 msgid "Excerpt"
 msgstr ""
 
-#: lite/includes/Helper.php:2880
+#: lite/includes/Helper.php:2896
 msgid "At the %1$s of <b>%2$s</b>"
 msgstr ""
 
-#: lite/includes/Promo.php:84
-msgid "Holiday Prep Sale"
+#: lite/includes/Promo.php:85
+msgid "BFCM Sale is live"
 msgstr ""
 
-#: lite/includes/Promo.php:92
-msgid "<p class=\"text-xl\">Buy an annual/lifetime URL Shortify PRO plan at <b class=\"text-2xl\">flat 30%</b> discount until <b class=\"text-red-600 text-xl\">November 2, 2024</b></p>"
+#: lite/includes/Promo.php:93
+msgid "<p class=\"text-xl\">Buy an annual/lifetime URL Shortify PRO plan at <b class=\"text-2xl\">flat 50%</b> discount until <b class=\"text-red-600 text-xl\">December 6, 2024</b></p>"
 msgstr ""
 
-#: lite/includes/Promo.php:94
-msgid "Use Coupon Code - <b>HOLIDAY</b>"
+#: lite/includes/Promo.php:95
+msgid "Use Coupon Code - <b>BFCM2024</b>"
 msgstr ""
 
-#: lite/includes/Promo.php:101
-msgid "Important Announcement"
-msgstr ""
-
-#: lite/includes/Promo.php:109
-msgid "<p class=\"text-xl\">Buy an annual/lifetime URL Shortify PRO plan at the old price until <b class=\"text-red-600 text-xl\">September 2, 2024</b></p>"
-msgstr ""
-
-#: lite/includes/Promo.php:111
-msgid "Starting September 2, our updated pricing will apply to all our subscription plans... <b><a href=\"%s\" target=\"_blank\">Learn More</a></b>"
-msgstr ""
-
-#: lite/includes/Promo.php:125
-#: lite/includes/Promo.php:132
-#: lite/includes/Promo.php:144
+#: lite/includes/Promo.php:108
+#: lite/includes/Promo.php:115
+#: lite/includes/Promo.php:127
 msgid "Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data."
 msgstr ""
 
-#: lite/includes/Promo.php:127
-#: lite/includes/Promo.php:146
+#: lite/includes/Promo.php:110
+#: lite/includes/Promo.php:129
 msgid "Use coupon code <b class=\"text-green-800 px-1 py-1 text-xl\">%s</b> to get flat <b class=\"text-2xl\">$30</b> off on any plan"
 msgstr ""
 
-#: lite/includes/Promo.php:151
+#: lite/includes/Promo.php:134
 msgid "Unlock the Full Power of Historical Data with an Upgraded Plugin Plan! Upgrade Today to Access All Historical Data."
 msgstr ""
 
