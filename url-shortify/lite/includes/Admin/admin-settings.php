@@ -257,7 +257,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 		'page' => __( 'Pages', 'url-shortify' ),
 	];
 
-	$cpt_array = apply_filters( 'kc_us_filter_auto_create_links_for_options', $cpt_array );
+	$cpt_array = apply_filters( 'kc_us_get_custom_post_types', $cpt_array );
 
 	$sections = [
 		[

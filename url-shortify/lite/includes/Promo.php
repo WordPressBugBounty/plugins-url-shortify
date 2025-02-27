@@ -94,7 +94,7 @@ class Promo {
 				'url-shortify' ),
 			'coupon_message'                => __( 'Use Coupon Code - <b>BFCM2024</b>', 'url-shortify' ),
 			'show_upgrade'                  => true,
-			'show_plan'                     => 'free',
+			'show_plan'                     => 'pro',
 			'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
 			'banner'                        => true
 		];
