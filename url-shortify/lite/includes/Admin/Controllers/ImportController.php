@@ -232,9 +232,9 @@ class ImportController extends BaseController {
 
 			foreach ( $links as $link ) {
 
-				$slug = Helper::get_data( $link, 'Slug', '' );
+				$slug = Helper::get_data( $link, 'Slug', '', true );
 
-				$groups_str = Helper::get_data($link, 'Groups', '');
+				$groups_str = Helper::get_data($link, 'Groups', '', true);
 
 				$groups = [];
 				if ( ! empty( $groups_str ) ) {
@@ -259,8 +259,8 @@ class ImportController extends BaseController {
 				}
 
 				$values[ $key ]['slug']              = $slug;
-				$values[ $key ]['name']              = ! empty( Helper::get_data( $link, 'Title', '' ) ) ? Helper::get_data( $link, 'Title', '' ) : Helper::get_data( $link, 'Target URL', '' );
-				$values[ $key ]['description']       = Helper::get_data( $link, 'Description', '' );
+				$values[ $key ]['name']              = ! empty( Helper::get_data( $link, 'Title', '' ) ) ? Helper::get_data( $link, 'Title', '', true ) : Helper::get_data( $link, 'Target URL', '' );
+				$values[ $key ]['description']       = Helper::get_data( $link, 'Description', '', true );
 				$values[ $key ]['url']               = Helper::get_data( $link, 'Target URL', '' );
 				$values[ $key ]['nofollow']          = Helper::get_data( $link, 'Nofollow', $default_nofollow );
 				$values[ $key ]['track_me']          = Helper::get_data( $link, 'Track', $default_track_me );

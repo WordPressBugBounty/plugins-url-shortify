@@ -3,8 +3,8 @@ Contributors: kaizencoders, mikeatkaizencoders
 Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
-Tested up to: 6.7.1
-Stable tag: 1.10.5.1
+Tested up to: 6.8.1
+Stable tag: 1.10.6
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -471,12 +471,17 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-**1.10.5.1 **
+**1.10.6 **
 
-* Fix: `Redirection After Expiration` setting not working issue.
-* Update: Compatibility with WordPress 6.7.2
+* Update: Compatibility with WordPress 6.8.1.
+* Update: Improve performance.
 
 == Changelog ==
+
+**1.10.6 [2025-05-24]**
+
+* Update: Compatibility with WordPress 6.8.1.
+* Update: Improve performance.
 
 **1.10.5.1 [2025-02-27]**
 
