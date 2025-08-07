@@ -221,41 +221,8 @@ $features = [
         </div>
     </div>
 
-	<?php if ( \KaizenCoders\URL_Shortify\Helper::get_data( $_GET, 'pricing', '' ) != 'true' ) { ?>
-
-    <!-- Let's Get Started -->
-    <div class="bg-white py-10 sm:py-10">
-        <div class="mx-auto max-w-7xl p-5">
-            <h2 class="text-3xl font-bold text-center tracking-tight text-gray-900 sm:text-4xl">Let's Get Started</h2>
-            <p class="mt-6 text-lg leading-8 text-gray-600 text-center">Here's the video tutorials for you to quickly get started with the URL Shortify.</p>
-            <div class="columns-2 gap-8 p-8">
-                <div class="w-full">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/VIfPOcQje4E?si=XsoA29Snycco2Oy0" title="Create Short Links" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    <p class="text-center text-xl p-2 text-bold">Create your first short link</p>
-                </div>
-                <div class="w-full">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/pVPHUQQrldU?si=sseLtBo9IKEDIaoM" title="Import Links" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    <p class="text-center text-xl p-2 text-bold">Import links from CSV</p>
-                </div>
-            </div>
-            <div class="columns-2 gap-8 p-8">
-                <div class="w-full">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/hSluD5wjFzk?si=uKjkPUYzECkZx325" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    <p class="text-center text-xl p-2 text-bold">Export Links [PRO]</p>
-                </div>
-                <div class="w-full">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/vf3OATdWd8o?si=H9QrX3etZpW3zu99" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    <p class="text-center text-xl p-2 text-bold">Cloak Affiliate URLs [PRO]</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- Pricing Section -->
-	<?php
-
+	<?php if ( \KaizenCoders\URL_Shortify\Helper::get_data( $_GET, 'pricing', '' ) != 'true' ) {
+        include_once 'videos.php';
     }
 
 	if ( \KaizenCoders\URL_Shortify\Helper::can_show_promotion( [ 'total_links' => 1 ] ) ||

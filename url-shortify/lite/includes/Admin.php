@@ -13,6 +13,7 @@
 namespace KaizenCoders\URL_Shortify;
 
 use KaizenCoders\URL_Shortify\Admin\Controllers\DashboardController;
+use KaizenCoders\URL_Shortify\Admin\Controllers\ResourcesController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\ToolsController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\WidgetsController;
 use KaizenCoders\URL_Shortify\Admin\Groups_Table;
@@ -307,6 +308,15 @@ class Admin {
 				new \KaizenCoders\URL_Shortify\Admin\Settings();
 			}
 
+
+			if ( Helper::can_show_tools_menu() ) {
+				$hook = add_submenu_page( 'url_shortify', __( 'Resources', 'url-shortify' ),
+					__( 'Resources', 'url-shortify' ), 'read', 'us_resources', [
+						$this,
+						'render_resources_page',
+					] );
+			}
+
 			do_action( 'kc_us_admin_menu' );
 		}
 
@@ -365,6 +375,17 @@ class Admin {
 		$tools->render();
 	}
 
+	/**
+	 * Render resources page.
+	 *
+	 * @return void
+	 *
+	 * @since 1.10.7
+	 */
+	public function render_resources_page() {
+		$tools = new ResourcesController();
+		$tools->render();
+	}
 
 	/******************************************************************* Utilities ********************************/
 

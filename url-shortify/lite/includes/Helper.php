@@ -406,6 +406,7 @@ class Helper {
 			"{$prefix}_page_us_utm_presets",
 			"{$prefix}_page_us_tracking_pixels",
 			"{$prefix}_page_us_tools",
+			"{$prefix}_page_us_resources",
 			"{$prefix}_page_kc-us-settings",
 			"{$prefix}_page_kc-us-tools-settings",
 			"{$prefix}_page_url_shortify-account",
@@ -2436,6 +2437,7 @@ class Helper {
 			'bing'               => __( 'Bing', 'url-shortify' ),
 			'quora'              => __( 'Quora', 'url-shortify' ),
 			'adroll'             => __( 'Adroll', 'url-shortify' ),
+			'reddit'             => __( 'Reddit', 'url-shortify' ),
 			'nexus-segment'      => __( 'Nexus Segment', 'url-shortify' ),
 		];
 	}

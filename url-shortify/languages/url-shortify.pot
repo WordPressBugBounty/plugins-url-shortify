@@ -1,21 +1,21 @@
-# Copyright (C) 2024 KaizenCoders
+# Copyright (C) 2025 KaizenCoders
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 1.10.4\n"
+"Project-Id-Version: URL Shortify 1.10.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-11-26T11:23:16+00:00\n"
+"POT-Creation-Date: 2025-08-07T10:51:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
 
 #. Plugin Name of the plugin
-#: lite/includes/Admin.php:241
+#: lite/includes/Admin.php:242
 #: lite/includes/Admin/Templates/other-products.php:24
 #: lite/includes/Helper.php:399
 #: lite/language.php:4
@@ -41,13 +41,13 @@ msgstr ""
 msgid "https://kaizencoders.com/"
 msgstr ""
 
-#: lite/includes/Admin.php:250
+#: lite/includes/Admin.php:251
 #: lite/includes/Admin/Templates/dashboard.php:62
 #: lite/language.php:13
 msgid "Dashboard"
 msgstr ""
 
-#: lite/includes/Admin.php:257
+#: lite/includes/Admin.php:258
 #: lite/includes/Admin/admin-settings.php:51
 #: lite/includes/Admin/Groups_Table.php:191
 #: lite/includes/Admin/Links_Table.php:73
@@ -57,19 +57,19 @@ msgstr ""
 msgid "Links"
 msgstr ""
 
-#: lite/includes/Admin.php:266
 #: lite/includes/Admin.php:267
+#: lite/includes/Admin.php:268
 #: lite/includes/Admin/Groups_Table.php:63
 #: lite/includes/Admin/Groups_Table.php:164
 #: lite/includes/Admin/Links_Table.php:213
 #: lite/includes/Admin/Templates/link-form.php:240
-#: lite/includes/Helper.php:2561
+#: lite/includes/Helper.php:2563
 #: lite/language.php:15
 msgid "Groups"
 msgstr ""
 
-#: lite/includes/Admin.php:274
 #: lite/includes/Admin.php:275
+#: lite/includes/Admin.php:276
 #: lite/language.php:16
 #: pro/includes/Actions.php:1372
 #: pro/includes/Admin/Domains_Table.php:37
@@ -78,8 +78,8 @@ msgstr ""
 msgid "Domains"
 msgstr ""
 
-#: lite/includes/Admin.php:282
 #: lite/includes/Admin.php:283
+#: lite/includes/Admin.php:284
 #: pro/includes/Actions.php:1565
 #: pro/includes/Admin/UTM_Presets_Table.php:36
 #: pro/includes/Admin/UTM_Presets_Table.php:37
@@ -87,8 +87,8 @@ msgstr ""
 msgid "UTM Presets"
 msgstr ""
 
-#: lite/includes/Admin.php:290
 #: lite/includes/Admin.php:291
+#: lite/includes/Admin.php:292
 #: pro/includes/Actions.php:1684
 #: pro/includes/Admin/Templates/tracking-pixel-form.php:24
 #: pro/includes/Admin/Tracking_Pixels_Table.php:45
@@ -96,29 +96,34 @@ msgstr ""
 msgid "Tracking Pixels"
 msgstr ""
 
-#: lite/includes/Admin.php:300
 #: lite/includes/Admin.php:301
+#: lite/includes/Admin.php:302
 #: lite/includes/Admin/Tools.php:42
 #: lite/includes/Admin/Tools.php:43
 #: lite/language.php:17
 msgid "Tools"
 msgstr ""
 
+#: lite/includes/Admin.php:313
+#: lite/includes/Admin.php:314
+msgid "Resources"
+msgstr ""
+
 #. translators: 1: WordPress link, 2: Plugin name, 3: Plugin version, 4: KaizenCoders link
-#: lite/includes/Admin.php:487
+#: lite/includes/Admin.php:508
 msgid "<span id=\"footer-thankyou\">Thank you for creating with <a href=\"%1$s\" target=\"_blank\">WordPress</a> | %2$s <b>%3$s</b>. Made with ❤️ by the team <a href=\"%4$s\" target=\"_blank\">KaizenCoders</a></span>"
 msgstr ""
 
-#: lite/includes/Admin.php:569
+#: lite/includes/Admin.php:590
 #: lite/language.php:19
 msgid "URL Shortify Quick Add"
 msgstr ""
 
-#: lite/includes/Admin.php:621
+#: lite/includes/Admin.php:642
 msgid "Support"
 msgstr ""
 
-#: lite/includes/Admin.php:631
+#: lite/includes/Admin.php:652
 msgid "Made with ♥ by the team KaizenCoders"
 msgstr ""
 
@@ -279,14 +284,14 @@ msgid "Use the Cloudflare \"CF-Connecting-IP\" HTTP header to get a visitor IP. 
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:256
-#: lite/includes/Helper.php:2883
+#: lite/includes/Helper.php:2885
 #: lite/language.php:203
 #: pro/includes/Settings.php:416
 msgid "Posts"
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:257
-#: lite/includes/Helper.php:2884
+#: lite/includes/Helper.php:2886
 #: lite/language.php:204
 #: pro/includes/Settings.php:417
 msgid "Pages"
@@ -1611,211 +1616,215 @@ msgstr ""
 msgid "Your Weekly URL Shortify Link Summary for %s"
 msgstr ""
 
-#: lite/includes/Helper.php:681
+#: lite/includes/Helper.php:682
 msgid "307 (Temporary)"
 msgstr ""
 
-#: lite/includes/Helper.php:682
+#: lite/includes/Helper.php:683
 msgid "302 (Temporary)"
 msgstr ""
 
-#: lite/includes/Helper.php:683
+#: lite/includes/Helper.php:684
 msgid "301 (Permanent)"
 msgstr ""
 
-#: lite/includes/Helper.php:705
+#: lite/includes/Helper.php:706
 msgid "-- No Prefix --"
 msgstr ""
 
-#: lite/includes/Helper.php:706
+#: lite/includes/Helper.php:707
 msgid "recommends"
 msgstr ""
 
-#: lite/includes/Helper.php:707
+#: lite/includes/Helper.php:708
 msgid "go"
 msgstr ""
 
-#: lite/includes/Helper.php:736
+#: lite/includes/Helper.php:737
 msgid "All my domains"
 msgstr ""
 
-#: lite/includes/Helper.php:778
-#: lite/includes/Helper.php:781
+#: lite/includes/Helper.php:779
+#: lite/includes/Helper.php:782
 #: lite/language.php:146
 msgid "Copy"
 msgstr ""
 
-#: lite/includes/Helper.php:843
+#: lite/includes/Helper.php:844
 #: lite/language.php:147
 msgid "Unique Clicks / Total Clicks"
 msgstr ""
 
-#: lite/includes/Helper.php:1102
+#: lite/includes/Helper.php:1103
 #: lite/language.php:148
 msgid "Post"
 msgstr ""
 
-#: lite/includes/Helper.php:1107
+#: lite/includes/Helper.php:1108
 #: lite/language.php:149
 msgid "Page"
 msgstr ""
 
-#: lite/includes/Helper.php:1112
+#: lite/includes/Helper.php:1113
 #: lite/language.php:150
 msgid "WooCommerce"
 msgstr ""
 
-#: lite/includes/Helper.php:1117
+#: lite/includes/Helper.php:1118
 #: lite/language.php:151
 msgid "Easy Digital Download"
 msgstr ""
 
-#: lite/includes/Helper.php:1122
+#: lite/includes/Helper.php:1123
 #: lite/language.php:152
 msgid "Events Manager"
 msgstr ""
 
-#: lite/includes/Helper.php:1127
+#: lite/includes/Helper.php:1128
 #: lite/language.php:153
 msgid "The Events Calendar"
 msgstr ""
 
-#: lite/includes/Helper.php:1132
+#: lite/includes/Helper.php:1133
 #: lite/language.php:154
 msgid "Betterdocs"
 msgstr ""
 
-#: lite/includes/Helper.php:1137
+#: lite/includes/Helper.php:1138
 #: lite/language.php:155
 msgid "WordPress Knowledgebase"
 msgstr ""
 
-#: lite/includes/Helper.php:1142
+#: lite/includes/Helper.php:1143
 #: lite/language.php:156
 msgid "Modern Events"
 msgstr ""
 
-#: lite/includes/Helper.php:2118
+#: lite/includes/Helper.php:2119
 msgid "Off"
 msgstr ""
 
-#: lite/includes/Helper.php:2119
+#: lite/includes/Helper.php:2120
 msgid "Geo Location"
 msgstr ""
 
-#: lite/includes/Helper.php:2120
+#: lite/includes/Helper.php:2121
 msgid "Technology"
 msgstr ""
 
-#: lite/includes/Helper.php:2121
+#: lite/includes/Helper.php:2122
 msgid "Link Rotation"
 msgstr ""
 
-#: lite/includes/Helper.php:2141
+#: lite/includes/Helper.php:2142
 msgid "Any Country"
 msgstr ""
 
-#: lite/includes/Helper.php:2190
-#: lite/includes/Helper.php:2277
-#: lite/includes/Helper.php:2326
+#: lite/includes/Helper.php:2191
+#: lite/includes/Helper.php:2278
+#: lite/includes/Helper.php:2327
 msgid "Any"
 msgstr ""
 
-#: lite/includes/Helper.php:2430
+#: lite/includes/Helper.php:2431
 #: lite/language.php:161
 #: pro/includes/Actions.php:1126
 msgid "Facebook"
 msgstr ""
 
-#: lite/includes/Helper.php:2431
+#: lite/includes/Helper.php:2432
 msgid "Google Tag Manager"
 msgstr ""
 
-#: lite/includes/Helper.php:2432
+#: lite/includes/Helper.php:2433
 #: lite/language.php:162
 #: pro/includes/Actions.php:1133
 msgid "Twitter"
 msgstr ""
 
-#: lite/includes/Helper.php:2433
+#: lite/includes/Helper.php:2434
 #: lite/language.php:164
 #: pro/includes/Actions.php:1147
 msgid "Linkedin"
 msgstr ""
 
-#: lite/includes/Helper.php:2434
+#: lite/includes/Helper.php:2435
 #: lite/language.php:165
 #: pro/includes/Actions.php:1154
 msgid "Pinterest"
 msgstr ""
 
-#: lite/includes/Helper.php:2435
+#: lite/includes/Helper.php:2436
 msgid "Adwords"
 msgstr ""
 
-#: lite/includes/Helper.php:2436
+#: lite/includes/Helper.php:2437
 msgid "Bing"
 msgstr ""
 
-#: lite/includes/Helper.php:2437
+#: lite/includes/Helper.php:2438
 msgid "Quora"
 msgstr ""
 
-#: lite/includes/Helper.php:2438
+#: lite/includes/Helper.php:2439
 msgid "Adroll"
 msgstr ""
 
-#: lite/includes/Helper.php:2439
+#: lite/includes/Helper.php:2440
+msgid "Reddit"
+msgstr ""
+
+#: lite/includes/Helper.php:2441
 msgid "Nexus Segment"
 msgstr ""
 
-#: lite/includes/Helper.php:2498
+#: lite/includes/Helper.php:2500
 msgid "Select Link"
 msgstr ""
 
-#: lite/includes/Helper.php:2546
+#: lite/includes/Helper.php:2548
 msgid "All Links"
 msgstr ""
 
-#: lite/includes/Helper.php:2555
+#: lite/includes/Helper.php:2557
 msgid "Not in Any Group"
 msgstr ""
 
-#: lite/includes/Helper.php:2575
+#: lite/includes/Helper.php:2577
 msgid "Redirect Types"
 msgstr ""
 
-#: lite/includes/Helper.php:2668
+#: lite/includes/Helper.php:2670
 msgid "Select User"
 msgstr ""
 
-#: lite/includes/Helper.php:2719
+#: lite/includes/Helper.php:2721
 msgid "Read"
 msgstr ""
 
-#: lite/includes/Helper.php:2720
+#: lite/includes/Helper.php:2722
 msgid "Write"
 msgstr ""
 
-#: lite/includes/Helper.php:2721
+#: lite/includes/Helper.php:2723
 msgid "Read & Write"
 msgstr ""
 
 #. Translators: %s = Consumer Key.
-#: lite/includes/Helper.php:2796
+#: lite/includes/Helper.php:2798
 msgid "Consumer Key: %s"
 msgstr ""
 
 #. Translators: %s = Consumer Secret.
-#: lite/includes/Helper.php:2799
+#: lite/includes/Helper.php:2801
 msgid "Consumer Secret: %s"
 msgstr ""
 
-#: lite/includes/Helper.php:2891
+#: lite/includes/Helper.php:2893
 msgid "Excerpt"
 msgstr ""
 
-#: lite/includes/Helper.php:2896
+#: lite/includes/Helper.php:2898
 msgid "At the %1$s of <b>%2$s</b>"
 msgstr ""
 
