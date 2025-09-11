@@ -1840,8 +1840,7 @@ class Helper {
                                     <button type="button"
                                             class="rounded-md border-2 border-green-800 bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50">
                                         <a href="<?php echo esc_url( $pricing_url ); ?>"
-                                           class="text-green-800 hover:text-green-800">Upgrade
-                                            Now</a></button>
+                                           class="text-green-800 hover:text-green-800">Upgrade Now</a></button>
 								<?php } ?>
                                 <button type="button"
                                         class="ml-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-800 focus:outline-none focus:ring-2">
@@ -2438,6 +2437,7 @@ class Helper {
 			'quora'              => __( 'Quora', 'url-shortify' ),
 			'adroll'             => __( 'Adroll', 'url-shortify' ),
 			'reddit'             => __( 'Reddit', 'url-shortify' ),
+			'tiktok'             => __( 'TikTok', 'url-shortify' ),
 			'nexus-segment'      => __( 'Nexus Segment', 'url-shortify' ),
 		];
 	}

@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.8.2
-Stable tag: 1.10.7
+Stable tag: 1.10.8
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -471,18 +471,21 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-**1.10.7 **
+**1.10.8 **
 
-* Update: Added Reddit pixel support. **[PRO]**
+* New: Added TikTok pixel support. **[PRO]**
 * Update: Compatibility with WordPress 6.8.2.
-* Update: .POT file.
 
 == Changelog ==
+
+**1.10.8 [2025-09-11]**
+
+* New: Added TikTok pixel support. **[PRO]**
+* Update: Compatibility with WordPress 6.8.2.
 
 **1.10.7 [2025-08-07]**
 
 * Update: Added Reddit pixel support. **[PRO]**
-* Update: Compatibility with WordPress 6.8.2.
 * Update: .POT file.
 
 **1.10.6 [2025-05-24]**
