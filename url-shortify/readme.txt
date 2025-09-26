@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.8.2
-Stable tag: 1.10.8
+Stable tag: 1.10.9
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -470,74 +470,78 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 15. Link Rotation & Split Test (A/B Test) [PRO]
 
 == Upgrade Notice ==
+= 1.10.9 =
 
-**1.10.8 **
-
-* New: Added TikTok pixel support. **[PRO]**
-* Update: Compatibility with WordPress 6.8.2.
+* Update: UX improvements
+* Translations: Updated .POT file for new translations
 
 == Changelog ==
 
-**1.10.8 [2025-09-11]**
+= 1.10.9 [2025-09-26] =
+
+* Update: UX improvements
+* Translations: Updated .POT file for new translations
+
+= 1.10.8 [2025-09-11] =
 
 * New: Added TikTok pixel support. **[PRO]**
 * Update: Compatibility with WordPress 6.8.2.
 
-**1.10.7 [2025-08-07]**
+= 1.10.7 [2025-08-07] =
 
 * Update: Added Reddit pixel support. **[PRO]**
 * Update: .POT file.
 
-**1.10.6 [2025-05-24]**
+= 1.10.6 [2025-05-24] =
 
 * Update: Compatibility with WordPress 6.8.1.
 * Update: Improve performance.
 
-**1.10.5.1 [2025-02-27]**
+= 1.10.5.1 [2025-02-27] =
 
 * Fix: `Redirection After Expiration` setting not working issue.
 * Update: Compatibility with WordPress 6.7.2.
 
-**1.10.5 [2024-12-03]**
+= 1.10.5 [2024-12-03] =
 
 * Fix: Auto create short links for custom post types issue.
 
-**1.10.4 [2024-11-26]**
+= 1.10.4 [2024-11-26] =
 
 * Fix: Scroll to top issue when click on "Copy Link".
 * Update: Compatibility with WordPress 6.7.1.
 * Update: .POT file.
 
-**1.10.3 [2024-10-25]**
+= 1.10.3 [2024-10-25] =
 
 * New: Add deep link support.
 * Update: Assets.
 * Update: .POT file
 
-**1.10.2 [2024-09-26]**
+= 1.10.2 [2024-09-26] =
 
 * New: Add `get_the_shorturl()` method to generate short url of a current post, page etc..
 * New: Set Redirect URL after link expire. **[PRO]**
 * Update: Minor enhancements.
 * Update: .POT file.
 
-**1.10.1 [2024-09-20]**
+= 1.10.1 [2024-09-20] =
 
 * Update: Minor enhancements.
 * Update: .POT file.
 
-**1.9.7 [2024-09-16]**
+= 1.9.7 [2024-09-16] =
 
 * New: Add `%short_url%` & `%short_url_without_link%` tag to post content and it will be replaced by the actual URL. **[PRO]**
 * Update: .POT file.
 
-**1.9.6 [2024-09-13]**
+= 1.9.6 [2024-09-13] =
 
 * New: Display short links for custom post types along with Pages & Posts. **[PRO]**
 * Update: Compatibility with WordPress 6.6.2
 * Update: .POT file
 
-**1.9.5 [2024-09-09]**
+= 1.9.5 [2024-09-09] =
 
 * New: Create API Keys for Read/Write operations.
 * New: Filter links by Password Protected Yes/No, Expired links, Non-Expired links & Expiration date not set. **[PRO]**
@@ -546,20 +550,20 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * Update: UI enhancements.
 * Update: .POT file.
 
-**1.9.4 [2024-08-29]**
+= 1.9.4 [2024-08-29] =
 
 * New: Filter links using additional link parameters like Nofollow, Sponsored, Parameter Forwarding & Tracking On/Off. **[PRO]**
 * Fix: Remove Groups option from filter dropdown if no groups are available.
 * Fix: UTM Presets creating issue. **[PRO]**
 
-**1.9.3 [2024-08-21]**
+= 1.9.3 [2024-08-21] =
 
 * New: Filter links by Groups & Redirect Type.
 * New: Generate Short links for Posts, Pages & Custom Post Types in bulk using Bulk Action. **[PRO]**
 * New: Security Enhancements.
 * Translations: Update .POT file.
 
-**1.9.2 [2024-08-06]**
+= 1.9.2 [2024-08-06] =
 
 * New: Add support of [WP All Imports](https://www.wpallimport.com/). **[PRO]**
 * Update: UI updates.
@@ -568,17 +572,17 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * Fix: WordPress database error Table doesn't exist error.
 * Fix: Browser icons image broken for few browsers in link analysis.
 
-**1.9.1 [2024-07-15]**
+= 1.9.1 [2024-07-15] =
 
 * New: Add Link Rotation feature to redirect to short link to multiple target URLs. **[PRO]**
 * Update: Improve UI.
 * Fix: Parameter forwarding issue.
 
-**1.9.0.1 [2024-07-04]**
+= 1.9.0.1 [2024-07-04] =
 
 * Fix: Domain checking issue. **[PRO]**
 
-**1.9.0 [2024-07-04]**
+= 1.9.0 [2024-07-04] =
 
 * New: Add support Twitter, Linkedin, Pinterest, Google Adwords, Bing, Quora, Adroll, Nexus Segment tracking pixels. **[PRO]**
 * Fix: Performance issues. Reduced number of database queries to improve the performance.

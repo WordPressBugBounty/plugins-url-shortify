@@ -4,18 +4,18 @@
  *
  * URL Shortify helps you beautify, manage, share & cloak any links on or off of your WordPress website. Create links that look how you want using your own domain name!
  *
- * @link      https://wordpress.org/plugins/url-shortify
- * @author    KaizenCoders <hello@kaizencoders.com>
- * @license   GPL-3.0+
- * @package   Url_Shortify
- * @copyright 2020 - 2025 KaizenCoders
+ * @link            https://wordpress.org/plugins/url-shortify
+ * @author          KaizenCoders <hello@kaizencoders.com>
+ * @license         GPL-3.0+
+ * @package         Url_Shortify
+ * @copyright       2020 - 2025 KaizenCoders
  *
  * @wordpress-plugin
  *
  * Plugin Name:       URL Shortify
  * Plugin URI:        https://kaizencoders.com/url-shortify
  * Description:       URL Shortify helps you beautify, manage, share & cloak any links on or off of your WordPress website. Create links that look how you want using your own domain name!
- * Version:           1.10.8
+ * Version:           1.10.9
  * Author:            KaizenCoders
  * Author URI:        https://kaizencoders.com/
  * Tested up to:      6.8.2
@@ -26,7 +26,7 @@
  * Domain Path:       /languages
  *
  * @fs_premium_only /pro/
- * @fs_ignore /vendor/, /lite/dist/styles/app.css, /lite/scripts/app.js
+ * @fs_ignore       /vendor/, /lite/dist/styles/app.css, /lite/scripts/app.js
  *
  */
 
@@ -45,7 +45,7 @@ if ( function_exists( 'kc_us_fs' ) ) {
 	 * @since 1.0.0
 	 */
 	if ( ! defined( 'KC_US_PLUGIN_VERSION' ) ) {
-		define( 'KC_US_PLUGIN_VERSION', '1.10.8' );
+		define( 'KC_US_PLUGIN_VERSION', '1.10.9' );
 	}
 
 	/**
