@@ -335,3 +335,13 @@ function kc_us_update_196_update_link_display_options() {
 		Option::set( 'settings', $settings );
 	}
 }
+
+/**************** 1.11.5 *******************/
+function kc_us_update_1115_create_tags_tables() {
+	Install::create_tables( '1.11.5' );
+}
+
+/**************** 1.12.2 *******************/
+function kc_us_update_1122_create_favorites_links_table() {
+	Install::create_tables( '1.12.2' );
+}

@@ -753,7 +753,7 @@ abstract class Base_DB {
 	 *
 	 */
 	public function save( $data = [], $id = null ) {
-		if ( is_null( $id ) ) {
+		if ( empty( $id ) ) {
 			return $this->insert( $data );
 		} else {
 			return $this->update( $id, $data );

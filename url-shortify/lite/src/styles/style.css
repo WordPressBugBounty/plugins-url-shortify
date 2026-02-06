@@ -86,11 +86,11 @@ li.menu-top div.wp-menu-image img {
 }
 
 .wp-core-ui .button-primary {
-    @apply text-sm rounded-md border leading-5 font-medium bg-indigo-600 text-white transition ease-in-out duration-150;
+    @apply text-sm rounded-md border leading-5 font-medium bg-indigo-600 text-white transition ease-in-out duration-150 content-center;
 }
 
-.wp-core-ui .button:hover {
-    @apply border-indigo-600 text-indigo-500;
+.wp-core-ui .button-primary:hover, .wp-core-ui .button:hover {
+    @apply border-indigo-600 text-white bg-indigo-500;
 }
 
 .wp-heading-inline .page-title-action {
@@ -106,7 +106,8 @@ p.search-box-group {
 }
 
 p.search-box .kc-us-links-search,
-p.search-box .kc-us-groups-search {
+p.search-box .kc-us-groups-search,
+p.search-box .kc-us-tags-search {
     @apply leading-normal;
 }
 
@@ -177,10 +178,6 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
 
 .wp-core-ui .button-primary {
     @apply text-sm rounded-md border leading-5 font-medium text-indigo-500 text-white transition ease-in-out duration-150;
-}
-
-.wp-core-ui .button-primary:hover {
-    @apply border-gray-600 text-gray-500;
 }
 
 .wp-core-ui .button:hover {

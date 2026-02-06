@@ -620,4 +620,77 @@ class Clicks extends Base_DB {
 
 		return $clicks_data;
 	}
+
+	/**
+	 * Get total clicks by time range.
+	 *
+	 * @param $start_time
+	 * @param $end_time
+	 *
+	 * @return string|null
+	 */
+	public function get_total_clicks_by_time_range( $start_time, $end_time ) {
+		global $wpdb;
+
+		$where = $wpdb->prepare( 'created_at >= %s AND created_at <= %s', date( 'Y-m-d H:i:s', $start_time ), date( 'Y-m-d H:i:s', $end_time ) );
+
+		return $this->count( $where );
+	}
+
+	public function get_top_locations_by_time_range( $start_time, $end_time, $limit = 1 ) {
+		global $wpdb;
+
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT country, COUNT(*) as count
+	 FROM {$this->table_name}
+	 WHERE created_at >= %s AND created_at <= %s
+	 GROUP BY country
+	 ORDER BY count DESC
+	 LIMIT %d",
+				date( 'Y-m-d H:i:s', $start_time ),
+				date( 'Y-m-d H:i:s', $end_time ),
+				$limit
+			)
+		);
+	}
+
+	public function get_top_devices_by_time_range($start_time, $end_time, $limit = 5) {
+		global $wpdb;
+
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT device, COUNT(*) as count
+	  FROM {$this->table_name}
+	  WHERE created_at >= %s AND created_at <= %s
+	  GROUP BY device
+	  ORDER BY count DESC
+	  LIMIT %d",
+				date( 'Y-m-d H:i:s', $start_time ),
+				date( 'Y-m-d H:i:s', $end_time ),
+				$limit
+			)
+		);
+	}
+
+	public function get_top_links_by_time_range( $start_time, $end_time, $limit = 5 ) {
+		global $wpdb;
+
+		$links_table = $wpdb->prefix . 'kc_us_links';
+
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT l.url, COUNT(c.id) as clicks
+	  FROM {$links_table} l
+	  LEFT JOIN {$this->table_name} c ON l.id = c.link_id
+	  WHERE c.created_at >= %s AND c.created_at <= %s
+	  GROUP BY l.id
+	  ORDER BY clicks DESC
+	  LIMIT %d",
+				date( 'Y-m-d H:i:s', $start_time ),
+				date( 'Y-m-d H:i:s', $end_time ),
+				$limit
+			)
+		);
+	}
 }

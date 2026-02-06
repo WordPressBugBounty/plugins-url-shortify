@@ -221,4 +221,9 @@ p.search-box, .search-box #form-search-input, .search-box #search-submit {
 .bulkactions input.kc-us-date-picker {
     line-height: 1;
 }
+
+.us-star-toggle {
+    font-size: 22px;
+    color : #ffb900;
+}
 /** Tooltip Custom CSS - END */

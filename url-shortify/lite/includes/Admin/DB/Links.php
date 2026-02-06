@@ -333,7 +333,7 @@ class Links extends Base_DB {
 		$default_redirection_type = $default_nofollow = $default_sponsored = $default_parameter_forwarding = $default_track_me = 0;
 
 		$slug = Helper::get_data( $data, 'slug', '', true );
-		if ( is_null( $id ) ) {
+		if ( empty( $id ) ) {
 
 			$default_settings = US()->get_settings();
 
@@ -564,7 +564,7 @@ class Links extends Base_DB {
 			return false;
 		}
 
-		if ( is_null( $id ) ) {
+		if ( empty( $id ) ) {
 			do_action( 'kc_us_link_created', $saved );
 		} else {
 			do_action( 'kc_us_link_updated', $id );
@@ -638,6 +638,14 @@ class Links extends Base_DB {
 		$where   = "id IN ($ids_str)";
 
 		return $this->update_by_condition( $parameter, $value, $where );
+	}
+
+	public function get_new_links_count_by_time_range($start_date, $end_date) {
+		global $wpdb;
+
+		$where = $wpdb->prepare( 'created_at >= %s AND created_at <= %s', date( 'Y-m-d H:i:s', $start_date ), date( 'Y-m-d H:i:s', $end_date ) );
+
+		return $this->count( $where );
 	}
 
 }

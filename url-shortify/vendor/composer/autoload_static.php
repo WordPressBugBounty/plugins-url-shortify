@@ -7,27 +7,32 @@ namespace Composer\Autoload;
 class ComposerStaticInitca151a9839a0ae5dc7ffe68a9da8a140
 {
     public static $prefixLengthsPsr4 = array (
-        'K' => 
+        'K' =>
         array (
             'KaizenCoders\\URL_Shortify\\PRO\\' => 30,
+            'KaizenCoders\\URL_Shortify\\Addons\\' => 33,
             'KaizenCoders\\URL_Shortify\\' => 26,
         ),
-        'C' => 
+        'C' =>
         array (
             'Composer\\Installers\\' => 20,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'KaizenCoders\\URL_Shortify\\PRO\\' => 
+        'KaizenCoders\\URL_Shortify\\PRO\\' =>
         array (
             0 => __DIR__ . '/../..' . '/pro/includes',
         ),
-        'KaizenCoders\\URL_Shortify\\' => 
+        'KaizenCoders\\URL_Shortify\\Addons\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/addons',
+        ),
+        'KaizenCoders\\URL_Shortify\\' =>
         array (
             0 => __DIR__ . '/../..' . '/lite/includes',
         ),
-        'Composer\\Installers\\' => 
+        'Composer\\Installers\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
         ),

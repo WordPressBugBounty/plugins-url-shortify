@@ -110,9 +110,9 @@ class Plugin {
 	/**
 	 * Plugin constructor.
 	 *
-	 * @since 1.0.0
+	 * @param  string  $version
 	 *
-	 * @param string $version
+	 * @since 1.0.0
 	 *
 	 */
 	public function __construct( $version = '' ) {
@@ -195,8 +195,8 @@ class Plugin {
 	 * The name of the plugin used to uniquely identify it within the context of
 	 * WordPress and to define internationalization functionality.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_plugin_name() {
 		return $this->Url_Shortify;
@@ -205,8 +205,8 @@ class Plugin {
 	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
-	 * @since     1.0.0
 	 * @return    Loader    Orchestrates the hooks of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_loader() {
 		return $this->loader;
@@ -215,8 +215,8 @@ class Plugin {
 	/**
 	 * Retrieve the version number of the plugin.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_version() {
 		return $this->version;
@@ -225,13 +225,13 @@ class Plugin {
 	/**
 	 * Get Settings
 	 *
-	 * @since 1.2.14
-	 *
 	 * @return array
+	 *
+	 * @since 1.2.14
 	 *
 	 */
 	public function get_settings() {
-		return get_option(  'kc_us_settings' );
+		return get_option( 'kc_us_settings' );
 	}
 
 	/**
@@ -269,7 +269,6 @@ class Plugin {
 	}
 
 	public function load_composer_packages() {
-
 	}
 
 	public function load_dependencies() {
@@ -279,16 +278,16 @@ class Plugin {
 	/**
 	 * Is US PRO?
 	 *
-	 * @since 1.1.0
 	 * @return bool
 	 *
+	 * @since 1.1.0
 	 */
 	public function is_pro() {
 		if ( defined( 'KC_US_DEV_MODE' ) && KC_US_DEV_MODE ) {
 			return true;
 		}
 
-		if ( kc_us_fs()->is_premium() && file_exists( KC_US_PLUGIN_DIR . 'pro/includes/Init_PRO.php' ) ) {
+		if ( kc_us_fs()->is_premium() && file_exists( KC_US_PLUGIN_DIR . 'pro/includes/Init.php' ) ) {
 			return true;
 		}
 
@@ -296,11 +295,30 @@ class Plugin {
 	}
 
 	/**
+	 * Can show premium promotion.
+	 *
+	 * @return mixed|null
+	 * @since 1.11.3
+	 *
+	 */
+	public function can_show_premium_promotion( $force_display = false ) {
+		if ( $force_display ) {
+			return true;
+		}
+
+		if ( US()->is_pro() ) {
+			return false;
+		}
+
+		return ! apply_filters( 'kc_us_disable_promotion', false );
+	}
+
+	/**
 	 * Is QR code enable
 	 *
-	 * @since 1.3.0
 	 * @return bool
 	 *
+	 * @since 1.3.0
 	 */
 	public function is_qr_enable() {
 		return apply_filters( 'kc_us_is_qr_enable', false );
@@ -318,9 +336,9 @@ class Plugin {
 	/**
 	 * Get landing page url.
 	 *
-	 * @since 1.5.15
 	 * @return string|void
 	 *
+	 * @since 1.5.15
 	 */
 	public function get_landing_page_url( $pricing = false ) {
 		if ( $pricing ) {
@@ -333,20 +351,20 @@ class Plugin {
 	/**
 	 * Check if this is qr request
 	 *
-	 * @since 1.3.6
 	 * @return boolean
 	 *
+	 * @since 1.3.6
 	 */
 	public function is_qr_request() {
 		return isset( $_GET['kc_us_source'] ) && 'qr' === Helper::clean( $_GET['kc_us_source'] );
 	}
 
 	/**
-	 * @since 1.3.9
-	 *
 	 * @param $user
 	 *
 	 * @return bool
+	 *
+	 * @since 1.3.9
 	 *
 	 */
 	public function is_administrator( $user = '' ) {
@@ -362,11 +380,11 @@ class Plugin {
 	/**
 	 * Is table exists?
 	 *
-	 * @since 1.3.4
-	 *
-	 * @param string $table
+	 * @param  string  $table
 	 *
 	 * @return bool|int
+	 *
+	 * @since 1.3.4
 	 *
 	 */
 	public function is_table_exists( $table = '' ) {
@@ -390,12 +408,18 @@ class Plugin {
 			'KaizenCoders\URL_Shortify\Frontend\Redirect',
 			'KaizenCoders\URL_Shortify\Common\Actions',
 			'KaizenCoders\URL_Shortify\Shortcode',
-			'KaizenCoders\URL_Shortify\PRO\Init_PRO',
 			'KaizenCoders\URL_Shortify\Feedback',
 			'KaizenCoders\URL_Shortify\Uninstall',
 			'KaizenCoders\URL_Shortify\API\Authentication',
 			'KaizenCoders\URL_Shortify\API\V1\LinksRestController',
+			'KaizenCoders\URL_Shortify\EmailReports\Init',
+			'KaizenCoders\URL_Shortify\PRO\Init',
+			'KaizenCoders\URL_Shortify\Addons\Init',
 		];
+
+		$additional_classes_to_load = apply_filters( 'kc_us_classes_to_initialise', [] );
+
+		$classes = array_merge( $classes, $additional_classes_to_load );
 
 		foreach ( $classes as $class ) {
 			$this->loader->add_class( $class );
@@ -405,9 +429,9 @@ class Plugin {
 	/**
 	 * Return a true instance of a class
 	 *
-	 * @since 1.0.0
 	 * @return Plugin|object
 	 *
+	 * @since 1.0.0
 	 */
 	public static function instance() {
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Plugin ) ) {

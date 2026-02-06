@@ -31,15 +31,17 @@ class Promo {
      */
     public function get_valid_promotions() {
         return [
-            'magic_link_launch_offer',
-            'bfcm_2024_offer',
-            'initial_upgrade',
-            'welcome_offer',
-            'anniversary_offer',
-            'june_2024_promotion',
-            'price_increase_notification',
-            'pre_launch_offer',
-            'helloween_offer',
+                'bfcm_2025_offer',
+                'magic_link_launch_offer',
+                'bfcm_2024_offer',
+                'initial_upgrade',
+                'welcome_offer',
+                'anniversary_offer',
+                'june_2024_promotion',
+                'price_increase_notification',
+                'pre_launch_offer',
+                'helloween_offer',
+                'survey_2025',
         ];
     }
 
@@ -60,7 +62,11 @@ class Promo {
                 if ( in_array( $option_name, $valid_options ) ) {
                     if ( isset( $_GET['redirect_to'] ) && ! empty( $_GET['redirect_to'] ) ) {
                         $redirect_to = esc_url_raw( $_GET['redirect_to'] );
-                        wp_redirect( $redirect_to );
+                        if( $this->is_valid_redirect_to( $redirect_to ) ) {
+                            wp_redirect( $redirect_to );
+                        } else {
+                            wp_safe_redirect( US()->get_pricing_url() );
+                        }
                     } elseif ( 'lifetime' === sanitize_text_field( Helper::get_data( $_GET, 'billing_cycle', '' ) ) ) {
                         wp_safe_redirect( US()->get_pricing_url( 'lifetime' ) );
                     } elseif ( (boolean) Helper::get_data( $_GET, 'landing', false ) ) {
@@ -79,11 +85,79 @@ class Promo {
     }
 
     /**
+     * Get Valid Redirect To URLs.
+     *
+     * @return string[]
+     *
+     * @since 1.12.2
+     */
+    public function get_valid_redirect_to() {
+        return [
+                US()->get_pricing_url(),
+                US()->get_landing_page_url(),
+                'https://kaizencoders.com/url-shortify',
+                'https://kaizencoders.com',
+                'https://kaizencoders.com/magic-link',
+                'https://kaizencoders.com/logify',
+                'https://kaizencoders.com/update-urls',
+        ];
+    }
+
+    /**
+     * Is Valid Redirect To URL.
+     *
+     * @param string $url
+     *
+     * @return bool
+     *
+     * @since 1.12.2
+     */
+    public function is_valid_redirect_to( $url ) {
+        $valid_urls = $this->get_valid_redirect_to();
+        return in_array( $url, $valid_urls, true );
+    }
+
+    /**
      * Handle promotions activity.
      *
      * @since 1.5.12.2
      */
     public function handle_promotions() {
+        $dismiss_url  = $this->get_dismiss_url( 'survey_2025' );
+        $external_url = $this->get_external_url( 'survey_2025', [], 'https://forms.gle/s4mmv1BCJc6yFQGWA' );
+
+        $bfcm_2025_offer = [
+                'title'                         => "<b class='text-red-600 text-xl'>" . __( 'BFCM Sale is live',
+                                'url-shortify' ) . "</b>",
+                'start_date'                    => '2025-11-19',
+                'end_date'                      => '2025-12-08',
+                'total_links'                   => 1,
+                'start_after_installation_days' => 0,
+                'pricing_url'                   => US()->get_pricing_url( 'yearly' ),
+                'promotion'                     => 'bfcm_2025_offer',
+                'show_plan'                     => 'free',
+                'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
+                'banner'                        => true,
+        ];
+
+        $survey_2025 = [
+                'title'                         => "<b class='text-red-600 text-xl'>Help shape what comes next in URL Shortify 🚀</b>",
+                'start_date'                    => '2025-10-08',
+                'end_date'                      => '2025-10-20',
+                'total_links'                   => 1,
+                'start_after_installation_days' => 0,
+                'pricing_url'                   => US()->get_pricing_url( 'yearly' ),
+                'promotion'                     => 'survey_2025',
+                'message'                       => '<p class="text-2xl"><strong>🚀 Help Shape the Future of URL Shortify!</strong></p><p class="text-xl mt-4">We’re working on new features for URL Shortify and would love your input.<br> Take our quick <strong>1-minute survey</strong> and tell us what you’d like to see next.<br><br> 💡 As a thank-you, you’ll get a <strong>20% OFF coupon</strong> for URL Shortify PRO!<br><br> <a href="' . $external_url . '" target="_blank" class="button-primary bg-indigo-600 text-white focus:bg-indigo-800"> 👉 Take the Survey Now </a> <a href="' . $dismiss_url . '" target="_blank" class="text-red-500 text-sm hover:text-red-600"> Close </a> </p>',
+                'coupon_message'                => '',
+                'show_upgrade'                  => false,
+                'show_dismiss_button'           => false,
+                'show_plan'                     => 'free',
+            //'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
+                'banner'                        => false,
+            //'redirect_to'                   => 'https://forms.gle/s4mmv1BCJc6yFQGWA',
+        ];
+
         $magic_link_launch_offer = [
                 'title'                         => "<b class='text-red-600 text-xl'>" . __( 'WordPress Plugin Launch Offer - Magic Link PRO', 'url-shortify' ) . "</b>",
                 'start_date'                    => '2025-09-10',
@@ -98,7 +172,7 @@ class Promo {
                 'show_plan'                     => 'free',
                 'dismiss_url'                   => add_query_arg( 'pricing', 'true', 'https://kaizencoders.com/magic-link' ),
                 'banner'                        => false,
-                'redirect_to'                  => 'https://kaizencoders.com/magic-link',
+                'redirect_to'                   => 'https://kaizencoders.com/magic-link',
         ];
 
         $bfcm_2024_offer = [
@@ -157,7 +231,11 @@ class Promo {
         ];
 
         // Promotion.
-        if ( Helper::can_show_promotion( $magic_link_launch_offer ) ) {
+        if ( Helper::can_show_promotion( $bfcm_2025_offer ) ) {
+            $this->show_promotion( 'bfcm_2025_offer', $bfcm_2025_offer );
+        } elseif ( Helper::can_show_promotion( $survey_2025 ) ) {
+            $this->show_promotion( 'survey_2025', $survey_2025 );
+        } elseif ( Helper::can_show_promotion( $magic_link_launch_offer ) ) {
             $this->show_promotion( 'magic_link_launch_offer', $magic_link_launch_offer );
         } elseif ( Helper::can_show_promotion( $bfcm_2024_offer ) ) {
             $this->show_promotion( 'bfcm_2024_offer', $bfcm_2024_offer );
@@ -215,6 +293,63 @@ class Promo {
             </div>
             <?php
         }
+    }
+
+    /**
+     * Get Dismiss URL.
+     *
+     * @param $promotion
+     * @param $query_strings
+     * @param $redirect_to
+     *
+     * @return string
+     */
+    public function get_dismiss_url( $promotion, $query_strings = [], $redirect_to = '' ) {
+        if ( empty( $promotion ) ) {
+            return '';
+        }
+
+        $query_strings['kc_us_dismiss_admin_notice'] = 1;
+        $query_strings['option_name']                = $promotion;
+
+        // Get the current url to redirect after dismissing the notice.
+        $current_url = home_url( $_SERVER['REQUEST_URI'] );
+
+        if ( empty( $current_url ) ) {
+            $current_url = admin_url();
+        }
+
+        $query_strings['redirect_to'] = esc_url( $current_url );
+        if ( ! empty( $redirect_to ) ) {
+            $query_strings['redirect_to'] = esc_url( $redirect_to );
+        }
+
+        return add_query_arg( $query_strings, $current_url );
+    }
+
+    /**
+     * Get External URL.
+     *
+     * @param $promotion
+     * @param $query_string
+     * @param $redirect_to
+     *
+     * @return string
+     */
+    public function get_external_url( $promotion, $query_string = [], $redirect_to = '' ) {
+        if ( empty( $promotion ) ) {
+            return '';
+        }
+
+        // This is to track the dismiss action from external URL.
+        $query_strings['kc_us_dismiss_admin_notice'] = 1;
+        $query_strings['option_name']                = $promotion;
+
+        if ( ! empty( $redirect_to ) ) {
+            $query_strings['redirect_to'] = esc_url( $redirect_to );
+        }
+
+        return add_query_arg( $query_strings, US()->get_pricing_url() );
     }
 
     /**

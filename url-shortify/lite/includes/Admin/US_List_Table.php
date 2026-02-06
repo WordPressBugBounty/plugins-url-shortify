@@ -166,8 +166,7 @@ class US_List_Table extends \WP_List_Table {
 	 *
 	 */
 	public function save( $data = [], $id = null ) {
-
-		if ( is_null( $id ) ) {
+		if ( empty( $id ) ) {
 			return $this->db->insert( $data );
 		} else {
 			return $this->db->update( $id, $data );

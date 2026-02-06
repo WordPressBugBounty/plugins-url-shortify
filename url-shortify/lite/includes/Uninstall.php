@@ -51,6 +51,8 @@ class Uninstall {
 			$wpdb->prefix . 'kc_us_domains',
 			$wpdb->prefix . 'kc_us_utm_presets',
 			$wpdb->prefix . 'kc_us_tracking_pixels',
+			$wpdb->prefix . 'kc_us_tags',
+			$wpdb->prefix . 'kc_us_favorites_links',
 		];
 
 		foreach ( $tables as $table ) {

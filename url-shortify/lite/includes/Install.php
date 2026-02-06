@@ -91,6 +91,14 @@ class Install {
 		'1.9.6' => [
 			'kc_us_update_196_update_link_display_options',
 		],
+
+		'1.11.5' => [
+			'kc_us_update_1115_create_tags_tables',
+		],
+
+		'1.12.2' => [
+			'kc_us_update_1122_create_favorites_links_table',
+		]
 	];
 
 	/**
@@ -576,6 +584,8 @@ class Install {
 		$tables .= self::get_189_schema( $collate );
 		$tables .= self::get_191_schema( $collate );
 		$tables .= self::get_195_schema( $collate );
+		$tables .= self::get_1115_schema( $collate );
+		$tables .= self::get_1122_schema( $collate );
 
 		return $tables;
 	}
@@ -968,4 +978,57 @@ class Install {
 		}
 	}
 
+	/**
+	 * Create Tag and Link-Tag Relationship tables.
+	 * 
+	 * @since 1.11.5
+	 */
+	public static function get_1115_schema( $collate = '' ) {
+		global $wpdb;
+
+		return "
+			CREATE TABLE `{$wpdb->prefix}kc_us_tags` (
+				`id` int(10) NOT NULL AUTO_INCREMENT,
+				`name` varchar(255) DEFAULT NULL,
+				`description` text DEFAULT NULL,
+				`created_by_id` int(11) DEFAULT NULL,
+				`created_at` datetime DEFAULT NULL,
+				`updated_by_id` int(11) DEFAULT NULL,
+				`updated_at` datetime DEFAULT NULL,
+				PRIMARY KEY  (id)
+			) $collate;
+
+			CREATE TABLE `{$wpdb->prefix}kc_us_links_tags` (
+				`id` int(10) NOT NULL AUTO_INCREMENT,
+				`link_id` int(10) NOT NULL,
+				`tag_id` int(10) NOT NULL,
+				`created_by_id` int(11) DEFAULT NULL,
+				`created_at` datetime DEFAULT NULL,
+				PRIMARY KEY  (id),
+				KEY link_id (link_id),	
+				KEY tag_id (tag_id)
+			) $collate;
+		";
+	}
+
+	/**
+	 * Create User Favorites Links Table.
+	 * 
+	 * @since 1.12.2
+	 */
+	public static function get_1122_schema( $collate = '' ) {
+		global $wpdb;
+		return "
+			CREATE TABLE `{$wpdb->prefix}kc_us_favorites_links` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL,
+				`link_id` bigint(20) unsigned NOT NULL,
+				`created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY  (id),
+				UNIQUE KEY user_link (user_id, link_id),
+				KEY user_id (user_id),
+				KEY link_id (link_id)
+			) $collate;
+		";
+	}
 }

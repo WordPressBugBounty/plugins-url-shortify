@@ -30,7 +30,13 @@ class Export {
 			foreach ( $data as $d ) {
 				$csv = array();
 				foreach ( $headers as $key => $header ) {
-					$csv[] = Helper::get_data( $d, $key, '' );
+					$value = Helper::get_data( $d, $key, '' );
+
+					if ( 'created_at' === $key && ! empty( $value ) ) {
+						$value = Helper::get_formatted_datetime( $value );
+					}
+
+					$csv[] = $value;
 				}
 
 				$csv_output .= '"' . implode( '","', $csv ) . '"';

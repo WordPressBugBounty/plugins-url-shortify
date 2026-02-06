@@ -17,6 +17,7 @@ use KaizenCoders\URL_Shortify\Admin\Controllers\ResourcesController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\ToolsController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\WidgetsController;
 use KaizenCoders\URL_Shortify\Admin\Groups_Table;
+use KaizenCoders\URL_Shortify\Admin\Tags_Table;
 use KaizenCoders\URL_Shortify\Admin\Links_Table;
 
 /**
@@ -199,6 +200,7 @@ class Admin {
 				'usParams',
 				[
 					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'security' => wp_create_nonce( KC_US_AJAX_SECURITY ),
 				]
 			);
 
@@ -223,6 +225,7 @@ class Admin {
 			'usParams',
 			[
 				'ajaxurl' => admin_url( 'admin-ajax.php' ),
+				'security' => wp_create_nonce( KC_US_AJAX_SECURITY ),
 			]
 		);
 
@@ -271,29 +274,12 @@ class Admin {
 					] );
 			}
 
-			if ( US()->is_pro() && in_array( 'manage_custom_domains', $permissions ) ) {
-				$hook = add_submenu_page( 'url_shortify', __( 'Domains', 'url-shortify' ),
-					__( 'Domains', 'url-shortify' ), 'read', 'us_domains', [
-						$this,
-						'render_domains_page',
-					] );
-			}
-
-			if ( US()->is_pro() && in_array( 'manage_utm_presets', $permissions ) ) {
-				$hook = add_submenu_page( 'url_shortify', __( 'UTM Presets', 'url-shortify' ),
-					__( 'UTM Presets', 'url-shortify' ), 'read', 'us_utm_presets', [
-						$this,
-						'render_utm_presets_page',
-					] );
-			}
-
-			if ( US()->is_pro() && in_array( 'manage_tracking_pixels', $permissions ) ) {
-				$hook = add_submenu_page( 'url_shortify', __( 'Tracking Pixels', 'url-shortify' ),
-					__( 'Tracking Pixels', 'url-shortify' ), 'read', 'us_tracking_pixels', [
-						$this,
-						'render_tracking_pixels_page',
-					] );
-			}
+			/**
+			 * Add additional admin menus.
+			 *
+			 * @since 1.11.5
+			 */
+			do_action('kc_us_add_admin_menus', $permissions );
 
 			if ( in_array( 'manage_settings', $permissions ) ) {
 
@@ -351,18 +337,6 @@ class Admin {
 	public function render_groups_page() {
 		$page = new Groups_Table();
 		$page->render();
-	}
-
-	public function render_domains_page() {
-		do_action( 'kc_us_render_domains_page' );
-	}
-
-	public function render_utm_presets_page() {
-		do_action( 'kc_us_render_utm_presets_page' );
-	}
-
-	public function render_tracking_pixels_page() {
-		do_action( 'kc_us_render_tracking_pixels_page' );
 	}
 
 	/**
@@ -654,6 +628,4 @@ class Admin {
 			require_once( KC_US_ADMIN_TEMPLATES_DIR . '/footer-promotion.php' );
 		}
 	}
-
-
 }

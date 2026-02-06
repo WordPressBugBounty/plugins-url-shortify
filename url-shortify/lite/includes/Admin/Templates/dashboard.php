@@ -200,8 +200,10 @@ if ( $show_kpis && ! $show_landing_page) {
 						<?php 
 						if ( US()->is_pro() ) {
 							do_action( 'kc_us_render_country_info', $data );
-						} else { 
+						} else {
+                            if ( US()->can_show_premium_promotion() ) {
 							?>
+
 							<div class="w-full h-64 p-10 bg-green-50">
 								<div class="">
 									<div class="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 rounded-full">
@@ -211,7 +213,7 @@ if ( $show_kpis && ! $show_landing_page) {
 									</div>
 									<div class="mt-3 text-center sm:mt-5">
 										<h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
-											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
+											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
 										</h3>
 										<div class="mt-2">
 											<p class="text-sm leading-5 text-gray-500">
@@ -221,7 +223,7 @@ if ( $show_kpis && ! $show_landing_page) {
 									</div>
 								</div>
 							</div>
-						<?php } ?>
+						<?php } } ?>
 					</div>
 				</div>
 
@@ -234,7 +236,8 @@ if ( $show_kpis && ! $show_landing_page) {
 						<?php 
 						if ( US()->is_pro() ) {
 							do_action( 'kc_us_render_referrer_info', $data );
-						} else { 
+						} else {
+                            if( US()->can_show_premium_promotion() ) {
 							?>
 							<div class="w-full h-64 p-10 bg-green-50">
 								<div class="">
@@ -245,7 +248,7 @@ if ( $show_kpis && ! $show_landing_page) {
 									</div>
 									<div class="mt-3 text-center sm:mt-5">
 										<h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
-											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
+											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
 										</h3>
 										<div class="mt-2">
 											<p class="text-sm leading-5 text-gray-500">
@@ -255,7 +258,7 @@ if ( $show_kpis && ! $show_landing_page) {
 									</div>
 								</div>
 							</div>
-						<?php } ?>
+						<?php } }  ?>
 					</div>
 				</div>
 			</div>
@@ -273,7 +276,8 @@ if ( $show_kpis && ! $show_landing_page) {
 					<?php 
 					if ( US()->is_pro() ) {
 						do_action( 'kc_us_render_device_info', $data );
-					} else { 
+					} else {
+                        if( US()->can_show_premium_promotion() ) {
 						?>
 						<div class="w-full h-64 p-10 bg-green-50">
 							<div class="">
@@ -284,7 +288,7 @@ if ( $show_kpis && ! $show_landing_page) {
 								</div>
 								<div class="mt-3 text-center sm:mt-5">
 									<h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
-										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
+										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
 									</h3>
 									<div class="mt-2">
 										<p class="text-sm leading-5 text-gray-500">
@@ -294,7 +298,7 @@ if ( $show_kpis && ! $show_landing_page) {
 								</div>
 							</div>
 						</div>
-					<?php } ?>
+					<?php }  } ?>
 				</div>
 
 				<!-- Browser Info -->
@@ -305,7 +309,8 @@ if ( $show_kpis && ! $show_landing_page) {
 					<?php 
 					if ( US()->is_pro() ) {
 						do_action( 'kc_us_render_browser_info', $data );
-					} else { 
+					} else {
+                        if( US()->can_show_premium_promotion() ) {
 						?>
 						<div class="w-full h-64 p-10 bg-green-50">
 							<div class="">
@@ -316,7 +321,7 @@ if ( $show_kpis && ! $show_landing_page) {
 								</div>
 								<div class="mt-3 text-center sm:mt-5">
 									<h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
-										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
+										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
 									</h3>
 									<div class="mt-2">
 										<p class="text-sm leading-5 text-gray-500">
@@ -326,7 +331,7 @@ if ( $show_kpis && ! $show_landing_page) {
 								</div>
 							</div>
 						</div>
-					<?php } ?>
+					<?php } } ?>
 				</div>
 
 
@@ -338,7 +343,8 @@ if ( $show_kpis && ! $show_landing_page) {
 					<?php 
 					if ( US()->is_pro() ) {
 						do_action( 'kc_us_render_os_info', $data );
-					} else { 
+					} else {
+                        if( US()->can_show_premium_promotion() ) {
 						?>
 						<div class="w-full h-64 p-10 bg-green-50">
 							<div class="">
@@ -349,7 +355,7 @@ if ( $show_kpis && ! $show_landing_page) {
 								</div>
 								<div class="mt-3 text-center sm:mt-5">
 									<h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
-										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
+										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
 									</h3>
 									<div class="mt-2">
 										<p class="text-sm leading-5 text-gray-500">
@@ -359,7 +365,7 @@ if ( $show_kpis && ! $show_landing_page) {
 								</div>
 							</div>
 						</div>
-					<?php } ?>
+					<?php } } ?>
 				</div>
 			</div>
 		</div>

@@ -64,6 +64,12 @@ class Links_Table extends US_List_Table {
 	public $link_ids = [];
 
 	/**
+	 * Map of link IDs to tag IDs.
+	 * @var array
+	 */
+	public $links_ids_tag_ids = [];
+
+	/**
 	 * Links_Table constructor.
 	 */
 	public function __construct() {
@@ -127,12 +133,12 @@ class Links_Table extends US_List_Table {
 
 			$action = Helper::get_request_data( 'action' );
 
+            $link_id_raw = Helper::get_request_data( 'id', null );
+
+            $link_id = Helper::sanitize_id( $link_id_raw );
+
 			if ( 'new' === $action || 'edit' === $action ) {
-
-				$link_id = Helper::get_request_data( 'id', null );
-
 				$this->render_form( $link_id );
-
 			} elseif ( 'statistics' === $this->current_action() ) {
 				// In our file that handles the request, verify the nonce.
 				$nonce = Helper::get_request_data( '_wpnonce' );
@@ -211,11 +217,15 @@ class Links_Table extends US_List_Table {
 			'clicks'     => __( 'Clicks', 'url-shortify' ),
 			'redirect'   => __( 'Redirect Type', 'url-shortify' ),
 			'groups'     => __( 'Groups', 'url-shortify' ),
-			// 'linked_post' => __( 'Linked Post', 'url-shortify' ),
-			'meta_info'  => __( 'Meta Info', 'url-shortify' ),
-			'created_at' => __( 'Created On', 'url-shortify' ),
-			'link'       => __( 'Link', 'url-shortify' ),
 		];
+
+		if ( US()->is_pro() ) {
+			$columns['tags'] = __( 'Tags', 'url-shortify' );
+		}
+
+		$columns['meta_info']  = __( 'Meta Info', 'url-shortify' );
+		$columns['created_at'] = __( 'Created On', 'url-shortify' );
+		$columns['link']       = __( 'Link', 'url-shortify' );
 
 		return apply_filters( 'kc_us_filter_links_columns', $columns );
 
@@ -263,17 +273,23 @@ class Links_Table extends US_List_Table {
 	 */
 	public function prepare_items() {
 		parent::prepare_items();
-
+		
 		if ( ! empty( $this->items ) ) {
 			$this->link_ids = array_map( function ( $item ) {
 				return $item['id'];
 			}, $this->items );
 		}
 
-		// We are preparing this map to avoid DB queries later for each link data.
+		// Existing clicks and groups fetch
 		$this->link_ids_clicks_data = US()->db->clicks->get_total_clicks_and_unique_clicks_by_link_ids( $this->link_ids );
-
 		$this->links_ids_group_ids = US()->db->links_groups->get_group_ids_by_link_ids( $this->link_ids );
+
+		// NEW: Fetch and store tags for these links
+		$this->links_ids_tag_ids = US()->db->links_tags->get_tag_ids_by_link_ids( $this->link_ids ); 
+
+
+
+
 	}
 
 	/**
@@ -304,11 +320,29 @@ class Links_Table extends US_List_Table {
 		$url     = esc_url( $item['url'] );
 		$name    = stripslashes( $item['name'] );
 		$slug    = $item['slug'];
+		$star_html = '';
+
+		if ( US()->is_pro() ) {
+			$user_id = get_current_user_id();
+			
+			$user_favorites = US()->db->favorites_links->get_by_user_id( $user_id );
+			$is_starred     = in_array( $link_id, $user_favorites );
+
+			$starred_class = $is_starred ? 'starred' : '';
+			$star_icon     = $is_starred ? '<span class="dashicons dashicons-star-filled"></span>' : '<span class="dashicons dashicons-star-empty"></span>';
+			$tooltip       = $is_starred ? __( 'Remove from Favorites', 'url-shortify' ) : __( 'Add to Favorites', 'url-shortify' );
+
+			$star_html = sprintf(
+				'<span class="us-star-toggle cursor-pointer mr-2 %s" data-id="%d" title="%s">%s</span>',
+				$starred_class, $link_id, $tooltip, $star_icon
+			);
+		}
 
 		$short_link = esc_attr( Helper::get_short_link( $slug, $item ) );
 
-		$title = sprintf( '<span class="flex w-full"><img class="h-6 w-6 mr-2" style="min-width: 1.5rem;" src="https://www.google.com/s2/favicons?domain=%s" title="%s"/><strong>%s</strong></span>',
-			$url, $url, $name );
+		// Injected $star_html as the first %s in the sprintf statement
+		$title = sprintf( '<span class="flex w-full">%s<img class="h-6 w-6 mr-2" style="min-width: 1.5rem;" src="https://www.google.com/s2/favicons?domain=%s" title="%s"/><strong>%s</strong></span>',
+			$star_html, $url, $url, $name );
 
 		$actions = [
 			'edit'   => sprintf( __( '<a href="%s" class="text-indigo-600">Edit</a>', 'url-shortify' ),
@@ -557,6 +591,43 @@ class Links_Table extends US_List_Table {
 			'created_at' => [ 'created_at', true ],
 		];
 
+	}
+
+	/**
+	 * Display Tags in the table column
+	 * @since 1.11.5
+	 */
+	function column_tags( $item ) {
+		$link_id = Helper::get_data( $item, 'id', '' );
+
+		if ( empty( $link_id ) ) {
+			return '-';
+		}
+
+		// Get the Tag IDs assigned to this link from our prepared map
+		$tag_ids = ! empty( $this->links_ids_tag_ids[ $link_id ] ) ? $this->links_ids_tag_ids[ $link_id ] : [];
+
+		if ( empty( $tag_ids ) ) {
+			return '-';
+		}
+
+		// Get the full name map from the database
+		$tag_name_map = US()->db->tags->get_all_id_name_map();
+
+		// $tags_output = [];
+		// foreach ( $tag_ids as $tag_id ) {
+		// 	if ( isset( $tag_name_map[ $tag_id ] ) ) {
+		// 		$tags_output[] = '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mr-1">' . esc_html( $tag_name_map[ $tag_id ] ) . '</span>';
+		// 	}
+		// }
+
+		// return ! empty( $tags_output ) ? implode( ' ', $tags_output ) : '-';
+
+
+
+
+		// Use a helper to convert IDs to a comma-separated string of names
+		return Helper::get_tag_str_from_ids( $tag_ids, $tag_name_map ); 
 	}
 
 	/**
@@ -1108,7 +1179,7 @@ class Links_Table extends US_List_Table {
 
 			$nonce = Helper::get_request_data( '_wpnonce' );
 
-			$form_data = Helper::get_request_data( 'form_data', [], false );
+			$form_data = Helper::get_post_data( 'form_data', [], false );
 
 			$form_data['existing_slug'] = $existing_slug;
 
@@ -1179,6 +1250,7 @@ class Links_Table extends US_List_Table {
 				'redirection_types' => Helper::get_redirection_types(),
 				'domains'           => Helper::get_domains(),
 				'groups'            => US()->db->groups->get_id_name_map(),
+				'tags'              => US()->db->tags->get_id_name_map(),
 			];
 
 			include_once KC_US_ADMIN_TEMPLATES_DIR . '/link-form.php';
@@ -1206,6 +1278,7 @@ class Links_Table extends US_List_Table {
 
 		if ( ! empty( $link_id ) ) {
 			$results = $this->db->get( $link_id );
+			$results['tag_ids'] = US()->db->links_tags->get_tag_ids_by_link_id( $link_id ); 
 		}
 
 		$default_settings = US()->get_settings();
@@ -1228,6 +1301,8 @@ class Links_Table extends US_List_Table {
 			'url'               => Helper::get_data( $results, 'url', '' ),
 			'slug'              => Helper::get_data( $results, 'slug', Utils::get_valid_slug() ),
 			'redirect_type'     => Helper::get_data( $results, 'redirect_type', $default_redirection_type ),
+			'tag_ids'           => Helper::get_data( $results, 'tag_ids', [] ),
+			'tags'              => Helper::get_data( $results, 'tags', '' ),
 			'description'       => Helper::get_data( $results, 'description', '' ),
 			'nofollow'          => Helper::get_data( $results, 'nofollow', $default_nofollow ),
 			'sponsored'         => Helper::get_data( $results, 'sponsored', $default_sponsored ),
@@ -1355,9 +1430,14 @@ class Links_Table extends US_List_Table {
 		}
 
 		$group_ids = Helper::get_data( $data, 'group_ids', [] );
+		US()->db->links_groups->add_link_to_groups( $link_id, $group_ids );
 
-		// Add link to groups
-		return US()->db->links_groups->add_link_to_groups( $link_id, $group_ids );
+		if ( US()->is_pro() ) {
+			$tag_ids = Helper::get_data( $data, 'tag_ids', [] );
+			US()->db->links_tags->add_link_to_tags( $link_id, $tag_ids ); 
+		}
+
+		return $link_id;
 	}
 
 	public function search_box( $text, $input_id ) {

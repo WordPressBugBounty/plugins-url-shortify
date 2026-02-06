@@ -3,8 +3,8 @@ Contributors: kaizencoders, mikeatkaizencoders
 Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
-Tested up to: 6.8.2
-Stable tag: 1.10.9
+Tested up to: 6.9
+Stable tag: 1.12.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -213,13 +213,16 @@ We have one click import setup for following WordPress Plugin. If you are using 
 > 👉 **Filter Links**
 > Filter links using Groups, Redirect Types, additional link parameters like Nofollow, Sponsored, Parameter Forwarding & Tracking On/Off, Password Protected links & Expired links.
 
-> 👉 **Tags** [Coming Soon!]
+> 👉 **Tags**
 > Quickly add tags to the links and search links based on the tags. It's a great way to organize links and find them quickly.
+
+> 👉 **Favorite Links**
+> Mark links as Favorite and access them quickly using Favorite filter.
 
 > 👉 **Broken Link Checker** [Coming Soon!]
 > Quickly find the broken links and restore their functionality, ensuring your website is up and running smoothly.
 
-> 👉 **Amazon Affiliate** [Coming Soon!]
+> 👉 **Amazon Affiliates** [Coming Soon!]
 > Adds your Amazon Affiliate-Tag to all Amazon URLs before redirection.
 
 > 👉 **A/B Testing** [Coming Soon!]
@@ -469,123 +472,59 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 15. Link Rotation & Split Test (A/B Test) [PRO]
 
-== Upgrade Notice ==
-= 1.10.9 =
+16. Favorite Links [PRO]
 
-* Update: UX improvements
+== Upgrade Notice ==
+= 1.12.2 =
+
+* New: Added support to mark links as Favorite. **[PRO]**
+* Update: Enhanced Security.
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
 
-= 1.10.9 [2025-09-26] =
+= 1.12.2 [2026-02-02] =
+
+* New: Added support to mark links as Favorite. **[PRO]**
+* Update: Enhanced Security.
+* Translations: Updated .POT file for new translations
+
+= 1.12.1 [2026-01-23] =
+
+* Fix: Custom domains not visible in the link creation dropdown. **[PRO]**
+
+= 1.12.0 [2026-01-20] =
+
+* New: Added support to add tags to created links. **[PRO]**
+* Update: Converted `Clicked On` time in user defined timezone in exported click history. **[PRO]**
+* Fix: Link prefix not getting added to the short links created. **[PRO]**
+* Update: Compatibility with WordPress 6.9
+
+= 1.11.4 [2025-11-20] =
+
+* Fix: Link creation issue.
+
+= 1.11.3 [2025-11-20] =
+
+* New: Weekly summary of new links and clicks report via email.
+* Update: Enhanced security.
+* Update: Compatibility with WordPress 6.8.3.
+
+= 1.11.2 [2025-10-13] =
+
+* New: No more promotion notice for PRO users.
+* Update: UX Improvements.
+* Update: Translations update.
+
+= 1.11.1 [2025-10-09] =
 
 * Update: UX improvements
 * Translations: Updated .POT file for new translations
+* Fix: Plugin version issue
 
-= 1.10.8 [2025-09-11] =
+= 1.11.0 [2025-10-09] =
 
-* New: Added TikTok pixel support. **[PRO]**
-* Update: Compatibility with WordPress 6.8.2.
-
-= 1.10.7 [2025-08-07] =
-
-* Update: Added Reddit pixel support. **[PRO]**
-* Update: .POT file.
-
-= 1.10.6 [2025-05-24] =
-
-* Update: Compatibility with WordPress 6.8.1.
-* Update: Improve performance.
-
-= 1.10.5.1 [2025-02-27] =
-
-* Fix: `Redirection After Expiration` setting not working issue.
-* Update: Compatibility with WordPress 6.7.2.
-
-= 1.10.5 [2024-12-03] =
-
-* Fix: Auto create short links for custom post types issue.
-
-= 1.10.4 [2024-11-26] =
-
-* Fix: Scroll to top issue when click on "Copy Link".
-* Update: Compatibility with WordPress 6.7.1.
-* Update: .POT file.
-
-= 1.10.3 [2024-10-25] =
-
-* New: Add deep link support.
-* Update: Assets.
-* Update: .POT file
-
-= 1.10.2 [2024-09-26] =
-
-* New: Add `get_the_shorturl()` method to generate short url of a current post, page etc..
-* New: Set Redirect URL after link expire. **[PRO]**
-* Update: Minor enhancements.
-* Update: .POT file.
-
-= 1.10.1 [2024-09-20] =
-
-* Update: Minor enhancements.
-* Update: .POT file.
-
-= 1.9.7 [2024-09-16] =
-
-* New: Add `%short_url%` & `%short_url_without_link%` tag to post content and it will be replaced by the actual URL. **[PRO]**
-* Update: .POT file.
-
-= 1.9.6 [2024-09-13] =
-
-* New: Display short links for custom post types along with Pages & Posts. **[PRO]**
-* Update: Compatibility with WordPress 6.6.2
-* Update: .POT file
-
-= 1.9.5 [2024-09-09] =
-
-* New: Create API Keys for Read/Write operations.
-* New: Filter links by Password Protected Yes/No, Expired links, Non-Expired links & Expiration date not set. **[PRO]**
-* New: Enable/Disable Nofollow, Sponsored, Tracking & Parameters Forwarding to links. **[PRO]**
-* Update: Performance improvements. Removed multiple database queries.
-* Update: UI enhancements.
-* Update: .POT file.
-
-= 1.9.4 [2024-08-29] =
-
-* New: Filter links using additional link parameters like Nofollow, Sponsored, Parameter Forwarding & Tracking On/Off. **[PRO]**
-* Fix: Remove Groups option from filter dropdown if no groups are available.
-* Fix: UTM Presets creating issue. **[PRO]**
-
-= 1.9.3 [2024-08-21] =
-
-* New: Filter links by Groups & Redirect Type.
-* New: Generate Short links for Posts, Pages & Custom Post Types in bulk using Bulk Action. **[PRO]**
-* New: Security Enhancements.
-* Translations: Update .POT file.
-
-= 1.9.2 [2024-08-06] =
-
-* New: Add support of [WP All Imports](https://www.wpallimport.com/). **[PRO]**
-* Update: UI updates.
-* Update: Compatibility check with WordPress 6.6.1
-* Fix: PHP Deprecated: Automatic conversion of false to array is deprecated notice.
-* Fix: WordPress database error Table doesn't exist error.
-* Fix: Browser icons image broken for few browsers in link analysis.
-
-= 1.9.1 [2024-07-15] =
-
-* New: Add Link Rotation feature to redirect to short link to multiple target URLs. **[PRO]**
-* Update: Improve UI.
-* Fix: Parameter forwarding issue.
-
-= 1.9.0.1 [2024-07-04] =
-
-* Fix: Domain checking issue. **[PRO]**
-
-= 1.9.0 [2024-07-04] =
-
-* New: Add support Twitter, Linkedin, Pinterest, Google Adwords, Bing, Quora, Adroll, Nexus Segment tracking pixels. **[PRO]**
-* Fix: Performance issues. Reduced number of database queries to improve the performance.
-* Fix: Main domain also considered even if only custom domain is selected while creating a short URL. **[PRO]**
+* Update: UX improvements
+* Translations: Updated .POT file for new translations
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/url-shortify/trunk/changelog.txt) file.

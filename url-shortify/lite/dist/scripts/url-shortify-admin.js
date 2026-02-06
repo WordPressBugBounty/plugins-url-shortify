@@ -75,6 +75,17 @@
                 multiple: true
             });
         }
+        
+        // Tags Dropdown.
+        if ($('.kc-us-tags').get(0)) {
+            $('.kc-us-tags').select2({
+                placeholder: 'Select Tags',
+                allowClear: true,
+                dropdownAutoWidth: true,
+                width: 500,
+                multiple: true
+            });
+        }
 
         // Tracking Pixels Dropdown.
         if ($('.kc-us-tracking-pixels').get(0)) {
@@ -382,3 +393,35 @@ function confirmDelete() {
 function confirmReset() {
     return confirm('Are you sure you want to reset statistics of short link?');
 }
+
+/**
+ * Toggle favorite link.
+ *
+ * @since 1.12.2
+ */
+jQuery(document).on('click', '.us-star-toggle', function() {
+    var $this = jQuery(this);
+    var linkId = $this.data('id');
+    
+    // Safety check: if usParams or security is missing, log an error
+    if ( typeof usParams === 'undefined' || ! usParams.security ) {
+        console.error('URL Shortify: Security nonce is missing. Please check script localization.');
+        return;
+    }
+
+    jQuery.post(ajaxurl, {
+        action: 'us_handle_request',
+        cmd: 'toggle_favorite',
+        link_id: linkId,
+        security: usParams.security,
+    }, function(response) {
+        if (response.success) {
+            $this.toggleClass('starred');
+            var isStarred = $this.hasClass('starred');
+            $this.html(isStarred ? '<span class="dashicons dashicons-star-filled"></span>' : '<span class="dashicons dashicons-star-empty"></span>');
+            $this.attr('title', isStarred ? 'Remove from Favorites' : 'Add to Favorites');
+        } else {
+            alert(response.data.message);
+        }
+    });
+});

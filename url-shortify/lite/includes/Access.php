@@ -91,6 +91,7 @@ class Access {
 				'create_links',
 				'manage_links',
 				'manage_groups',
+				'manage_tags',
 				'manage_settings',
 				'manage_custom_domains',
 				'manage_utm_presets',

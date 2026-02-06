@@ -101,12 +101,12 @@ class Groups_Table extends US_List_Table {
 
 			$action = Helper::get_request_data( 'action' );
 
+            $group_id_raw = Helper::get_request_data( 'id', null );
+
+            $group_id = Helper::sanitize_id( $group_id_raw );
+
 			if ( 'new' === $action || 'edit' === $action ) {
-
-				$group_id = Helper::get_request_data( 'id', null );
-
 				$this->render_form( $group_id );
-
 			} elseif ( 'statistics' === $this->current_action() ) {
 				// In our file that handles the request, verify the nonce.
 				$nonce = Helper::get_request_data( '_wpnonce' );
@@ -479,7 +479,7 @@ class Groups_Table extends US_List_Table {
 
 			$nonce = Helper::get_request_data( '_wpnonce' );
 
-			$form_data = Helper::get_request_data( 'form_data', array(), false );
+			$form_data = Helper::get_post_data( 'form_data', array(), false );
 
 			$form_data['nonce'] = $nonce;
 
@@ -598,7 +598,6 @@ class Groups_Table extends US_List_Table {
 			$error      = true;
 		} else {
 			$title      = Helper::get_data( $data, 'name', '' );
-			$target_url = Helper::get_data( $data, 'url', '' );
 
 			if ( empty( $title ) ) {
 				$messages[] = __( 'Please Enter Name', 'url-shortify' );

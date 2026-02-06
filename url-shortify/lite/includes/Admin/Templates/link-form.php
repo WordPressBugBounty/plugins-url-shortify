@@ -6,6 +6,7 @@ $form_data = Helper::get_data( $template_data, 'form_data', array() );
 
 $redirection_types = Helper::get_data( $template_data, 'redirection_types', '' );
 $groups            = Helper::get_data( $template_data, 'groups', array() );
+$tags            = Helper::get_data( $template_data, 'tags', array() );
 $title             = Helper::get_data( $template_data, 'title', '' );
 $link_id           = Helper::get_data( $template_data, 'link_id', 0 );
 
@@ -18,6 +19,7 @@ $rules             = Helper::get_data( $form_data, 'rules', array() );
 $default_domain    = Helper::get_data( $form_data, 'default_domain', '' );
 
 $group_url = admin_url( 'admin.php?page=us_groups&action=new' );
+$tag_url = admin_url( 'admin.php?page=us_tags&action=new' );
 
 $dynamic_redirect_type = Helper::get_data($rules, 'dynamic_redirect_type', 'off');
 
@@ -187,50 +189,15 @@ $settings = array(
                             </div>
 						<?php } ?>
 
-                        <!-- Tracking Pixel -->
+                        <!-- Tracking Pixel, Domains -->
 	                    <?php
 	                    if ( US()->is_pro() ) {
 		                    do_action( 'kc_us_add_tracking_pixels', $form_data );
+
+                            do_action( 'kc_us_add_domains', $form_data );
+
+                            do_action( 'kc_us_add_tags', $form_data );
 	                    } ?>
-
-                        <!-- Domains -->
-						<?php if ( Helper::is_forechable( $domains ) ) { ?>
-                            <div class="flex flex-row border-b border-gray-100">
-                                <div class="flex w-1/5">
-                                    <div class="pt-6 ml-4">
-                                        <label for="domains">
-                                            <span class="block pt-1 pb-2 pr-4 ml-4 text-sm font-medium text-gray-600"><?php echo __( 'Domain', 'url-shortify' ); ?></span>
-
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="flex">
-                                    <div class="h-10 mt-4 mb-4 ml-16 mr-4">
-                                        <div class="relative h-10">
-                                            <select class="relative border border-gray-400 shadow-sm form-select"
-                                                    name="form_data[rules][domain]" id="">
-												<?php foreach ( $domains as $value => $option ) { ?>
-                                                    <option value="<?php echo $value; ?>"
-														<?php
-														if ( Helper::get_data( $rules, 'domain', $default_domain ) == $value ) {
-															echo 'selected=selected';
-														}
-														?>
-                                                    > <?php echo esc_html( $option ); ?> </option>
-												<?php } ?>
-                                            </select>
-											<?php if ( US()->is_pro() ) { ?>
-                                                <p class="field-desciption mb-2 text-xs italic font-normal leading-snug text-gray-500 helper mt-2"><?php _e( 'Select on which domain should this short link be accessible.', 'url-shortify' ); ?></p>
-											<?php } else { ?>
-                                                <h3 class="text-sm leading-5 font-medium text-green-800"><?php echo sprintf( __( 'Want to use shortlinks with custom domains? <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?></h3>
-											<?php } ?>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-						<?php } ?>
 
                         <!-- Groups -->
                         <div class="flex flex-row border-b border-gray-100">
@@ -278,6 +245,8 @@ $settings = array(
                             </div>
                         </div>
 
+
+                        
                         <!-- Settings (no follow, sponsored, parameter forwarding, tracking) -->
 						<?php foreach ( $settings as $key => $setting ) { ?>
                             <div class="flex border-b border-gray-100">
@@ -326,7 +295,7 @@ $settings = array(
 	                    <?php
 	                    if ( US()->is_pro() ) {
 		                    do_action( 'kc_us_add_dynamic_redirection', $form_data );
-	                    } else { ?>
+	                    } else { if(US()->can_show_premium_promotion()) { ?>
                             <div class="flex flex-row border-b border-gray-100">
                                 <div class="flex w-1/5">
                                     <div class="pt-6 ml-4">
@@ -357,7 +326,7 @@ $settings = array(
                                     </div>
                                 </div>
                             </div>
-                        <?php } ?>
+                        <?php } } ?>
 
 
                         <!-- Expiration Date -->
@@ -365,6 +334,7 @@ $settings = array(
 						if ( US()->is_pro() ) {
 							do_action( 'kc_us_add_expiry_option', $form_data );
 						} else {
+                        if(US()->can_show_premium_promotion()) {
 							?>
                             <div class="flex flex-row border-b border-gray-100">
                                 <div class="flex w-1/5">
@@ -396,7 +366,7 @@ $settings = array(
                                 </div>
                             </div>
 
-						<?php } ?>
+						<?php } } ?>
 
 
                         <!-- Password  -->
@@ -404,6 +374,7 @@ $settings = array(
 						if ( US()->is_pro() ) {
 							do_action( 'kc_us_add_password_option', $form_data );
 						} else {
+                        if(US()->can_show_premium_promotion()) {
 							?>
                             <div class="flex flex-row border-b border-gray-100">
                                 <div class="flex w-1/5">
@@ -434,7 +405,7 @@ $settings = array(
                                     </div>
                                 </div>
                             </div>
-						<?php } ?>
+						<?php } } ?>
 
                         <!-- Notes -->
                         <div class="flex flex-row border-b border-gray-100">

@@ -68,6 +68,27 @@ class DB {
 	public $api_keys;
 
 	/**
+	 * @var Object|Tags
+	 *
+	 * @since 1.11.5
+	 */
+	public $tags;
+
+	/**
+	 * @var Object|Links_Tags
+	 *
+	 * @since 1.11.5
+	 */
+	public $links_tags;
+
+	/**
+	 * @var Object|Favorites_Links
+	 *
+	 * @since 1.12.2
+	 */
+	public $favorites_links;
+
+	/**
 	 * constructor.
 	 *
 	 * @since 1.0.0
@@ -82,5 +103,8 @@ class DB {
 		$this->tracking_pixels  = new Tracking_Pixels();
 		$this->clicks_rotations = new Clicks_Rotations();
 		$this->api_keys         = new API_Keys();
+		$this->tags             = new Tags();
+		$this->links_tags       = new Links_Tags();
+		$this->favorites_links  = new Favorites_Links();
 	}
 }

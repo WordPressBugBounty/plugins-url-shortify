@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'KaizenCoders\\URL_Shortify\\PRO\\' => array($baseDir . '/pro/includes'),
+    'KaizenCoders\\URL_Shortify\\Addons\\' => array($baseDir . '/addons'),
     'KaizenCoders\\URL_Shortify\\' => array($baseDir . '/lite/includes'),
     'Composer\\Installers\\' => array($vendorDir . '/composer/installers/src/Composer/Installers'),
 );

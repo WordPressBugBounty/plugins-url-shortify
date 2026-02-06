@@ -15,17 +15,17 @@
  * Plugin Name:       URL Shortify
  * Plugin URI:        https://kaizencoders.com/url-shortify
  * Description:       URL Shortify helps you beautify, manage, share & cloak any links on or off of your WordPress website. Create links that look how you want using your own domain name!
- * Version:           1.10.9
+ * Version:           1.12.2
  * Author:            KaizenCoders
  * Author URI:        https://kaizencoders.com/
- * Tested up to:      6.8.2
+ * Tested up to:      6.9
  * Requires PHP:      5.6
  * Text Domain:       url-shortify
  * License:           GPL-3.0+
  * License URI:       https://www.gnu.org/licenses
  * Domain Path:       /languages
  *
- * @fs_premium_only /pro/
+ * @fs_premium_only /pro/, /addons/
  * @fs_ignore       /vendor/, /lite/dist/styles/app.css, /lite/scripts/app.js
  *
  */
@@ -45,7 +45,7 @@ if ( function_exists( 'kc_us_fs' ) ) {
 	 * @since 1.0.0
 	 */
 	if ( ! defined( 'KC_US_PLUGIN_VERSION' ) ) {
-		define( 'KC_US_PLUGIN_VERSION', '1.10.9' );
+		define( 'KC_US_PLUGIN_VERSION', '1.12.2' );
 	}
 
 	/**
@@ -172,6 +172,11 @@ if ( function_exists( 'kc_us_fs' ) ) {
 
 	if ( ! defined( 'KC_US_UPLOADS_DIR' ) ) {
 		define( 'KC_US_UPLOADS_DIR', $upload_dir['basedir'] . '/kaizencoders_uploads/url-shortify/uploads/' );
+	}
+
+	// Load the action scheduler library.
+	if ( ! class_exists( 'ActionScheduler' ) ) {
+		require_once dirname( __FILE__ ) . '/libs/action-scheduler/action-scheduler.php';
 	}
 
 	/**
