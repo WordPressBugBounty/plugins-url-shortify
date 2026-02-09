@@ -113,4 +113,93 @@ class Links_Tags extends Base_DB {
 
 		return $data;
 	}
+
+	/**
+	 * Prepare data for bulk insertion into the links_tags table.
+	 *
+	 * @param array $link_ids
+	 * @param array $tag_ids
+	 * @return array
+	 */
+	public function prepare_links_tags_data( $link_ids, $tag_ids ) {
+		$data = [];
+		$now  = Helper::get_current_date_time();
+		$user = get_current_user_id();
+
+		foreach ( (array) $link_ids as $link_id ) {
+			foreach ( (array) $tag_ids as $tag_id ) {
+				$data[] = [
+					'link_id'       => absint( $link_id ),
+					'tag_id'        => absint( $tag_id ),
+					'created_at'    => $now,
+					'created_by_id' => $user,
+				];
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Map links to tags (Bulk Add or Bulk Move).
+	 *
+	 * @param array|int $link_ids Link IDs to be tagged.
+	 * @param array|int $tag_ids  Tag IDs to assign.
+	 * @param bool      $move     If true, deletes existing tag associations for these links first.
+	 *
+	 * @return bool|int Returns result of bulk_insert or false on failure.
+	 * 
+	 * @since 1.12.3
+	 */
+	public function map_links_and_tags( $link_ids = [], $tag_ids = [], $move = false ) {
+		if ( empty( $link_ids ) || empty( $tag_ids ) ) {
+			return false;
+		}
+
+		if ( ! is_array( $link_ids ) ) {
+			$link_ids = [ absint( $link_ids ) ];
+		}
+
+		if ( ! is_array( $tag_ids ) ) {
+			$tag_ids = [ absint( $tag_ids ) ];
+		}
+
+		if ( is_array( $link_ids ) && is_array( $tag_ids ) ) {
+			if ( $move ) {
+				$links_ids_str = $this->prepare_for_in_query( $link_ids );
+				$where = "link_id IN ($links_ids_str)";
+
+				$this->delete_by_condition( $where );
+			}
+
+			$links_tags_data = $this->prepare_links_tags_data( $link_ids, $tag_ids );
+
+			return $this->bulk_insert( $links_tags_data );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete link-tag associations based on link IDs.
+	 *
+	 * @param array|int $link_ids Link IDs for which to delete tag associations.
+	 * @return bool Returns true on success, false on failure.
+	 *
+	 * @since 1.12.3
+	 */
+	public function delete_by_link_ids( $link_ids = [] ) {
+		if ( empty( $link_ids ) ) {
+			return false;
+		}
+
+		if ( ! is_array( $link_ids ) ) {
+			$link_ids = [ absint( $link_ids ) ];
+		}
+
+		$link_ids_str = $this->prepare_for_in_query( $link_ids );
+		$where        = "link_id IN ($link_ids_str)";
+
+		return $this->delete_by_condition( $where );
+	}
 }

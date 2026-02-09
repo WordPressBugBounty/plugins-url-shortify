@@ -19,7 +19,7 @@ $rules             = Helper::get_data( $form_data, 'rules', array() );
 $default_domain    = Helper::get_data( $form_data, 'default_domain', '' );
 
 $group_url = admin_url( 'admin.php?page=us_groups&action=new' );
-$tag_url = admin_url( 'admin.php?page=us_tags&action=new' );
+
 
 $dynamic_redirect_type = Helper::get_data($rules, 'dynamic_redirect_type', 'off');
 

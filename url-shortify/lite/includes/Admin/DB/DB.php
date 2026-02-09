@@ -54,37 +54,37 @@ class DB {
 	public $tracking_pixels;
 
 	/**
+	 * @since 1.9.1
 	 * @var Clicks_Rotations
 	 *
-	 * @since 1.9.1
 	 */
 	public $clicks_rotations;
 
 	/**
+	 * @since 1.9.5
 	 * @var API_Keys
 	 *
-	 * @since 1.9.5
 	 */
 	public $api_keys;
 
 	/**
+	 * @since 1.11.5
 	 * @var Object|Tags
 	 *
-	 * @since 1.11.5
 	 */
 	public $tags;
 
 	/**
+	 * @since 1.11.5
 	 * @var Object|Links_Tags
 	 *
-	 * @since 1.11.5
 	 */
 	public $links_tags;
 
 	/**
-	 * @var Object|Favorites_Links
-	 *
 	 * @since 1.12.2
+	 * @var Object|Favorites_Links $this
+	 *
 	 */
 	public $favorites_links;
 
@@ -94,17 +94,40 @@ class DB {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->clicks           = new Clicks();
-		$this->links            = new Links();
-		$this->groups           = new Groups();
-		$this->links_groups     = new Links_Groups();
-		$this->domains          = new Domains();
-		$this->utm_presets      = new UTM_Presets();
-		$this->tracking_pixels  = new Tracking_Pixels();
+		/* @var Object|Clicks $this */
+		$this->clicks = new Clicks();
+		/* @var Object|Links $this */
+
+		$this->links = new Links();
+
+		/* @var Object|Groups $this */
+		$this->groups = new Groups();
+
+		/* @var Object|Links_Groups $this */
+		$this->links_groups = new Links_Groups();
+
+		/* @var Object|Domains $this */
+		$this->domains = new Domains();
+
+		/* @var Object|UTM_Presets $this */
+		$this->utm_presets = new UTM_Presets();
+
+		/* @var Object|Tracking_Pixels $this */
+		$this->tracking_pixels = new Tracking_Pixels();
+
+		/* @var Object|Clicks_Rotations $this */
 		$this->clicks_rotations = new Clicks_Rotations();
-		$this->api_keys         = new API_Keys();
-		$this->tags             = new Tags();
-		$this->links_tags       = new Links_Tags();
-		$this->favorites_links  = new Favorites_Links();
+
+		/* @var Object|API_Keys $this */
+		$this->api_keys = new API_Keys();
+
+		/* @var Object|Tags $this */
+		$this->tags = new Tags();
+
+		/* @var Object|Links_Tags $this */
+		$this->links_tags = new Links_Tags();
+
+		/* @var Object|Favorites_Links $this */
+		$this->favorites_links = new Favorites_Links();
 	}
 }

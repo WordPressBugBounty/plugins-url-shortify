@@ -84,4 +84,18 @@ class Favorites_Links extends Base_DB {
 		return wp_list_pluck( $results, 'link_id' );
 	}
 
+	/**
+	 * Get link IDs for favorites filter.
+	 * 
+	 * @since 1.12.3
+	 * 
+	 * @param int  $user_id
+	 * @param bool $is_favorite
+	 * @return string
+	 */
+	public function get_filter_query( $user_id, $is_favorite = true ) {
+		$operator = $is_favorite ? 'IN' : 'NOT IN';
+
+		return "id {$operator} (SELECT link_id FROM {$this->table_name} WHERE user_id = " . absint( $user_id ) . ")";
+	}
 }

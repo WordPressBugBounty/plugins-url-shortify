@@ -32,7 +32,6 @@ class US_List_Table extends \WP_List_Table {
 	 * @since 1.0.0
 	 */
 	public function prepare_items() {
-
 		$this->_column_headers = $this->get_column_info();
 
 		/** Process bulk action */
@@ -56,32 +55,32 @@ class US_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * @since 1.0.0
-	 *
-	 * @param  int  $current_page
+	 * @param  int    $current_page
 	 * @param  false  $do_count_only
 	 *
-	 * @param  int  $per_page
+	 * @param  int    $per_page
+	 *
+	 * @since 1.0.0
+	 *
 	 */
 	public function get_lists( $per_page = 10, $current_page = 1, $do_count_only = false ) {
-
 	}
 
 	/**
 	 * @since 1.0.0
 	 */
 	public function process_bulk_action() {
-
 	}
 
 	/**
 	 * Hide default search box
 	 *
-	 * @since 1.0.3
-	 *
 	 * @param  string  $input_id
 	 *
 	 * @param  string  $text
+	 *
+	 * @since 1.0.3
+	 *
 	 */
 	public function search_box( $text, $input_id ) {
 	}
@@ -90,13 +89,12 @@ class US_List_Table extends \WP_List_Table {
 	/**
 	 * Hide top pagination
 	 *
-	 * @since 1.0.3
-	 *
 	 * @param  string  $which
+	 *
+	 * @since 1.0.3
 	 *
 	 */
 	public function pagination( $which ) {
-
 		if ( $which == 'bottom' ) {
 			parent::pagination( $which );
 		}
@@ -117,18 +115,72 @@ class US_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Overriding the parent method to support grouped bulk actions (optgroups)
+	 *
+	 * @since 1.12.3
+	 */
+	protected function bulk_actions( $which = '' ) {
+		if ( is_null( $this->_actions ) ) {
+			$this->_actions = $this->get_bulk_actions();
+
+			/**
+			 * Filters the items in the bulk actions menu of the list table.
+			 *
+			 * The dynamic portion of the hook name, `$this->screen->id`, refers
+			 * to the ID of the current screen.
+			 *
+			 * @param  array  $actions  An array of the available bulk actions.
+			 *
+			 * @since 5.6.0 A bulk action can now contain an array of options in order to create an optgroup.
+			 *
+			 * @since 3.1.0
+			 */
+			$this->_actions = apply_filters( "bulk_actions-{$this->screen->id}", $this->_actions ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
+			$two = '';
+		} else {
+			$two = '2';
+		}
+
+		if ( empty( $this->_actions ) ) {
+			return;
+		}
+
+		echo '<label for="bulk-action-selector-' . esc_attr( $which ) . '" class="screen-reader-text">' .
+			 /* translators: Hidden accessibility text. */
+			 __( 'Select bulk action' ) .
+			 '</label>';
+		echo '<select name="action' . $two . '" id="bulk-action-selector-' . esc_attr( $which ) . "\">\n";
+		echo '<option value="-1">' . __( 'Bulk actions' ) . "</option>\n";
+
+		foreach ( $this->_actions as $key => $group ) {
+			if ( is_array( $group ) && isset( $group['values'] ) ) {
+				echo '<optgroup label="' . esc_attr( $group['label'] ) . "\">\n";
+				foreach ( $group['values'] as $action_key => $action_label ) {
+					echo "\t" . '<option value="' . esc_attr( $action_key ) . '">' . $action_label . "</option>\n";
+				}
+				echo "</optgroup>\n";
+			} else {
+				echo "\t" . '<option value="' . esc_attr( $key ) . '">' . $group . "</option>\n";
+			}
+		}
+		echo "</select>\n";
+		submit_button( __( 'Apply' ), 'action', '', false, [ 'id' => 'doaction' . $two ] );
+	}
+
+	/**
 	 * Add Row action
 	 *
-	 * @since 1.0.4
-	 *
-	 * @modify 1.1.3 Added third argument $class
-	 *
-	 * @param  bool  $always_visible
-	 * @param  string  $class
+	 * @param  bool      $always_visible
+	 * @param  string    $class
 	 *
 	 * @param  string[]  $actions
 	 *
 	 * @return string
+	 *
+	 * @since  1.0.4
+	 *
+	 * @modify 1.1.3 Added third argument $class
 	 *
 	 */
 	protected function row_actions( $actions, $always_visible = false, $class = '' ) {
@@ -156,13 +208,13 @@ class US_List_Table extends \WP_List_Table {
 	/**
 	 * Save Form Data
 	 *
-	 * @since 1.0.0
-	 *
-	 * @param  null  $id
+	 * @param  null   $id
 	 *
 	 * @param  array  $data
 	 *
 	 * @return bool|int
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public function save( $data = [], $id = null ) {

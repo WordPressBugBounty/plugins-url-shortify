@@ -73,7 +73,6 @@ class Links_Table extends US_List_Table {
 	 * Links_Table constructor.
 	 */
 	public function __construct() {
-
 		parent::__construct( [
 			'singular' => __( 'Link', 'url-shortify' ), //singular name of the listed records
 			'plural'   => __( 'Links', 'url-shortify' ), //plural name of the listed records
@@ -110,7 +109,6 @@ class Links_Table extends US_List_Table {
 		$restricted_actions = [ 'new', 'edit', 'statistics', 'export' ];
 
 		if ( ! in_array( $action, $restricted_actions ) ) {
-
 			$option = 'per_page';
 			$args   = [
 				'label'   => __( 'Number of Links per page', 'url-shortify' ),
@@ -130,12 +128,11 @@ class Links_Table extends US_List_Table {
 	 */
 	public function render() {
 		try {
-
 			$action = Helper::get_request_data( 'action' );
 
-            $link_id_raw = Helper::get_request_data( 'id', null );
+			$link_id_raw = Helper::get_request_data( 'id', null );
 
-            $link_id = Helper::sanitize_id( $link_id_raw );
+			$link_id = Helper::sanitize_id( $link_id_raw );
 
 			if ( 'new' === $action || 'edit' === $action ) {
 				$this->render_form( $link_id );
@@ -147,7 +144,6 @@ class Links_Table extends US_List_Table {
 					$message = __( 'You do not have permission to view statistics of this link.', 'url-shortify' );
 					US()->notices->error( $message );
 				} else {
-
 					$link_id = Helper::get_request_data( 'id' );
 
 					if ( ! empty( $link_id ) ) {
@@ -163,7 +159,6 @@ class Links_Table extends US_List_Table {
 					$message = __( 'You do not have permission to export statistics of this link.', 'url-shortify' );
 					US()->notices->error( $message );
 				} else {
-
 					$link_id = Helper::get_request_data( 'id' );
 
 					if ( ! empty( $link_id ) ) {
@@ -184,7 +179,6 @@ class Links_Table extends US_List_Table {
 					die();
 				}
 			} else {
-
 				$template_data = [
 					'object'       => $this,
 					'title'        => __( 'Links', 'url-shortify' ),
@@ -199,7 +193,6 @@ class Links_Table extends US_List_Table {
 
 
 		} catch ( \Exception $e ) {
-
 		}
 
 	}
@@ -210,13 +203,12 @@ class Links_Table extends US_List_Table {
 	 * @return array
 	 */
 	function get_columns() {
-
 		$columns = [
-			'cb'         => '<input type="checkbox" />',
-			'title'      => __( 'Title', 'url-shortify' ),
-			'clicks'     => __( 'Clicks', 'url-shortify' ),
-			'redirect'   => __( 'Redirect Type', 'url-shortify' ),
-			'groups'     => __( 'Groups', 'url-shortify' ),
+			'cb'       => '<input type="checkbox" />',
+			'title'    => __( 'Title', 'url-shortify' ),
+			'clicks'   => __( 'Clicks', 'url-shortify' ),
+			'redirect' => __( 'Redirect Type', 'url-shortify' ),
+			'groups'   => __( 'Groups', 'url-shortify' ),
 		];
 
 		if ( US()->is_pro() ) {
@@ -239,19 +231,37 @@ class Links_Table extends US_List_Table {
 		echo wp_kses( $data, Helper::allowed_html_tags_in_esc() );
 	}
 
+	/**
+	 * Prepare tags dropdown for bulk edit and quick edit
+	 *
+	 * @since 1.12.3
+	 *
+	 */
+	function prepare_tags_dropdown() {
+		if ( ! US()->is_pro() ) {
+			return;
+		}
+
+		$data = '<label for="bulk-action-selector-top" class="screen-reader-text">Select bulk action</label><select name="tag_id" id="tag_id" class="tag_select" style="display: none;">';
+		$data .= Helper::prepare_tag_dropdown_options();
+		$data .= '</select>';
+
+		echo wp_kses( $data, Helper::allowed_html_tags_in_esc() );
+	}
+
 	function prepare_expiry_datepicker() {
 		echo '<input type="text" class="kc-us-date-picker" name="expiry_date"  style="display: none;"/>';
 	}
 
 
 	/**
-	 * @since 1.0.0
-	 *
 	 * @param  string  $column_name
 	 *
 	 * @param  object  $item
 	 *
 	 * @return string|void
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public function column_default( $item, $column_name ) {
@@ -267,13 +277,13 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Prepare items.
 	 *
-	 * @since 1.9.0
 	 * @return void
 	 *
+	 * @since 1.9.0
 	 */
 	public function prepare_items() {
 		parent::prepare_items();
-		
+
 		if ( ! empty( $this->items ) ) {
 			$this->link_ids = array_map( function ( $item ) {
 				return $item['id'];
@@ -282,26 +292,23 @@ class Links_Table extends US_List_Table {
 
 		// Existing clicks and groups fetch
 		$this->link_ids_clicks_data = US()->db->clicks->get_total_clicks_and_unique_clicks_by_link_ids( $this->link_ids );
-		$this->links_ids_group_ids = US()->db->links_groups->get_group_ids_by_link_ids( $this->link_ids );
+		$this->links_ids_group_ids  = US()->db->links_groups->get_group_ids_by_link_ids( $this->link_ids );
 
 		// NEW: Fetch and store tags for these links
-		$this->links_ids_tag_ids = US()->db->links_tags->get_tag_ids_by_link_ids( $this->link_ids ); 
-
-
+		$this->links_ids_tag_ids = US()->db->links_tags->get_tag_ids_by_link_ids( $this->link_ids );
 
 
 	}
 
 	/**
-	 * @since 1.3.1
-	 *
 	 * @param $item
 	 *
 	 * @return string
 	 *
+	 * @since 1.3.1
+	 *
 	 */
 	public function column_share( $item ) {
-
 		$link_id = Helper::get_data( $item, 'id', 0 );
 
 		return Helper::get_social_share_widget( $link_id );
@@ -315,16 +322,15 @@ class Links_Table extends US_List_Table {
 	 * @return string
 	 */
 	function column_title( $item ) {
-
-		$link_id = $item['id'];
-		$url     = esc_url( $item['url'] );
-		$name    = stripslashes( $item['name'] );
-		$slug    = $item['slug'];
+		$link_id   = $item['id'];
+		$url       = esc_url( $item['url'] );
+		$name      = stripslashes( $item['name'] );
+		$slug      = $item['slug'];
 		$star_html = '';
 
 		if ( US()->is_pro() ) {
 			$user_id = get_current_user_id();
-			
+
 			$user_favorites = US()->db->favorites_links->get_by_user_id( $user_id );
 			$is_starred     = in_array( $link_id, $user_favorites );
 
@@ -366,15 +372,14 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Render link column
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param $item
 	 *
 	 * @return string
 	 *
+	 * @since 1.0.0
+	 *
 	 */
 	function column_link( $item ) {
-
 		$slug = esc_attr( Helper::get_data( $item, 'slug', '' ) );
 
 		if ( empty( $slug ) ) {
@@ -398,11 +403,11 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Render link column
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param $item
 	 *
 	 * @return string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	function column_clicks( $item ) {
@@ -424,11 +429,11 @@ class Links_Table extends US_List_Table {
 	}
 
 	/**
-	 * @since 1.2.5
-	 *
 	 * @param $item
 	 *
 	 * @return string
+	 *
+	 * @since 1.2.5
 	 *
 	 */
 	function column_linked_post( $item ) {
@@ -441,11 +446,9 @@ class Links_Table extends US_List_Table {
 		}
 
 		if ( empty( $cpt_type ) ) {
-
 			$cpt_type = Helper::get_cpt_type_from_cpt_id( $cpt_id );
 
 			if ( ! empty( $cpt_type ) ) {
-
 				$data = [
 					'cpt_type' => $cpt_type,
 				];
@@ -468,11 +471,11 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Get Meta info.
 	 *
-	 * @since 1.7.7
-	 *
 	 * @param $item
 	 *
 	 * @return string
+	 *
+	 * @since 1.7.7
 	 *
 	 */
 	function column_meta_info( $item ) {
@@ -535,15 +538,14 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Get the redirect type
 	 *
-	 * @since 1.3.7
-	 *
 	 * @param $item
 	 *
 	 * @return array|\KaizenCoders\URL_Shortify\data|string
 	 *
+	 * @since 1.3.7
+	 *
 	 */
 	function column_redirect( $item ) {
-
 		$type = Helper::get_data( $item, 'redirect_type', '' );
 
 		$redirect_types = Helper::get_redirection_types();
@@ -552,7 +554,6 @@ class Links_Table extends US_List_Table {
 	}
 
 	function column_groups( $item ) {
-
 		$link_id = Helper::get_data( $item, 'id', '' );
 
 		if ( empty( $link_id ) ) {
@@ -567,11 +568,11 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Render the bulk edit checkbox
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param  array  $item
 	 *
 	 * @return string
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	function column_cb( $item ) {
@@ -624,21 +625,19 @@ class Links_Table extends US_List_Table {
 		// return ! empty( $tags_output ) ? implode( ' ', $tags_output ) : '-';
 
 
-
-
 		// Use a helper to convert IDs to a comma-separated string of names
-		return Helper::get_tag_str_from_ids( $tag_ids, $tag_name_map ); 
+		return Helper::get_tag_str_from_ids( $tag_ids, $tag_name_map );
 	}
 
 	/**
-	 * @since 1.0.0
-	 *
-	 * @param  int  $page_number
+	 * @param  int   $page_number
 	 * @param  bool  $do_count_only
 	 *
-	 * @param  int  $per_page
+	 * @param  int   $per_page
 	 *
 	 * @return array
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public function get_lists( $per_page = 10, $page_number = 1, $do_count_only = false ) {
@@ -723,7 +722,6 @@ class Links_Table extends US_List_Table {
 		}
 
 		if ( ! $do_count_only ) {
-
 			$order = ! empty( $order ) ? strtolower( $order ) : 'desc';
 
 			$expected_order_values = [ 'asc', 'desc' ];
@@ -758,18 +756,30 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Returns an associative array containing the bulk action
 	 *
-	 * @since 1.0.0
 	 * @return array
 	 *
+	 * @since 1.0.0
 	 */
 	public function get_bulk_actions() {
-		$bulk_action = [
-			'bulk_delete'     => __( 'Delete', 'url-shortify' ),
-			'bulk_group_add'  => __( 'Add to group', 'url-shortify' ),
-			'bulk_group_move' => __( 'Move to group', 'url-shortify' ),
+		$bulk_actions = [
+			'general' => [
+				'label'  => __( 'General Actions', 'url-shortify' ),
+				'values' => [
+					'bulk_delete' => __( 'Delete', 'url-shortify' ),
+					'bulk_reset'  => __( 'Reset Stats', 'url-shortify' ),
+				],
+			],
+
+			'group_actions' => [
+				'label'  => __( 'Group Actions', 'url-shortify' ),
+				'values' => [
+					'bulk_group_add'  => __( 'Add to group', 'url-shortify' ),
+					'bulk_group_move' => __( 'Move to group', 'url-shortify' ),
+				],
+			],
 		];
 
-		return apply_filters( 'kc_us_link_bulk_actions', $bulk_action );
+		return apply_filters( 'kc_us_link_bulk_actions', $bulk_actions );
 	}
 
 	/**
@@ -782,7 +792,6 @@ class Links_Table extends US_List_Table {
 		$action2 = Helper::get_request_data( 'action2' );
 
 		if ( 'delete' === $this->current_action() ) {
-
 			// In our file that handles the request, verify the nonce.
 			$nonce = Helper::get_request_data( '_wpnonce' );
 
@@ -790,7 +799,6 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to delete this link.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-
 				$link_id = Helper::get_request_data( 'id' );
 
 				if ( ! empty( $link_id ) ) {
@@ -801,7 +809,6 @@ class Links_Table extends US_List_Table {
 				}
 			}
 		} elseif ( 'reset' === $this->current_action() ) {
-
 			// In our file that handles the request, verify the nonce.
 			$nonce = Helper::get_request_data( '_wpnonce' );
 
@@ -809,7 +816,6 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to reset statistics of this link.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-
 				$link_id = Helper::get_request_data( 'id' );
 
 				if ( ! empty( $link_id ) ) {
@@ -821,7 +827,6 @@ class Links_Table extends US_List_Table {
 			}
 
 		} elseif ( ( 'bulk_delete' === $action ) || ( 'bulk_delete' === $action2 ) ) {
-
 			// In our file that handles the request, verify the nonce.
 			$nonce  = Helper::get_request_data( '_wpnonce' );
 			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
@@ -830,9 +835,11 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to delete link(s).', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
 
-				$link_ids = Helper::get_request_data( 'link_ids' );
-
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 				if ( ! empty( $link_ids ) ) {
 					$this->db->delete( $link_ids );
 					$message = __( 'Link(s) have been deleted successfully!', 'url-shortify' );
@@ -846,7 +853,6 @@ class Links_Table extends US_List_Table {
 			}
 
 		} elseif ( ( 'bulk_reset' === $action ) || ( 'bulk_reset' === $action2 ) ) {
-
 			// In our file that handles the request, verify the nonce.
 			$nonce  = Helper::get_request_data( '_wpnonce' );
 			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
@@ -855,11 +861,12 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to reset stats.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( ! empty( $link_ids ) ) {
-
 					do_action( 'kc_us_bulk_reset_link_stats', $link_ids );
 
 					$message = __( 'Link(s) stats have been reset successfully!', 'url-shortify' );
@@ -872,7 +879,6 @@ class Links_Table extends US_List_Table {
 				}
 			}
 		} elseif ( ( 'bulk_group_add' === $action ) || ( 'bulk_group_add' === $action2 ) ) {
-
 			// In our file that handles the request, verify the nonce.
 			$nonce  = Helper::get_request_data( '_wpnonce' );
 			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
@@ -881,8 +887,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to add links to group.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				$group_id = Helper::get_request_data( 'group_id' );;
 
@@ -915,8 +923,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to move links to group.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				$group_id = Helper::get_request_data( 'group_id' );;
 
@@ -978,7 +988,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Nofollow parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to enable nofollow.', 'url-shortify' );
@@ -1001,7 +1014,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Nofollow parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to disable nofollow.', 'url-shortify' );
@@ -1024,7 +1040,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Sponsored parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to disable Sponsored.', 'url-shortify' );
@@ -1047,7 +1066,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Sponsored parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to enable Sponsored.', 'url-shortify' );
@@ -1070,7 +1092,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Tracking parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to enable Tracking.', 'url-shortify' );
@@ -1093,7 +1118,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Tracking parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to disable Tracking.', 'url-shortify' );
@@ -1116,7 +1144,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Parameters Forwarding to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to enable Parameters Forwarding.', 'url-shortify' );
@@ -1139,7 +1170,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Parameters Forwarding to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to disable Parameters Forwarding.', 'url-shortify' );
@@ -1153,17 +1187,156 @@ class Links_Table extends US_List_Table {
 				$message = __( 'Params Forwarding has been added to selected links.', 'url-shortify' );
 				US()->notices->success( $message );
 			}
+		} elseif ( ( 'bulk_add_favorite' === $action ) || ( 'bulk_add_favorite' === $action2 ) ) {
+			$nonce        = Helper::get_request_data( '_wpnonce' );
+			$action_nonce = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action_nonce ) ) {
+				US()->notices->error( __( 'You do not have permission to add favorites.', 'url-shortify' ) );
+			} else {
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
+
+				if ( ! empty( $link_ids ) ) {
+					$user_id = get_current_user_id();
+					$data    = [];
+					$now     = current_time( 'mysql' );
+					foreach ( $link_ids as $link_id ) {
+						$data[] = [
+							'user_id'    => $user_id,
+							'link_id'    => absint( $link_id ),
+							'created_at' => $now,
+						];
+					}
+					US()->db->favorites_links->bulk_insert( $data );
+					US()->notices->success( __( 'Link(s) added to favorites successfully!', 'url-shortify' ) );
+				} else {
+					US()->notices->error( __( 'Please select link(s) to add to favorites.', 'url-shortify' ) );
+				}
+			}
+		} elseif ( ( 'bulk_remove_favorite' === $action ) || ( 'bulk_remove_favorite' === $action2 ) ) {
+			$nonce        = Helper::get_request_data( '_wpnonce' );
+			$action_nonce = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action_nonce ) ) {
+				US()->notices->error( __( 'You do not have permission to remove favorites.', 'url-shortify' ) );
+			} else {
+				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				if ( empty( $link_ids ) ) {
+					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+				}
+				$user_id = get_current_user_id();
+
+				if ( ! empty( $link_ids ) ) {
+					$ids_str = implode( ',', array_map( 'absint', $link_ids ) );
+					US()->db->favorites_links->delete_by_condition( "user_id = $user_id AND link_id IN ($ids_str)" );
+
+					US()->notices->success( __( 'Link(s) removed from favorites successfully!', 'url-shortify' ) );
+				}
+			}
+		} elseif ( ( 'bulk_add_tag' === $action ) || ( 'bulk_add_tag' === $action2 ) ) {
+			$nonce  = Helper::get_request_data( '_wpnonce' );
+			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action ) ) {
+				$message = __( 'You do not have permission to add links to tag.', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$link_ids = Helper::get_request_data( 'link_ids' );
+				$tag_id   = [ absint( Helper::get_request_data( 'tag_id' ) ) ];
+
+				if ( empty( $link_ids ) ) {
+					$message = __( 'Please select link(s).', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				if ( empty( $tag_id[0] ) ) {
+					$message = __( 'Please select a tag.', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				US()->db->links_tags->map_links_and_tags( $link_ids, $tag_id );
+
+				$message = __( 'A new tag has been added successfully to all selected Link(s).', 'url-shortify' );
+
+				US()->notices->success( $message );
+			}
+		} elseif ( ( 'bulk_change_tag_to' === $action ) || ( 'bulk_change_tag_to' === $action2 ) ) {
+			// In our file that handles the request, verify the nonce.
+			$nonce  = Helper::get_request_data( '_wpnonce' );
+			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action ) ) {
+				$message = __( 'You do not have permission to move links to tag.', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$link_ids = Helper::get_request_data( 'link_ids' );
+				$tag_id   = [ absint( Helper::get_request_data( 'tag_id' ) ) ];
+
+				if ( ! empty( $link_ids ) && ! empty( $tag_id[0] ) ) {
+					US()->db->links_tags->map_links_and_tags( $link_ids, $tag_id, true );
+				}
+
+				if ( empty( $link_ids ) ) {
+					$message = __( 'Please select link(s).', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				if ( empty( $tag_id ) ) {
+					$message = __( 'Please select a tag.', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				US()->db->links_tags->map_links_and_tags( $link_ids, $tag_id, true );
+
+				$message = __( 'New tag has been added successfully!', 'url-shortify' );
+
+				US()->notices->success( $message );
+			}
+		} elseif ( 'bulk_remove_tag' === $action || ( 'bulk_change_tag_to' === $action2 ) ) {
+			// In our file that handles the request, verify the nonce.
+			$nonce  = Helper::get_request_data( '_wpnonce' );
+			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action ) ) {
+				$message = __( 'You do not have permission to remove all tag(s).', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$link_ids = Helper::get_request_data( 'link_ids' );
+
+				if ( empty( $link_ids ) ) {
+					$message = __( 'Please select link(s) to remove all tag(s).', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				US()->db->links_tags->delete_by_link_ids( $link_ids );
+
+				$message = __( 'All tags from link(s) are removed successfully!', 'url-shortify' );
+
+				US()->notices->success( $message );
+			}
 		}
 	}
 
 	/**
-	 * @since 1.0.0
-	 *
 	 * @param $link_id
+	 *
+	 * @since 1.0.0
 	 *
 	 */
 	public function render_form( $link_id = null ) {
-
 		$is_new = true;
 		if ( ! empty( $link_id ) ) {
 			$is_new = false;
@@ -1174,7 +1347,6 @@ class Links_Table extends US_List_Table {
 		$form_data = $this->get_form_data( $link_id );
 
 		if ( 'submitted' === $submitted ) {
-
 			$existing_slug = Helper::get_data( $form_data, 'slug', '' );
 
 			$nonce = Helper::get_request_data( '_wpnonce' );
@@ -1191,11 +1363,9 @@ class Links_Table extends US_List_Table {
 				$message = $response['message'];
 				US()->notices->error( $message );
 			} else {
-
 				$save = $this->save( $form_data, $link_id );
 
 				if ( $save ) {
-
 					$value = [
 						'status'  => 'success',
 						'message' => __( 'Link data have been saved successfully!', 'url-shortify' ),
@@ -1214,7 +1384,6 @@ class Links_Table extends US_List_Table {
 		$nonce = wp_create_nonce( 'us_link_form' );
 
 		try {
-
 			if ( $link_id ) {
 				$title       = __( 'Edit Link', 'url-shortify' );
 				$button_text = __( 'Save Changes', 'url-shortify' );
@@ -1256,7 +1425,6 @@ class Links_Table extends US_List_Table {
 			include_once KC_US_ADMIN_TEMPLATES_DIR . '/link-form.php';
 
 		} catch ( \Exception $e ) {
-
 		}
 
 
@@ -1265,20 +1433,19 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Get Form data
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param  int  $link_id
 	 *
 	 * @return array
 	 *
+	 * @since 1.0.0
+	 *
 	 */
 	public function get_form_data( $link_id = 0 ) {
-
 		$results = [];
 
 		if ( ! empty( $link_id ) ) {
-			$results = $this->db->get( $link_id );
-			$results['tag_ids'] = US()->db->links_tags->get_tag_ids_by_link_id( $link_id ); 
+			$results            = $this->db->get( $link_id );
+			$results['tag_ids'] = US()->db->links_tags->get_tag_ids_by_link_id( $link_id );
 		}
 
 		$default_settings = US()->get_settings();
@@ -1322,15 +1489,14 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Validate data
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param  array  $data
 	 *
 	 * @return array
 	 *
+	 * @since 1.0.0
+	 *
 	 */
 	public function validate_data( $data = [] ) {
-
 		$status   = 'success';
 		$error    = false;
 		$messages = [];
@@ -1360,7 +1526,7 @@ class Links_Table extends US_List_Table {
 			if ( empty( $target_url ) ) {
 				$messages[] = __( 'Please enter Target URL', 'url-shortify' );
 				$error      = true;
-			} elseif ( ! Utils::validate_url($target_url, true) ) {
+			} elseif ( ! Utils::validate_url( $target_url, true ) ) {
 				$messages[] = __( 'Please enter valid Target URL', 'url-shortify' );
 				$error      = true;
 			} elseif ( $no_equal_slug && Utils::is_slug_exists( $slug ) ) {
@@ -1410,17 +1576,16 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Insert/ Update form data
 	 *
-	 * @since 1.0.0
-	 *
-	 * @param  null  $id
+	 * @param  null   $id
 	 *
 	 * @param  array  $data
 	 *
 	 * @return bool|int
 	 *
+	 * @since 1.0.0
+	 *
 	 */
 	public function save( $data = [], $id = null ) {
-
 		$form_data = $this->db->prepare_form_data( $data, $id );
 
 		$link_id = $this->db->save( $form_data, $id );
@@ -1434,7 +1599,7 @@ class Links_Table extends US_List_Table {
 
 		if ( US()->is_pro() ) {
 			$tag_ids = Helper::get_data( $data, 'tag_ids', [] );
-			US()->db->links_tags->add_link_to_tags( $link_id, $tag_ids ); 
+			US()->db->links_tags->add_link_to_tags( $link_id, $tag_ids );
 		}
 
 		return $link_id;
@@ -1445,10 +1610,15 @@ class Links_Table extends US_List_Table {
 
         <p class="search-box">
             <label class="screen-reader-text"
-                   for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_attr( $text ); ?>:</label>
-            <input type="search" class="kc-us-links-search" id="<?php echo esc_attr( $input_id ); ?>" name="s"
-                   value="<?php _admin_search_query(); ?>"/>
-			<?php submit_button( __( 'Search Links', 'url-shortify' ), 'button', false, false,
+                   for="<?php
+				   echo esc_attr( $input_id ); ?>"><?php
+				echo esc_attr( $text ); ?>:</label>
+            <input type="search" class="kc-us-links-search" id="<?php
+			echo esc_attr( $input_id ); ?>" name="s"
+                   value="<?php
+				   _admin_search_query(); ?>"/>
+			<?php
+			submit_button( __( 'Search Links', 'url-shortify' ), 'button', false, false,
 				[ 'id' => 'search-submit' ] ); ?>
         </p>
 
@@ -1464,14 +1634,15 @@ class Links_Table extends US_List_Table {
 	public function no_items() { ?>
 
         <div class="block ml-auto mr-auto" style="width:50%;">
-            <img src="<?php echo KC_US_PLUGIN_ASSETS_DIR_URL . '/images/empty.svg' ?>"/>
+            <img src="<?php
+			echo KC_US_PLUGIN_ASSETS_DIR_URL . '/images/empty.svg' ?>"/>
         </div>
 
 
-	<?php }
+		<?php
+	}
 
 	public function export_links() {
-
 		@set_time_limit( 0 );
 
 		$links = US()->db->links->get_all();
@@ -1490,11 +1661,11 @@ class Links_Table extends US_List_Table {
 	/**
 	 * Extra Table Navigation.
 	 *
-	 * @since 1.9.5
-	 *
 	 * @param $which
 	 *
 	 * @return void
+	 *
+	 * @since 1.9.5
 	 *
 	 */
 	protected function extra_tablenav( $which ) {
@@ -1505,7 +1676,8 @@ class Links_Table extends US_List_Table {
 
         <div class="alignleft actions">
             <p class="">
-				<?php $filter_by = Helper::get_request_data( 'filter_by', '' ); ?>
+				<?php
+				$filter_by = Helper::get_request_data( 'filter_by', '' ); ?>
                 <select name="filter_by">
 					<?php
 					$allowed_tags = Helper::allowed_html_tags_in_esc();

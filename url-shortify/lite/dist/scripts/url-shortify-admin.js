@@ -2,12 +2,16 @@
     'use strict';
 
     $(document).ready(function () {
-
         // Link bulk action.
         if ($('.group_select').length) {
             var group_select = $('.group_select')[0].outerHTML;
             $(".kc-us-items-lists .bulkactions #bulk-action-selector-top").after(group_select);
             $('.group_select').hide();
+        }
+        if ($('.tag_select').length) {
+            var tag_select = $('.tag_select')[0].outerHTML;
+            $(".kc-us-items-lists .bulkactions #bulk-action-selector-top").after(tag_select);
+            $('.tag_select').hide();
         }
 
         // Datepixker.
@@ -19,14 +23,22 @@
 
         // Bulk action additional dropdown/datepicker show/hide.
         $("#bulk-action-selector-top").change(function () {
-            if ($('option:selected', this).attr('value') == 'bulk_group_move' || $('option:selected', this).attr('value') == 'bulk_group_add') {
+            var selectedAction = $('option:selected', this).attr('value');
+            if (selectedAction == 'bulk_group_move' || selectedAction == 'bulk_group_add') {
                 $('.group_select').eq(1).show();
+                $('.tag_select').hide();
                 $('.bulkactions .kc-us-date-picker').hide();
-            } else if ($('option:selected', this).attr('value') == 'bulk_add_expiry') {
+            } else if (selectedAction == 'bulk_add_tag' || selectedAction == 'bulk_change_tag_to') {
+                $('.tag_select').eq(1).show();
                 $('.group_select').hide();
+                $('.bulkactions .kc-us-date-picker').hide();
+            } else if (selectedAction == 'bulk_add_expiry') {
+                $('.group_select').hide();
+                $('.tag_select').hide();
                 $('.bulkactions .kc-us-date-picker').show();
             } else {
                 $('.group_select').hide();
+                $('.tag_select').hide();
                 $('.bulkactions .kc-us-date-picker').hide();
             }
         });

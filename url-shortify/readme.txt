@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 1.12.2
+Stable tag: 1.12.3
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -475,13 +475,23 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 16. Favorite Links [PRO]
 
 == Upgrade Notice ==
-= 1.12.2 =
+= 1.12.3 =
 
-* New: Added support to mark links as Favorite. **[PRO]**
-* Update: Enhanced Security.
+* New: Added support to mark links as Favorite and remove from favorite using bulk action. **[PRO]**
+* New: Added support to add/remove tags using bulk action. **[PRO]**
+* New: Filter links based on Favorite and Tags. **[PRO]**
+* Update: Compatibility with WordPress 6.9.1
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 1.12.3 [2026-02-09] =
+
+* New: Added support to mark links as Favorite and remove from favorite using bulk action. **[PRO]**
+* New: Added support to add/remove tags using bulk action. **[PRO]**
+* New: Filter links based on Favorite and Tags. **[PRO]**
+* Update: Compatibility with WordPress 6.9.1
+* Translations: Updated .POT file for new translations
 
 = 1.12.2 [2026-02-02] =
 
@@ -527,4 +537,4 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * Update: UX improvements
 * Translations: Updated .POT file for new translations
 
-[See changelog for all versions](https://plugins.svn.wordpress.org/url-shortify/trunk/changelog.txt) file.
+[See changelog for all versions](https://kaizencoders.com/docs/url-shortify/changelog) file.

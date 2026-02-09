@@ -1929,6 +1929,50 @@ class Helper {
     }
 
     /**
+     * Prepare tags dropdown options.
+     *
+     * @param $default_label
+     *
+     * @param $selected
+     *
+     * @return string
+     *
+     * @since 1.12.3
+     *
+     */
+    public static function prepare_tag_dropdown_options( $selected = '', $default_label = 'Select Tag' ) {
+        $default_option[0] = __( $default_label, 'url-shortify' );
+
+        $tags = US()->db->tags->get_all_id_name_map();
+
+        $tags = $default_option + $tags;
+
+        $dropdown = '';
+
+        if ( is_string( $selected ) && strpos( $selected, ',' ) > 0 ) {
+            $selected = explode( ',', $selected );
+        }
+
+        foreach ( $tags as $key => $tag ) {
+            $dropdown .= '<option value="' . esc_attr( $key ) . '" ';
+
+            if ( is_array( $selected ) ) {
+                if ( in_array( $key, $selected ) ) {
+                    $dropdown .= 'selected = selected';
+                }
+            } else {
+                if ( ! empty( $selected ) && $selected == $key ) {
+                    $dropdown .= 'selected = selected';
+                }
+            }
+
+            $dropdown .= '>' . esc_html( $tag ) . '</option>';
+        }
+
+        return $dropdown;
+    }
+
+    /**
      * Prepare custom dropdown options.
      *
      * @param $default_label
