@@ -698,7 +698,7 @@ class Links_Table extends US_List_Table {
 				$add_where_clause = true;
 				$redirect_type    = str_replace( 'redirect_type_', '', $filter_by );
 
-				$query[] = "redirect_type = '{$redirect_type}'";
+				$query[] = $wpdb->prepare( 'redirect_type = %s', $redirect_type );
 			} else {
 				$query = [];
 				$query = apply_filters( 'kc_us_links_filter_by_query', $query, $filter_by );
@@ -742,8 +742,7 @@ class Links_Table extends US_List_Table {
 			}
 
 			$sql .= $order_by_clause;
-			$sql .= " LIMIT $per_page";
-			$sql .= ' OFFSET ' . ( $page_number - 1 ) * $per_page;
+			$sql .= $wpdb->prepare( ' LIMIT %d OFFSET %d', $per_page, ( $page_number - 1 ) * $per_page );
 
 			$result = $wpdb->get_results( $sql, 'ARRAY_A' );
 		} else {
@@ -835,10 +834,10 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to delete link(s).', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 				if ( ! empty( $link_ids ) ) {
 					$this->db->delete( $link_ids );
@@ -861,9 +860,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to reset stats.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( ! empty( $link_ids ) ) {
@@ -887,12 +886,12 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to add links to group.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
-				$group_id = Helper::get_request_data( 'group_id' );;
+				$group_id = Helper::get_request_data( 'group_id' );
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to add into group.', 'url-shortify' );
@@ -923,12 +922,12 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to move links to group.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
-				$group_id = Helper::get_request_data( 'group_id' );;
+				$group_id = Helper::get_request_data( 'group_id' );
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to move into group.', 'url-shortify' );
@@ -988,9 +987,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Nofollow parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1014,9 +1013,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Nofollow parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1040,9 +1039,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Sponsored parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1066,9 +1065,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Sponsored parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1092,9 +1091,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Tracking parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1118,9 +1117,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Tracking parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1144,9 +1143,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Parameters Forwarding to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1170,9 +1169,9 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Parameters Forwarding to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1194,9 +1193,9 @@ class Links_Table extends US_List_Table {
 			if ( ! wp_verify_nonce( $nonce, $action_nonce ) ) {
 				US()->notices->error( __( 'You do not have permission to add favorites.', 'url-shortify' ) );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
 
 				if ( ! empty( $link_ids ) ) {
@@ -1223,15 +1222,15 @@ class Links_Table extends US_List_Table {
 			if ( ! wp_verify_nonce( $nonce, $action_nonce ) ) {
 				US()->notices->error( __( 'You do not have permission to remove favorites.', 'url-shortify' ) );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : Helper::get_request_data( 'link_ids' );
+				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
 				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? $_POST['link_ids'] : [];
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
 				}
-				$user_id = get_current_user_id();
+				$user_id = absint( get_current_user_id() );
 
 				if ( ! empty( $link_ids ) ) {
 					$ids_str = implode( ',', array_map( 'absint', $link_ids ) );
-					US()->db->favorites_links->delete_by_condition( "user_id = $user_id AND link_id IN ($ids_str)" );
+					US()->db->favorites_links->delete_by_condition( "user_id = {$user_id} AND link_id IN ({$ids_str})" );
 
 					US()->notices->success( __( 'Link(s) removed from favorites successfully!', 'url-shortify' ) );
 				}
@@ -1643,7 +1642,9 @@ class Links_Table extends US_List_Table {
 	}
 
 	public function export_links() {
-		@set_time_limit( 0 );
+		if ( function_exists( 'set_time_limit' ) ) {
+			set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
 
 		$links = US()->db->links->get_all();
 

@@ -141,7 +141,7 @@ class Install {
 	public static function install_actions() {
 		if ( ! empty( $_GET['do_update_us'] ) ) {
 			check_admin_referer( 'us_db_update', 'us_db_update_nonce' );
-			$from_db_version = ! empty( $_GET['from_db_version'] ) ? $_GET['from_db_version'] : '';
+			$from_db_version = ! empty( $_GET['from_db_version'] ) ? sanitize_text_field( wp_unslash( $_GET['from_db_version'] ) ) : '';
 
 			self::delete_update_transient();
 

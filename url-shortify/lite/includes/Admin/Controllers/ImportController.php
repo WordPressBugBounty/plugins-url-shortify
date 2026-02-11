@@ -158,12 +158,16 @@ class ImportController extends BaseController {
 		$nonce = Helper::get_request_data( '_wpnonce' );
 
 		if ( ! wp_verify_nonce( $nonce, 'import_csv' ) ) {
-			die( 'You do not have permission to import CSV' );
+			wp_die( esc_html__( 'You do not have permission to import CSV.', 'url-shortify' ) );
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to import CSV.', 'url-shortify' ) );
 		}
 
 		// Check if a file was uploaded
 		if ( ! isset( $_FILES['csv_file'] ) || empty( $_FILES['csv_file']['tmp_name'] ) ) {
-			wp_die( 'Please select a CSV file to import.' );
+			wp_die( esc_html__( 'Please select a CSV file to import.', 'url-shortify' ) );
 		}
 
 		// Get the file path and name
@@ -173,7 +177,13 @@ class ImportController extends BaseController {
 		// Validate the file extension
 		$file_extension = strtolower( pathinfo( $csv_file_name, PATHINFO_EXTENSION ) );
 		if ( $file_extension !== 'csv' ) {
-			wp_die( 'Invalid file format. Please upload a CSV file.' );
+			wp_die( esc_html__( 'Invalid file format. Please upload a CSV file.', 'url-shortify' ) );
+		}
+
+		// Validate MIME type
+		$file_type = wp_check_filetype( $csv_file_name, array( 'csv' => 'text/csv' ) );
+		if ( empty( $file_type['ext'] ) ) {
+			wp_die( esc_html__( 'Invalid file type.', 'url-shortify' ) );
 		}
 
 		// Import the CSV file
@@ -187,7 +197,9 @@ class ImportController extends BaseController {
 			return false;
 		}
 
-		@set_time_limit( 0 );
+		if ( function_exists( 'set_time_limit' ) ) {
+			set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
 
 		// Read the first row of the CSV file as the column names.
 		$columns = fgetcsv( $csv_file );
@@ -261,7 +273,7 @@ class ImportController extends BaseController {
 				$values[ $key ]['slug']              = $slug;
 				$values[ $key ]['name']              = ! empty( Helper::get_data( $link, 'Title', '' ) ) ? Helper::get_data( $link, 'Title', '', true ) : Helper::get_data( $link, 'Target URL', '' );
 				$values[ $key ]['description']       = Helper::get_data( $link, 'Description', '', true );
-				$values[ $key ]['url']               = Helper::get_data( $link, 'Target URL', '' );
+				$values[ $key ]['url']               = esc_url_raw( Helper::get_data( $link, 'Target URL', '' ) );
 				$values[ $key ]['nofollow']          = Helper::get_data( $link, 'Nofollow', $default_nofollow );
 				$values[ $key ]['track_me']          = Helper::get_data( $link, 'Track', $default_track_me );
 				$values[ $key ]['sponsored']         = Helper::get_data( $link, 'Sponsored', $default_sponsored );
@@ -323,7 +335,9 @@ class ImportController extends BaseController {
 
 			if ( Helper::is_forechable( $links ) ) {
 
-				@set_time_limit( 0 );
+				if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 				$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
@@ -420,7 +434,9 @@ class ImportController extends BaseController {
 
 			if ( Helper::is_forechable( $links ) ) {
 
-				@set_time_limit( 0 );
+				if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 				$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
@@ -522,7 +538,9 @@ class ImportController extends BaseController {
 
 			if ( Helper::is_forechable( $links ) ) {
 
-				@set_time_limit( 0 );
+				if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 				$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
@@ -615,7 +633,9 @@ class ImportController extends BaseController {
 
 			if ( Helper::is_forechable( $links ) ) {
 
-				@set_time_limit( 0 );
+				if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 				$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
@@ -700,7 +720,9 @@ class ImportController extends BaseController {
 
 			$link_prefix = get_option( 'ta_link_prefix_custom', true );
 
-			@set_time_limit( 0 );
+			if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 			$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
@@ -816,7 +838,9 @@ class ImportController extends BaseController {
 
 				$current_user_id = get_current_user_id();
 
-				@set_time_limit( 0 );
+				if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 				$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
@@ -918,7 +942,9 @@ class ImportController extends BaseController {
 
 				$current_user_id = get_current_user_id();
 
-				@set_time_limit( 0 );
+				if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
 
 				$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 

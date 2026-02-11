@@ -171,8 +171,8 @@ class Authentication {
 	 * @return array|false
 	 */
 	private function get_credentials( $key_var, $secret_var ) {
-		$key    = isset( $_SERVER[ $key_var ] ) ? sanitize_text_field( filter_var( wp_unslash( $_SERVER[ $key_var ] ) ) ) : null;
-		$secret = isset( $_SERVER[ $secret_var ] ) ? sanitize_text_field( filter_var( wp_unslash( $_SERVER[ $secret_var ] ) ) ) : null;
+		$key    = isset( $_SERVER[ $key_var ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $key_var ] ) ) : null;
+		$secret = isset( $_SERVER[ $secret_var ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $secret_var ] ) ) : null;
 
 		if ( ! $key || ! $secret ) {
 			return false;

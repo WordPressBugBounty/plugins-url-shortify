@@ -664,17 +664,76 @@ class Utils {
 			return '';
 		}
 
-		$str = file_get_contents( $url );
+		if ( ! self::is_safe_url( $url ) ) {
+			return $url;
+		}
+
+		$response = wp_safe_remote_get( $url, [
+			'timeout'   => 10,
+			'sslverify' => false,
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return $url;
+		}
+
+		$str = wp_remote_retrieve_body( $response );
 
 		if ( strlen( $str ) > 0 ) {
 			$str = trim( preg_replace( '/\s+/', ' ', $str ) ); // supports line breaks inside <title>
 
 			preg_match( '/\<title\>(.*)\<\/title\>/i', $str, $title ); // ignore case
 
-			return substr( sanitize_text_field( $title[1] ), 0, 250 );
+			if ( ! empty( $title[1] ) ) {
+				return substr( sanitize_text_field( $title[1] ), 0, 250 );
+			}
 		}
 
 		return $url;
+	}
+
+	/**
+	 * Check if a URL is safe to fetch (not targeting internal/private resources).
+	 *
+	 * @param string $url
+	 *
+	 * @return bool
+	 *
+	 * @since 1.12.4
+	 */
+	public static function is_safe_url( $url ) {
+		// Only allow http and https schemes.
+		$parsed = wp_parse_url( $url );
+
+		if ( empty( $parsed['scheme'] ) || ! in_array( strtolower( $parsed['scheme'] ), [ 'http', 'https' ], true ) ) {
+			return false;
+		}
+
+		if ( empty( $parsed['host'] ) ) {
+			return false;
+		}
+
+		$host = strtolower( $parsed['host'] );
+
+		// Block localhost and common internal hostnames.
+		$blocked_hosts = [ 'localhost', '0.0.0.0', '[::1]' ];
+		if ( in_array( $host, $blocked_hosts, true ) ) {
+			return false;
+		}
+
+		// Resolve the hostname to an IP and check for private/reserved ranges.
+		$ip = gethostbyname( $host );
+
+		// gethostbyname returns the hostname on failure.
+		if ( $ip === $host && ! filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			return false;
+		}
+
+		if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

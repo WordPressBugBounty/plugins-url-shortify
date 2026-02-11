@@ -120,16 +120,16 @@ abstract class Base_DB {
 	}
 
 	/**
-	 * Get rows by conditions
+	 * Get rows by conditions.
+	 *
+	 * @internal Expects pre-prepared WHERE clauses. Do not pass unsanitized user input.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $output
-	 *
-	 * @param string $where
+	 * @param string $where  Pre-prepared WHERE clause.
+	 * @param string $output Output type.
 	 *
 	 * @return array
-	 *
 	 */
 	public function get_by_conditions( $where = '', $output = ARRAY_A ) {
 		global $wpdb;
@@ -491,6 +491,8 @@ abstract class Base_DB {
 			return false;
 		}
 
+		$column = sanitize_key( $column );
+
 		$query = $wpdb->prepare( "UPDATE $this->table_name SET $column = %s WHERE $where", $value );
 
 		if ( false === $wpdb->query( $query ) ) {
@@ -721,23 +723,24 @@ abstract class Base_DB {
 	}
 
 	/**
-	 * Prepare string for SQL IN query
+	 * Prepare string for SQL IN query.
+	 *
+	 * All callers pass numeric IDs, so absint() is the correct sanitization.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $array
+	 * @param array $array Array of numeric IDs.
 	 *
-	 * @return string
-	 *
+	 * @return string Comma-separated list of integers safe for SQL IN clause.
 	 */
 	public function prepare_for_in_query( $array = [] ) {
-		$array = esc_sql( $array );
-
-		if ( is_array( $array ) && count( $array ) > 0 ) {
-			return "'" . implode( "', '", $array ) . "'";
+		if ( ! is_array( $array ) || empty( $array ) ) {
+			return '';
 		}
 
-		return '';
+		$array = array_map( 'absint', $array );
+
+		return implode( ', ', $array );
 	}
 
 	/**

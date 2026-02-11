@@ -252,7 +252,16 @@ class Helper {
         $how_to = Helper::get_data( $settings, 'reports_reporting_options_how_to_get_ip', '' );
 
         if ( $how_to ) {
-            return ! empty( $_SERVER[ $how_to ] ) ? $_SERVER[ $how_to ] : $_SERVER['REMOTE_ADDR'];
+            $ip = ! empty( $_SERVER[ $how_to ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $how_to ] ) ) : sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+            // Handle comma-separated forwarded IPs.
+            if ( strpos( $ip, ',' ) !== false ) {
+                $ip = trim( explode( ',', $ip )[0] );
+            }
+            if ( self::is_ip_address( $ip ) ) {
+                return $ip;
+            }
+
+            return '';
         } else {
             $fields = [
                     'HTTP_CF_CONNECTING_IP',
@@ -266,12 +275,19 @@ class Helper {
 
             foreach ( $fields as $ip_field ) {
                 if ( ! empty( $_SERVER[ $ip_field ] ) ) {
-                    return $_SERVER[ $ip_field ];
+                    $ip = sanitize_text_field( wp_unslash( $_SERVER[ $ip_field ] ) );
+                    // Handle comma-separated forwarded IPs.
+                    if ( strpos( $ip, ',' ) !== false ) {
+                        $ip = trim( explode( ',', $ip )[0] );
+                    }
+                    if ( self::is_ip_address( $ip ) ) {
+                        return $ip;
+                    }
                 }
             }
         }
 
-        return $_SERVER['REMOTE_ADDR'];
+        return '';
     }
 
     /**

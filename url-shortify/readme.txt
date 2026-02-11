@@ -1,10 +1,10 @@
-=== URL Shortify - Simple, Powerful and Easy URL Shortener Plugin For WordPress ===
+=== URL Shortify - Simple and Easy URL Shortener ===
 Contributors: kaizencoders, mikeatkaizencoders
 Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 1.12.3
+Stable tag: 1.12.4
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -15,7 +15,7 @@ URL Shortify helps you beautify, manage, share & cloak any links on or off your 
 
 URL Shortify helps you beautify, manage, and share any URL on or off of your WordPress website. Create links that look how you want using your domain name! It's a **Simple, Easy & Elegant** self hosted alternative to Bitly, TinyURL, Cuttly, Pretty Links, URL Shortener By My Theme Shop, Rebrandly, BL.Link, Short.io, and many other SaaS URL Shortener services.
 
-=== ✨Simple and fast URL shortener! ===
+=== ✨Simple and fast URL Shortener! ===
 
 URL Shortify allows to reduce long links from [Facebook](https://facebook.com/), [YouTube](https://www.youtube.com/), [Twitter](https://twitter.com/), [Linked In](https://www.linkedin.com/) and top sites on the Internet, You can copy the shortened URL and share it on websites, chat and e-mail
 
@@ -23,7 +23,7 @@ URL Shortify allows to reduce long links from [Facebook](https://facebook.com/),
 
 Your shortened URLs can be used in publications, advertisements, blogs, forums, e-mails, instant messages, and other locations. Track statistics for your business and projects by monitoring the number of hits from your URL with the click counter, you do not have to register.
 
-URL Shortify enables you to shorten links using your own domain name (as opposed to using tinyurl.com, bit.ly, or any other link shrinking service)! In addition to creating clean links, URL Shortify tracks each hit on your URL and provides a full, detailed report of where the hit came from, the browser, os, and host. URL Shortify is a killer plugin for people who want to clean up their affiliate links, track clicks from emails, their links on Twitter to come from their own domain, or generally increase the reach of their website by spreading these links on forums or comments on other blogs.
+URL Shortify enables you to shorten links using your own domain name (as opposed to using tinyurl.com, bit.ly, or any other link shrinking service)! In addition to creating clean links, URL Shortify tracks each hit on your URL and provides a full, detailed report of where the hit came from, the browser, os, and host. URL Shortify is a plugin for people who want to clean up their affiliate links, track clicks from emails, their links on Twitter to come from their own domain, or generally increase the reach of their website by spreading these links on forums or comments on other blogs.
 
 https://www.youtube.com/watch?v=VIfPOcQje4E
 
@@ -47,9 +47,6 @@ https://www.youtube.com/watch?v=VIfPOcQje4E
 
 > 👉 **Create Short Links**
 > Create short links that your visitors will easily be able to memorize and that you can fit into Tweets, Facebook posts, and more.
-
-> 👉 **Faster Than Any External Shortener**
-> External Shortener can be slow when redirecting your visitors. That damages customer satisfaction and slows down your site. Our plugin is the fastest way to link!
 
 > 👉 **Editable Destination URL**
 > Update destination URL of branded links anytime.
@@ -475,15 +472,20 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 16. Favorite Links [PRO]
 
 == Upgrade Notice ==
-= 1.12.3 =
 
-* New: Added support to mark links as Favorite and remove from favorite using bulk action. **[PRO]**
-* New: Added support to add/remove tags using bulk action. **[PRO]**
-* New: Filter links based on Favorite and Tags. **[PRO]**
-* Update: Compatibility with WordPress 6.9.1
+= 1.12.4 =
+
+* Update: Added support to **Manage Tags** permission in Access Control **PRO**
+* Update: Security enhancements.
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 1.12.4 [2026-02-11] =
+
+* Update: Added support to **Manage Tags** permission in Access Control **PRO**
+* Update: Security enhancements.
+* Translations: Updated .POT file for new translations
 
 = 1.12.3 [2026-02-09] =
 

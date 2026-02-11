@@ -214,8 +214,15 @@ class LinksRestController extends \WP_REST_Controller {
 			);
 		}
 
-		foreach ( $params as $key => $value ) {
-			$link[ $key ] = sanitize_text_field( $value );
+		$allowed_fields = [ 'name', 'description', 'url', 'nofollow', 'track_me', 'sponsored', 'params_forwarding', 'redirect_type' ];
+		foreach ( $allowed_fields as $field ) {
+			if ( isset( $params[ $field ] ) ) {
+				$link[ $field ] = sanitize_text_field( $params[ $field ] );
+			}
+		}
+
+		if ( isset( $params['url'] ) ) {
+			$link['url'] = esc_url_raw( $params['url'] );
 		}
 
 		$link = US()->db->links->update( $id, $link );

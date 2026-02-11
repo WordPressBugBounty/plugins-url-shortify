@@ -67,6 +67,10 @@ class Ajax {
 
 		check_ajax_referer( KC_US_AJAX_SECURITY, 'security' );
 
+//		if ( ! current_user_can( 'edit_posts' ) ) {
+//			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'url-shortify' ) ) );
+//		}
+
 		$cmd = Helper::get_data( $params, 'cmd', '' );
 
 		$ajax = US()->is_pro() ? new \KaizenCoders\URL_Shortify\PRO\Ajax() : $this;
@@ -92,16 +96,23 @@ class Ajax {
 		wp_send_json( $response );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function handle_plugin_management() {
 		check_ajax_referer( 'url-shortify-plugin-management', 'nonce' );
 
 		if ( ! current_user_can( 'activate_plugins' ) ) {
-			wp_send_json_error( [ 'message' => 'Permission denied' ] );
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ] );
 		}
 
-		$action = sanitize_text_field( $_POST['plugin_action'] );
-		$plugin = sanitize_text_field( $_POST['plugin'] );
-		$slug   = sanitize_text_field( $_POST['slug'] );
+		$action = sanitize_text_field( wp_unslash( $_POST['plugin_action'] ) );
+		$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+		$slug   = sanitize_text_field( wp_unslash( $_POST['slug'] ) );
+
+		if ( ! preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid plugin slug.', 'url-shortify' ) ) );
+		}
 
 		switch ( $action ) {
 			case 'install':

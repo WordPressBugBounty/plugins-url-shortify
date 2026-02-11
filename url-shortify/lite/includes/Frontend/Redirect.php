@@ -41,7 +41,7 @@ class Redirect {
 	 */
 	public function redirect() {
 		// Remove the trailing slash if there is one.
-		$request_uri = preg_replace( '#/(\?.*)?$#', '$1', rawurldecode( $_SERVER['REQUEST_URI'] ) );
+		$request_uri = preg_replace( '#/(\?.*)?$#', '$1', rawurldecode( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 
 		$link_data = Helper::is_us_link( $request_uri, false );
 
@@ -49,7 +49,7 @@ class Redirect {
 			//TODO: Handle params.
 
 			if ( ! US()->is_qr_request() ) {
-				$params = $_GET;
+				$params = array_map( 'sanitize_text_field', wp_unslash( $_GET ) );
 
 				if ( $this->can_redirect( $link_data ) ) {
 					do_action( 'kc_us_before_redirect', $link_data );
@@ -148,10 +148,11 @@ class Redirect {
 
 				$param_string = '';
 
-				$params = explode( '?', $_SERVER['REQUEST_URI'] );
+				$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+				$parsed      = wp_parse_url( $request_uri );
 
-				if ( isset( $params[1] ) ) {
-					$param_string = ( preg_match( '#\?#', $url ) ? '&' : '?' ) . $params[1];
+				if ( ! empty( $parsed['query'] ) ) {
+					$param_string = ( preg_match( '#\?#', $url ) ? '&' : '?' ) . sanitize_text_field( $parsed['query'] );
 				}
 
 				$param_string = preg_replace( [ '#%5B#i', '#%5D#i' ], [ '[', ']' ], $param_string );

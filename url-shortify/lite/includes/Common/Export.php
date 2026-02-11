@@ -69,7 +69,8 @@ class Export {
 			header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 			header( 'Cache-Control: private', false );
 			header( 'Content-Type: application/octet-stream' );
-			header( "Content-Disposition: attachment; filename={$file_name};" );
+			$safe_filename = sanitize_file_name( $file_name );
+			header( 'Content-Disposition: attachment; filename="' . $safe_filename . '"' );
 			header( 'Content-Transfer-Encoding: binary' );
 
 			echo wp_kses_post( $csv_data );
