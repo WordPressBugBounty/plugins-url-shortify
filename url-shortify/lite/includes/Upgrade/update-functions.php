@@ -345,3 +345,27 @@ function kc_us_update_1115_create_tags_tables() {
 function kc_us_update_1122_create_favorites_links_table() {
 	Install::create_tables( '1.12.2' );
 }
+
+/**************** 1.12.5 *******************/
+
+/**
+ * Add color column to tags table.
+ * * @since 1.12.5
+ */
+function kc_us_update_1125_add_color_to_tags_table() {
+    global $wpdb;
+
+    $table_name = "{$wpdb->prefix}kc_us_tags";
+    
+    // Check if the table exists
+    $table_exists = $wpdb->query( "SHOW TABLES LIKE '$table_name'" );
+    
+    if ( $table_exists > 0 ) {
+        $cols = $wpdb->get_col( "SHOW COLUMNS FROM $table_name" );
+
+        // If 'color' column doesn't exist, insert it
+        if ( ! in_array( 'color', $cols ) ) {
+            $wpdb->query( "ALTER TABLE $table_name ADD COLUMN `color` varchar(20) DEFAULT '#6366f1' AFTER `description`" );
+        }
+    }
+}

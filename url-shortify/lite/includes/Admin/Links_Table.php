@@ -613,20 +613,10 @@ class Links_Table extends US_List_Table {
 		}
 
 		// Get the full name map from the database
-		$tag_name_map = US()->db->tags->get_all_id_name_map();
-
-		// $tags_output = [];
-		// foreach ( $tag_ids as $tag_id ) {
-		// 	if ( isset( $tag_name_map[ $tag_id ] ) ) {
-		// 		$tags_output[] = '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mr-1">' . esc_html( $tag_name_map[ $tag_id ] ) . '</span>';
-		// 	}
-		// }
-
-		// return ! empty( $tags_output ) ? implode( ' ', $tags_output ) : '-';
-
+		$tag_data_map = US()->db->tags->get_all_id_object_map();
 
 		// Use a helper to convert IDs to a comma-separated string of names
-		return Helper::get_tag_str_from_ids( $tag_ids, $tag_name_map );
+		return Helper::get_tag_str_from_ids( $tag_ids, $tag_data_map );
 	}
 
 	/**

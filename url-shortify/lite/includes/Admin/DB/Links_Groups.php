@@ -264,19 +264,26 @@ class Links_Groups extends Base_DB {
 		}
 
 		if ( is_array( $link_ids ) && is_array( $group_ids ) ) {
-
+			$links_ids_str = $this->prepare_for_in_query( $link_ids );
 			if ( $move ) {
-				$links_ids_str = $this->prepare_for_in_query( $link_ids );
-
 				$where = "link_id IN ($links_ids_str)";
 
 				// Delete current groups of all $link_ids.
 				$this->delete_by_condition( $where );
+			} else {
+				if ( count( $group_ids ) > 0 ) {
+					// If the group is already exists? Delete it.
+					foreach ( $group_ids as $group_id ) {
+						$where = "group_id = {$group_id} AND link_id IN ($links_ids_str)";
+						$this->delete_by_condition( $where );
+					}
+
+					$links_groups_data = $this->prepare_links_groups_data( $link_ids, $group_ids );
+
+					return $this->bulk_insert( $links_groups_data );
+				}
 			}
 
-			$links_groups_data = $this->prepare_links_groups_data( $link_ids, $group_ids );
-
-			return $this->bulk_insert( $links_groups_data );
 		}
 
 		return true;

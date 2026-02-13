@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 1.12.4
+Stable tag: 1.12.5
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -481,6 +481,13 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Changelog ==
 
+= 1.12.5 [2026-02-13] =
+
+* New: Add color to tags **PRO**
+* Fix: Duplicate Groups issue when adding via Bulk Add Group
+* Fix: Duplicate Tags issue when adding via Bulk Add Tag **PRO**
+* Translations: Updated .POT file for new translations
+
 = 1.12.4 [2026-02-11] =
 
 * Update: Added support to **Manage Tags** permission in Access Control **PRO**
@@ -489,27 +496,27 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 = 1.12.3 [2026-02-09] =
 
-* New: Added support to mark links as Favorite and remove from favorite using bulk action. **[PRO]**
-* New: Added support to add/remove tags using bulk action. **[PRO]**
-* New: Filter links based on Favorite and Tags. **[PRO]**
+* New: Added support to mark links as Favorite and remove from favorite using bulk action. **PRO**
+* New: Added support to add/remove tags using bulk action. **PRO**
+* New: Filter links based on Favorite and Tags. **PRO**
 * Update: Compatibility with WordPress 6.9.1
 * Translations: Updated .POT file for new translations
 
 = 1.12.2 [2026-02-02] =
 
-* New: Added support to mark links as Favorite. **[PRO]**
+* New: Added support to mark links as Favorite. **PRO**
 * Update: Enhanced Security.
 * Translations: Updated .POT file for new translations
 
 = 1.12.1 [2026-01-23] =
 
-* Fix: Custom domains not visible in the link creation dropdown. **[PRO]**
+* Fix: Custom domains not visible in the link creation dropdown. **PRO**
 
 = 1.12.0 [2026-01-20] =
 
-* New: Added support to add tags to created links. **[PRO]**
-* Update: Converted `Clicked On` time in user defined timezone in exported click history. **[PRO]**
-* Fix: Link prefix not getting added to the short links created. **[PRO]**
+* New: Added support to add tags to created links. **PRO**
+* Update: Converted `Clicked On` time in user defined timezone in exported click history. **PRO**
+* Fix: Link prefix not getting added to the short links created. **PRO**
 * Update: Compatibility with WordPress 6.9
 
 = 1.11.4 [2025-11-20] =

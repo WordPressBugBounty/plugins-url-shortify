@@ -3095,19 +3095,27 @@ class Helper {
      * Convert Tag IDs to a comma-separated string of names
      * @since 1.11.5
      */
-    public static function get_tag_str_from_ids( $tag_ids = [], $tag_name_map = [] ) {
-        if ( empty( $tag_ids ) || empty( $tag_name_map ) ) {
+    public static function get_tag_str_from_ids( $tag_ids = [], $tag_data_map = [] ) {
+        if ( empty( $tag_ids ) || empty( $tag_data_map ) ) {
             return '-';
         }
 
-        $tags = [];
+        $tags_output = [];
         foreach ( $tag_ids as $tag_id ) {
-            if ( isset( $tag_name_map[ $tag_id ] ) ) {
-                // Optional: Wrap in a span for styling
-                $tags[] = '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">' . esc_html( $tag_name_map[ $tag_id ] ) . '</span>';
+            if ( isset( $tag_data_map[ $tag_id ] ) ) {
+                $tag   = $tag_data_map[ $tag_id ];
+                $name  = is_array( $tag ) ? $tag['name'] : $tag;
+                $color = ( is_array( $tag ) && ! empty( $tag['color'] ) ) ? $tag['color'] : '#6366f1';
+
+                // Tailwind-inspired badge structure
+                $tags_output[] = sprintf(
+                    '<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10" style="background-color: %1$s20; color: %1$s; margin: 2px;">%2$s</span>',
+                    esc_attr( $color ),
+                    esc_html( $name )
+                );
             }
         }
 
-        return ! empty( $tags ) ? implode( ' ', $tags ) : '-';
+        return ! empty( $tags_output ) ? '<div style="display: flex; flex-wrap: wrap; gap: 2;">' . implode( '', $tags_output ) . '</div>' : '-';
     }
 }

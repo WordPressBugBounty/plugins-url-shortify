@@ -17,6 +17,7 @@ class Tags extends Base_DB {
 			'id'            => '%d',
 			'name'          => '%s',
 			'description'   => '%s',
+			'color'         => '%s',
 			'created_at'    => '%s',
 			'created_by_id' => '%d',
 			'updated_at'    => '%s',
@@ -28,6 +29,7 @@ class Tags extends Base_DB {
 		return [
 			'name'          => '',
 			'description'   => '',
+			'color'         => '#6366f1',
 			'created_at'    => Helper::get_current_date_time(),
 			'created_by_id' => null,
 			'updated_at'    => null,
@@ -40,6 +42,7 @@ class Tags extends Base_DB {
 		$form_data = [
 			'name'        => Helper::get_data( $data, 'name', '', true ),
 			'description' => sanitize_textarea_field( Helper::get_data( $data, 'description', '' ) ),
+			'color'       => sanitize_hex_color( Helper::get_data( $data, 'color', '#6366f1' ) ),
 		];
 
 		$current_user_id   = get_current_user_id();
@@ -62,6 +65,20 @@ class Tags extends Base_DB {
 		if ( ! empty( $results ) ) {
 			foreach ( $results as $row ) {
 				$map[ $row['id'] ] = $row['name'];
+			}
+		}
+		return $map;
+	}
+
+	public function get_all_id_object_map() {
+		$results = $this->get_all();
+		$map = [];
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $row ) {
+				$map[ $row['id'] ] = [
+					'name'  => $row['name'],
+					'color' => $row['color'],
+				];
 			}
 		}
 		return $map;

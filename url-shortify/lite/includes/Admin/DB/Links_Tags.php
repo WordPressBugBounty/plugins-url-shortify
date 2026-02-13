@@ -165,16 +165,26 @@ class Links_Tags extends Base_DB {
 		}
 
 		if ( is_array( $link_ids ) && is_array( $tag_ids ) ) {
+			$links_ids_str = $this->prepare_for_in_query( $link_ids );
 			if ( $move ) {
-				$links_ids_str = $this->prepare_for_in_query( $link_ids );
 				$where = "link_id IN ($links_ids_str)";
 
 				$this->delete_by_condition( $where );
+			} else {
+				if ( count( $tag_ids ) > 0 ) {
+					// If the tag is already exists? Delete it.
+					foreach ( $tag_ids as $tag_id ) {
+						$where = "tag_id = {$tag_id} AND link_id IN ($links_ids_str)";
+						$this->delete_by_condition( $where );
+					}
+
+					$links_tags_data = $this->prepare_links_tags_data( $link_ids, $tag_ids );
+
+					return $this->bulk_insert( $links_tags_data );
+				}
+
 			}
 
-			$links_tags_data = $this->prepare_links_tags_data( $link_ids, $tag_ids );
-
-			return $this->bulk_insert( $links_tags_data );
 		}
 
 		return true;

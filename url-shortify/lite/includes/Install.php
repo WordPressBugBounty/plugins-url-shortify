@@ -98,7 +98,11 @@ class Install {
 
 		'1.12.2' => [
 			'kc_us_update_1122_create_favorites_links_table',
-		]
+		],
+
+		'1.12.5' => [
+			'kc_us_update_1125_add_color_to_tags_table',
+		],
 	];
 
 	/**
@@ -991,6 +995,7 @@ class Install {
 				`id` int(10) NOT NULL AUTO_INCREMENT,
 				`name` varchar(255) DEFAULT NULL,
 				`description` text DEFAULT NULL,
+				`color` varchar(20) DEFAULT '#6366f1' NOT NULL,
 				`created_by_id` int(11) DEFAULT NULL,
 				`created_at` datetime DEFAULT NULL,
 				`updated_by_id` int(11) DEFAULT NULL,
