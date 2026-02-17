@@ -46,6 +46,7 @@ $current_url = \KaizenCoders\URL_Shortify\Common\Utils::get_current_page_url();
                         $object->prepare_groups_dropdown();
                         $object->prepare_tags_dropdown();
                         $object->prepare_expiry_datepicker();
+						$object->render_select_all_banner();
 						$object->display();
 						?>
 					</form>

@@ -222,6 +222,12 @@ p.search-box, .search-box #form-search-input, .search-box #search-submit {
     line-height: 1;
 }
 
+/* Hide bulk-action dropdowns by default to prevent FOUC; JS shows them on demand */
+.group_select,
+.tag_select {
+    display: none;
+}
+
 .us-star-toggle {
     font-size: 22px;
     color : #ffb900;

@@ -630,23 +630,21 @@ class Links_Table extends US_List_Table {
 	 * @since 1.0.0
 	 *
 	 */
-	public function get_lists( $per_page = 10, $page_number = 1, $do_count_only = false ) {
+	/**
+	 * Build the WHERE clause for the links query based on current search, filter, and access parameters.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @return string The full WHERE clause (including " WHERE "), or empty string if no conditions.
+	 */
+	private function build_filter_where_clause() {
 		global $wpdb;
 
-		$order_by  = sanitize_sql_orderby( Helper::get_request_data( 'orderby' ) );
-		$order     = Helper::get_request_data( 'order' );
 		$search    = Helper::get_request_data( 's' );
 		$filter_by = Helper::get_request_data( 'filter_by', '' );
 
-		$table = $this->db->table_name;
-
-		if ( $do_count_only ) {
-			$sql = "SELECT count(*) as total FROM {$table}";
-		} else {
-			$sql = "SELECT * FROM {$table}";
-		}
-
-		$args = $query = [];
+		$args  = [];
+		$query = [];
 
 		$add_where_clause = false;
 
@@ -684,6 +682,20 @@ class Links_Table extends US_List_Table {
 
 					$query[] = "id IN ( $filter_sql )";
 				}
+			} elseif ( strpos( $filter_by, 'tag_id' ) !== false ) { // Filter by tag.
+				$tag_id = str_replace( 'tag_id_', '', $filter_by );
+
+				$links_tags_table = US()->db->links_tags->table_name;
+				$add_where_clause = true;
+
+				if ( 'none' == $tag_id ) {
+					$query[] = "id NOT IN (SELECT link_id FROM {$links_tags_table})";
+				} elseif ( $tag_id > 0 ) {
+					$filter_sql = $wpdb->prepare( "SELECT link_id FROM {$links_tags_table} WHERE tag_id = %d",
+						$tag_id );
+
+					$query[] = "id IN ( $filter_sql )";
+				}
 			} elseif ( strpos( $filter_by, 'redirect_type' ) !== false ) { // Filter by redirect type.
 				$add_where_clause = true;
 				$redirect_type    = str_replace( 'redirect_type_', '', $filter_by );
@@ -697,19 +709,35 @@ class Links_Table extends US_List_Table {
 					$add_where_clause = true;
 				}
 			}
-
 		}
 
-		if ( $add_where_clause ) {
-			$sql .= ' WHERE ';
+		$where = '';
 
-			if ( count( $query ) > 0 ) {
-				$sql .= implode( ' AND ', $query );
-				if ( count( $args ) > 0 ) {
-					$sql = $wpdb->prepare( $sql, $args );
-				}
+		if ( $add_where_clause && count( $query ) > 0 ) {
+			$where = ' WHERE ' . implode( ' AND ', $query );
+			if ( count( $args ) > 0 ) {
+				$where = $wpdb->prepare( $where, $args );
 			}
 		}
+
+		return $where;
+	}
+
+	public function get_lists( $per_page = 10, $page_number = 1, $do_count_only = false ) {
+		global $wpdb;
+
+		$order_by = sanitize_sql_orderby( Helper::get_request_data( 'orderby' ) );
+		$order    = Helper::get_request_data( 'order' );
+
+		$table = $this->db->table_name;
+
+		if ( $do_count_only ) {
+			$sql = "SELECT count(*) as total FROM {$table}";
+		} else {
+			$sql = "SELECT * FROM {$table}";
+		}
+
+		$sql .= $this->build_filter_where_clause();
 
 		if ( ! $do_count_only ) {
 			$order = ! empty( $order ) ? strtolower( $order ) : 'desc';
@@ -772,6 +800,39 @@ class Links_Table extends US_List_Table {
 	}
 
 	/**
+	 * Render the "Select All Links" banner for bulk actions.
+	 *
+	 * @since 1.13.0
+	 */
+	public function render_select_all_banner() {
+		if ( ! US()->is_pro() ) {
+			return;
+		}
+
+		$total_items = $this->get_pagination_arg( 'total_items' );
+
+		echo '<input type="hidden" name="select_all_links" id="kc-us-select-all-links" value="0">';
+		echo '<div id="kc-us-select-all-banner" class="notice notice-info inline" style="display:none; margin: 5px 0; padding: 8px 12px;" data-total-links="' . esc_attr( $total_items ) . '"></div>';
+	}
+
+	/**
+	 * Get all link IDs for bulk actions, respecting filters and access control.
+	 *
+	 * @since 1.13.0
+	 *
+	 * @return array
+	 */
+	private function get_all_link_ids_for_bulk() {
+		global $wpdb;
+
+		$table = $this->db->table_name;
+		$sql   = "SELECT id FROM {$table}";
+		$sql  .= $this->build_filter_where_clause();
+
+		return $wpdb->get_col( $sql );
+	}
+
+	/**
 	 * Process bulk action
 	 *
 	 * @since 1.0.0
@@ -824,10 +885,16 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to delete link(s).', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
 
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 				if ( ! empty( $link_ids ) ) {
 					$this->db->delete( $link_ids );
@@ -850,9 +917,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to reset stats.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( ! empty( $link_ids ) ) {
@@ -876,9 +949,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to add links to group.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				$group_id = Helper::get_request_data( 'group_id' );
@@ -912,9 +991,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to move links to group.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				$group_id = Helper::get_request_data( 'group_id' );
@@ -948,8 +1033,14 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to add expiry to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids    = Helper::get_request_data( 'link_ids' );
+				$select_all  = Helper::get_request_data( 'select_all_links', '0' );
 				$expiry_date = Helper::get_request_data( 'expiry_date' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = Helper::get_request_data( 'link_ids' );
+				}
 
 				if ( empty( $expiry_date ) ) {
 					$message = __( 'Please select expiry date.', 'url-shortify' );
@@ -977,9 +1068,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Nofollow parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1003,9 +1100,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Nofollow parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1029,9 +1132,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Sponsored parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1055,9 +1164,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Sponsored parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1081,9 +1196,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Tracking parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1107,9 +1228,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Tracking parameter to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1133,9 +1260,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to enable Parameters Forwarding to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1159,9 +1292,15 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to disable Parameters Forwarding to links.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( empty( $link_ids ) ) {
@@ -1183,9 +1322,15 @@ class Links_Table extends US_List_Table {
 			if ( ! wp_verify_nonce( $nonce, $action_nonce ) ) {
 				US()->notices->error( __( 'You do not have permission to add favorites.', 'url-shortify' ) );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 
 				if ( ! empty( $link_ids ) ) {
@@ -1212,9 +1357,15 @@ class Links_Table extends US_List_Table {
 			if ( ! wp_verify_nonce( $nonce, $action_nonce ) ) {
 				US()->notices->error( __( 'You do not have permission to remove favorites.', 'url-shortify' ) );
 			} else {
-				$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
-				if ( empty( $link_ids ) ) {
-					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
 				}
 				$user_id = absint( get_current_user_id() );
 
@@ -1233,7 +1384,13 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to add links to tag.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = Helper::get_request_data( 'link_ids' );
+				}
 				$tag_id   = [ absint( Helper::get_request_data( 'tag_id' ) ) ];
 
 				if ( empty( $link_ids ) ) {
@@ -1265,7 +1422,13 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to move links to tag.', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = Helper::get_request_data( 'link_ids' );
+				}
 				$tag_id   = [ absint( Helper::get_request_data( 'tag_id' ) ) ];
 
 				if ( ! empty( $link_ids ) && ! empty( $tag_id[0] ) ) {
@@ -1301,7 +1464,13 @@ class Links_Table extends US_List_Table {
 				$message = __( 'You do not have permission to remove all tag(s).', 'url-shortify' );
 				US()->notices->error( $message );
 			} else {
-				$link_ids = Helper::get_request_data( 'link_ids' );
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = Helper::get_request_data( 'link_ids' );
+				}
 
 				if ( empty( $link_ids ) ) {
 					$message = __( 'Please select link(s) to remove all tag(s).', 'url-shortify' );
@@ -1669,7 +1838,7 @@ class Links_Table extends US_List_Table {
             <p class="">
 				<?php
 				$filter_by = Helper::get_request_data( 'filter_by', '' ); ?>
-                <select name="filter_by">
+                <select name="filter_by" id="kc-us-filter-by">
 					<?php
 					$allowed_tags = Helper::allowed_html_tags_in_esc();
 					$groups       = Helper::prepare_links_filters_dropdown_options( $filter_by );
@@ -1679,9 +1848,35 @@ class Links_Table extends US_List_Table {
 
 				<?php
 
-				submit_button( __( 'Filter' ), '', 'filter_action', false, [ 'id' => 'post-query-submit' ] );
+				submit_button( __( 'Filter' ), '', 'filter_action', false, [
+					'id'      => 'post-query-submit',
+					'onclick' => 'return kcUsFilterLinks();',
+				] );
+
+				if ( ! empty( $filter_by ) ) {
+					$clear_url = admin_url( 'admin.php?page=us_links' );
+					printf(
+						'<a href="%s" class="underline" style="color: #ff0000; border-color: #dc3545; margin-left: 5px;">%s</a>',
+						esc_url( $clear_url ),
+						esc_html__( 'Reset', 'url-shortify' )
+					);
+				}
 
 				?>
+                <script type="text/javascript">
+                    function kcUsFilterLinks() {
+                        var filterBy = document.getElementById('kc-us-filter-by').value;
+                        var url = new URL(window.location.href);
+                        if (filterBy) {
+                            url.searchParams.set('filter_by', filterBy);
+                        } else {
+                            url.searchParams.delete('filter_by');
+                        }
+                        url.searchParams.delete('paged');
+                        window.location.href = url.toString();
+                        return false;
+                    }
+                </script>
             </p>
         </div>
 		<?php

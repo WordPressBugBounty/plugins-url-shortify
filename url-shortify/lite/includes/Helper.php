@@ -3100,6 +3100,8 @@ class Helper {
             return '-';
         }
 
+        $filter_base_url = admin_url( 'admin.php?page=us_links' );
+
         $tags_output = [];
         foreach ( $tag_ids as $tag_id ) {
             if ( isset( $tag_data_map[ $tag_id ] ) ) {
@@ -3107,11 +3109,16 @@ class Helper {
                 $name  = is_array( $tag ) ? $tag['name'] : $tag;
                 $color = ( is_array( $tag ) && ! empty( $tag['color'] ) ) ? $tag['color'] : '#6366f1';
 
-                // Tailwind-inspired badge structure
+                $filter_url = add_query_arg( 'filter_by', 'tag_id_' . absint( $tag_id ), $filter_base_url );
+
+                // Tailwind-inspired badge structure with clickable filter link
                 $tags_output[] = sprintf(
-                    '<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10" style="background-color: %1$s20; color: %1$s; margin: 2px;">%2$s</span>',
+                    '<a href="%3$s" title="%4$s" style="text-decoration: none;"><span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10 cursor-pointer" style="background-color: %1$s20; color: %1$s; margin: 2px;">%2$s</span></a>',
                     esc_attr( $color ),
-                    esc_html( $name )
+                    esc_html( $name ),
+                    esc_url( $filter_url ),
+                    /* translators: %s: tag name */
+                    esc_attr( sprintf( __( 'Filter by tag: %s', 'url-shortify' ), $name ) )
                 );
             }
         }

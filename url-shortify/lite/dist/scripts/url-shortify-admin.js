@@ -182,6 +182,109 @@
             });
         });
 
+        // Select All Links banner (PRO only).
+        var $banner = $('#kc-us-select-all-banner');
+        if (typeof usParams !== 'undefined' && usParams.is_pro && $banner.length && $banner.data('total-links')) {
+            var totalLinks = parseInt($banner.data('total-links'), 10);
+            var $hiddenField = $('#kc-us-select-all-links');
+            var $headerCheckbox = $('#cb-select-all-1');
+            var selectAllActive = false;
+
+            function getPageCheckboxCount() {
+                return $('input[name="link_ids[]"]').length;
+            }
+
+            function showPageSelectedBanner() {
+                var pageCount = getPageCheckboxCount();
+                if (pageCount >= totalLinks) {
+                    $banner.hide();
+                    return;
+                }
+                selectAllActive = false;
+                $hiddenField.val('0');
+                $banner.html(
+                    'All <strong>' + pageCount + '</strong> links on this page are selected. ' +
+                    '<a href="#" id="kc-us-select-all-links-trigger" style="cursor:pointer;">Select all <strong>' + totalLinks + '</strong> links.</a>'
+                ).show();
+            }
+
+            function showAllSelectedBanner() {
+                selectAllActive = true;
+                $hiddenField.val('1');
+                $banner.html(
+                    'All <strong>' + totalLinks + '</strong> links are selected. ' +
+                    '<a href="#" id="kc-us-clear-selection-trigger" style="cursor:pointer;">Clear selection.</a>'
+                ).show();
+            }
+
+            function resetSelectAll() {
+                selectAllActive = false;
+                $hiddenField.val('0');
+                $banner.hide();
+            }
+
+            // Header checkbox change.
+            $headerCheckbox.on('change', function () {
+                if ($(this).prop('checked')) {
+                    showPageSelectedBanner();
+                } else {
+                    resetSelectAll();
+                }
+            });
+
+            // "Select all Y links" click.
+            $(document).on('click', '#kc-us-select-all-links-trigger', function (e) {
+                e.preventDefault();
+                showAllSelectedBanner();
+            });
+
+            // "Clear selection" click.
+            $(document).on('click', '#kc-us-clear-selection-trigger', function (e) {
+                e.preventDefault();
+                $headerCheckbox.prop('checked', false).trigger('change');
+                $('input[name="link_ids[]"]').prop('checked', false);
+                resetSelectAll();
+            });
+
+            // Individual checkbox unchecked resets all-links mode.
+            $(document).on('change', 'input[name="link_ids[]"]', function () {
+                if (!$(this).prop('checked') && selectAllActive) {
+                    resetSelectAll();
+                }
+            });
+        }
+
+        // Bulk action confirmation for destructive actions.
+        $('#doaction').on('click', function (e) {
+            var selectedAction = $('#bulk-action-selector-top').val();
+            var isDestructive = (selectedAction === 'bulk_delete' || selectedAction === 'bulk_reset');
+
+            if (!isDestructive) {
+                return true;
+            }
+
+            var selectAll = $('#kc-us-select-all-links').val();
+            var actionLabel = (selectedAction === 'bulk_delete') ? 'delete' : 'reset statistics for';
+            var message;
+
+            if (selectAll === '1') {
+                var $selectAllBanner = $('#kc-us-select-all-banner');
+                var total = $selectAllBanner.length ? $selectAllBanner.data('total-links') : 'ALL';
+                message = 'This will ' + actionLabel + ' ALL ' + total + ' link(s). Are you sure?';
+            } else {
+                var checkedCount = $('input[name="link_ids[]"]:checked').length;
+                if (checkedCount === 0) {
+                    return true;
+                }
+                message = 'Are you sure you want to ' + actionLabel + ' ' + checkedCount + ' selected link(s)?';
+            }
+
+            if (!confirm(message)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
         var redirectType = $('#kc-us-redirection-types-options').val();
         toggleTrackingPixel(redirectType);
 

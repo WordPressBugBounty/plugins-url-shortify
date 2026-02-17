@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 1.12.5
+Stable tag: 1.13.0
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -473,13 +473,21 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 1.12.4 =
+= 1.13.0 =
 
-* Update: Added support to **Manage Tags** permission in Access Control **PRO**
-* Update: Security enhancements.
+* New: Added support to filter links by tags by clicking on tags from links list page. **PRO**
+* New: Added support to perform bulk actions on all links not just selected. **PRO**
+* Update: Improved UI.
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 1.13.0 [2026-02-17] =
+
+* New: Added support to filter links by tags by clicking on tags from links list page. **PRO**
+* New: Added support to perform bulk actions on all links not just selected. **PRO**
+* Update: Improved UI.
+* Translations: Updated .POT file for new translations
 
 = 1.12.5 [2026-02-13] =
 

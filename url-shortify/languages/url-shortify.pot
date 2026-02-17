@@ -2,20 +2,20 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 1.12.5\n"
+"Project-Id-Version: URL Shortify 1.13.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: FULL NAME <hello@kaizencoders.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-13T10:30:49+00:00\n"
+"POT-Creation-Date: 2026-02-17T13:28:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
 
 #. Plugin Name of the plugin
-#: lite/includes/Admin.php:245
+#: lite/includes/Admin.php:249
 #: lite/includes/Helper.php:425
 #: lite/language.php:4
 msgid "URL Shortify"
@@ -56,13 +56,13 @@ msgstr ""
 msgid "Meta Refresh"
 msgstr ""
 
-#: lite/includes/Admin.php:254
+#: lite/includes/Admin.php:258
 #: lite/includes/Admin/Templates/dashboard.php:62
 #: lite/language.php:13
 msgid "Dashboard"
 msgstr ""
 
-#: lite/includes/Admin.php:261
+#: lite/includes/Admin.php:265
 #: lite/includes/Admin/admin-settings.php:51
 #: lite/includes/Admin/Groups_Table.php:191
 #: lite/includes/Admin/Links_Table.php:78
@@ -73,8 +73,8 @@ msgstr ""
 msgid "Links"
 msgstr ""
 
-#: lite/includes/Admin.php:270
-#: lite/includes/Admin.php:271
+#: lite/includes/Admin.php:274
+#: lite/includes/Admin.php:275
 #: lite/includes/Admin/Groups_Table.php:63
 #: lite/includes/Admin/Groups_Table.php:164
 #: lite/includes/Admin/Links_Table.php:211
@@ -84,34 +84,34 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
-#: lite/includes/Admin.php:287
-#: lite/includes/Admin.php:288
+#: lite/includes/Admin.php:291
+#: lite/includes/Admin.php:292
 #: lite/includes/Admin/Tools.php:42
 #: lite/includes/Admin/Tools.php:43
 #: lite/language.php:17
 msgid "Tools"
 msgstr ""
 
-#: lite/includes/Admin.php:299
-#: lite/includes/Admin.php:300
+#: lite/includes/Admin.php:303
+#: lite/includes/Admin.php:304
 msgid "Resources"
 msgstr ""
 
 #. translators: 1: WordPress link, 2: Plugin name, 3: Plugin version, 4: KaizenCoders link
-#: lite/includes/Admin.php:482
+#: lite/includes/Admin.php:486
 msgid "<span id=\"footer-thankyou\">Thank you for creating with <a href=\"%1$s\" target=\"_blank\">WordPress</a> | %2$s <b>%3$s</b>. Made with ❤️ by the team <a href=\"%4$s\" target=\"_blank\">KaizenCoders</a></span>"
 msgstr ""
 
-#: lite/includes/Admin.php:564
+#: lite/includes/Admin.php:568
 #: lite/language.php:19
 msgid "URL Shortify Quick Add"
 msgstr ""
 
-#: lite/includes/Admin.php:616
+#: lite/includes/Admin.php:620
 msgid "Support"
 msgstr ""
 
-#: lite/includes/Admin.php:626
+#: lite/includes/Admin.php:630
 msgid "Made with ♥ by the team KaizenCoders"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgid "<a href=\"%1$s\"  title=\"%2$s\" class=\"kc-us-group\"/>%3$s</a>"
 msgstr ""
 
 #: lite/includes/Admin/Groups_Table.php:400
-#: lite/includes/Admin/Links_Table.php:757
+#: lite/includes/Admin/Links_Table.php:785
 #: lite/language.php:45
 #: pro/includes/Admin/Domains_Table.php:255
 #: pro/includes/Admin/Tags_Table.php:188
@@ -513,7 +513,7 @@ msgid "Edit Group"
 msgstr ""
 
 #: lite/includes/Admin/Groups_Table.php:519
-#: lite/includes/Admin/Links_Table.php:1378
+#: lite/includes/Admin/Links_Table.php:1547
 #: lite/language.php:52
 #: pro/includes/Admin/Domains_Table.php:374
 #: pro/includes/Admin/Tags_Table.php:293
@@ -630,329 +630,334 @@ msgstr ""
 msgid "<a href=\"%s\" target=\"_blank\" title=\"Visit Link\"><i class=\"fa fa-external-link-square\"></i></a>"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:755
+#: lite/includes/Admin/Links_Table.php:783
 msgid "General Actions"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:758
+#: lite/includes/Admin/Links_Table.php:786
 msgid "Reset Stats"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:763
+#: lite/includes/Admin/Links_Table.php:791
 msgid "Group Actions"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:765
+#: lite/includes/Admin/Links_Table.php:793
 msgid "Add to group"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:766
+#: lite/includes/Admin/Links_Table.php:794
 msgid "Move to group"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:788
+#: lite/includes/Admin/Links_Table.php:849
 #: lite/language.php:67
 msgid "You do not have permission to delete this link."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:796
+#: lite/includes/Admin/Links_Table.php:857
 #: lite/language.php:68
 msgid "Link has been deleted successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:805
+#: lite/includes/Admin/Links_Table.php:866
 #: lite/language.php:69
 msgid "You do not have permission to reset statistics of this link."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:813
+#: lite/includes/Admin/Links_Table.php:874
 #: lite/language.php:70
 msgid "Link stats has been reset successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:824
+#: lite/includes/Admin/Links_Table.php:885
 msgid "You do not have permission to delete link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:834
+#: lite/includes/Admin/Links_Table.php:901
 #: lite/language.php:71
 msgid "Link(s) have been deleted successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:837
+#: lite/includes/Admin/Links_Table.php:904
 #: lite/language.php:72
 msgid "Please select link(s) to delete."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:850
+#: lite/includes/Admin/Links_Table.php:917
 msgid "You do not have permission to reset stats."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:861
+#: lite/includes/Admin/Links_Table.php:934
 #: lite/language.php:73
 msgid "Link(s) stats have been reset successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:864
+#: lite/includes/Admin/Links_Table.php:937
 #: lite/language.php:74
 msgid "Please select link(s) to reset stats."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:876
+#: lite/includes/Admin/Links_Table.php:949
 msgid "You do not have permission to add links to group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:887
+#: lite/includes/Admin/Links_Table.php:966
 msgid "Please select link(s) to add into group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:894
+#: lite/includes/Admin/Links_Table.php:973
 msgid "Please select group to add links to."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:902
+#: lite/includes/Admin/Links_Table.php:981
 msgid "Link(s) have been added to group successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:912
+#: lite/includes/Admin/Links_Table.php:991
 msgid "You do not have permission to move links to group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:923
+#: lite/includes/Admin/Links_Table.php:1008
 msgid "Please select link(s) to move into group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:930
+#: lite/includes/Admin/Links_Table.php:1015
 msgid "Please select group to move links to."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:938
+#: lite/includes/Admin/Links_Table.php:1023
 msgid "Link(s) have been moved to group successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:948
+#: lite/includes/Admin/Links_Table.php:1033
 msgid "You do not have permission to add expiry to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:955
+#: lite/includes/Admin/Links_Table.php:1046
 msgid "Please select expiry date."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:960
+#: lite/includes/Admin/Links_Table.php:1051
 msgid "Please select link(s) to add expiry date."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:968
+#: lite/includes/Admin/Links_Table.php:1059
 msgid "Expiry date has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:977
+#: lite/includes/Admin/Links_Table.php:1068
 msgid "You do not have permission to enable Nofollow parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:986
+#: lite/includes/Admin/Links_Table.php:1083
 msgid "Please select link(s) to enable nofollow."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:994
+#: lite/includes/Admin/Links_Table.php:1091
 msgid "Nofollow has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1003
+#: lite/includes/Admin/Links_Table.php:1100
 msgid "You do not have permission to disable Nofollow parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1012
+#: lite/includes/Admin/Links_Table.php:1115
 msgid "Please select link(s) to disable nofollow."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1020
+#: lite/includes/Admin/Links_Table.php:1123
 msgid "Nofollow has been disabled to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1029
+#: lite/includes/Admin/Links_Table.php:1132
 msgid "You do not have permission to disable Sponsored parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1038
+#: lite/includes/Admin/Links_Table.php:1147
 msgid "Please select link(s) to disable Sponsored."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1046
+#: lite/includes/Admin/Links_Table.php:1155
 msgid "Sponsored has been disabled to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1055
+#: lite/includes/Admin/Links_Table.php:1164
 msgid "You do not have permission to enable Sponsored parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1064
+#: lite/includes/Admin/Links_Table.php:1179
 msgid "Please select link(s) to enable Sponsored."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1072
+#: lite/includes/Admin/Links_Table.php:1187
 msgid "Sponsored has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1081
+#: lite/includes/Admin/Links_Table.php:1196
 msgid "You do not have permission to enable Tracking parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1090
+#: lite/includes/Admin/Links_Table.php:1211
 msgid "Please select link(s) to enable Tracking."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1098
-#: lite/includes/Admin/Links_Table.php:1124
+#: lite/includes/Admin/Links_Table.php:1219
+#: lite/includes/Admin/Links_Table.php:1251
 msgid "Tracking has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1107
+#: lite/includes/Admin/Links_Table.php:1228
 msgid "You do not have permission to disable Tracking parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1116
+#: lite/includes/Admin/Links_Table.php:1243
 msgid "Please select link(s) to disable Tracking."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1133
+#: lite/includes/Admin/Links_Table.php:1260
 msgid "You do not have permission to enable Parameters Forwarding to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1142
+#: lite/includes/Admin/Links_Table.php:1275
 msgid "Please select link(s) to enable Parameters Forwarding."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1150
+#: lite/includes/Admin/Links_Table.php:1283
 msgid "Parameters Forwarding has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1159
+#: lite/includes/Admin/Links_Table.php:1292
 msgid "You do not have permission to disable Parameters Forwarding to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1168
+#: lite/includes/Admin/Links_Table.php:1307
 msgid "Please select link(s) to disable Parameters Forwarding."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1176
+#: lite/includes/Admin/Links_Table.php:1315
 msgid "Params Forwarding has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1184
+#: lite/includes/Admin/Links_Table.php:1323
 msgid "You do not have permission to add favorites."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1203
+#: lite/includes/Admin/Links_Table.php:1348
 msgid "Link(s) added to favorites successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1205
+#: lite/includes/Admin/Links_Table.php:1350
 msgid "Please select link(s) to add to favorites."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1213
+#: lite/includes/Admin/Links_Table.php:1358
 msgid "You do not have permission to remove favorites."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1225
+#: lite/includes/Admin/Links_Table.php:1376
 msgid "Link(s) removed from favorites successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1233
+#: lite/includes/Admin/Links_Table.php:1384
 msgid "You do not have permission to add links to tag."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1240
-#: lite/includes/Admin/Links_Table.php:1276
+#: lite/includes/Admin/Links_Table.php:1397
+#: lite/includes/Admin/Links_Table.php:1439
 msgid "Please select link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1247
-#: lite/includes/Admin/Links_Table.php:1283
+#: lite/includes/Admin/Links_Table.php:1404
+#: lite/includes/Admin/Links_Table.php:1446
 msgid "Please select a tag."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1255
+#: lite/includes/Admin/Links_Table.php:1412
 msgid "A new tag has been added successfully to all selected Link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1265
+#: lite/includes/Admin/Links_Table.php:1422
 msgid "You do not have permission to move links to tag."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1291
+#: lite/includes/Admin/Links_Table.php:1454
 msgid "New tag has been added successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1301
+#: lite/includes/Admin/Links_Table.php:1464
 msgid "You do not have permission to remove all tag(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1307
+#: lite/includes/Admin/Links_Table.php:1476
 msgid "Please select link(s) to remove all tag(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1315
+#: lite/includes/Admin/Links_Table.php:1484
 msgid "All tags from link(s) are removed successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1360
+#: lite/includes/Admin/Links_Table.php:1529
 #: lite/language.php:75
 msgid "Link data have been saved successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1377
+#: lite/includes/Admin/Links_Table.php:1546
 #: lite/language.php:76
 msgid "Edit Link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1388
+#: lite/includes/Admin/Links_Table.php:1557
 #: lite/includes/Admin/Templates/dashboard.php:122
 #: lite/language.php:77
 msgid "New Link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1389
+#: lite/includes/Admin/Links_Table.php:1558
 #: lite/language.php:78
 msgid "Save Link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1495
+#: lite/includes/Admin/Links_Table.php:1664
 #: lite/language.php:79
 msgid "You do not have permission to edit this form."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1511
+#: lite/includes/Admin/Links_Table.php:1680
 #: lite/language.php:80
 msgid "Please enter Title"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1516
+#: lite/includes/Admin/Links_Table.php:1685
 #: lite/language.php:81
 msgid "Please enter Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1519
+#: lite/includes/Admin/Links_Table.php:1688
 #: lite/language.php:82
 msgid "Please enter valid Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1522
+#: lite/includes/Admin/Links_Table.php:1691
 msgid "Short URL already exists. Please use different Short URL."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1534
+#: lite/includes/Admin/Links_Table.php:1703
 msgid "Your link rotations weights should be equal or less than 100%"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1544
+#: lite/includes/Admin/Links_Table.php:1713
 msgid "Split test is enable. Please select goal link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1610
+#: lite/includes/Admin/Links_Table.php:1779
 #: lite/language.php:83
 msgid "Search Links"
+msgstr ""
+
+#: lite/includes/Admin/Links_Table.php:1861
+#: lite/language.php:179
+msgid "Reset"
 msgstr ""
 
 #: lite/includes/Admin/Templates/api-key-form.php:24
@@ -1882,6 +1887,11 @@ msgstr ""
 msgid "At the %1$s of <b>%2$s</b>"
 msgstr ""
 
+#. translators: %s: tag name
+#: lite/includes/Helper.php:3121
+msgid "Filter by tag: %s"
+msgstr ""
+
 #: lite/includes/Promo.php:130
 #: lite/includes/Promo.php:179
 msgid "BFCM Sale is live"
@@ -2067,10 +2077,6 @@ msgstr ""
 #: pro/includes/Actions.php:1748
 #: pro/includes/Admin/Templates/utm-preset-form.php:135
 msgid "Content"
-msgstr ""
-
-#: lite/language.php:179
-msgid "Reset"
 msgstr ""
 
 #: lite/language.php:180

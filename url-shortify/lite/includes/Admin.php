@@ -142,49 +142,52 @@ class Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
+		$version = $this->plugin->get_version();
+		if(defined('KC_US_DEV_MODE') && KC_US_DEV_MODE) {
+			$version = time();
+		}
 
 		if ( Helper::is_plugin_admin_screen() ) {
-
 			\wp_enqueue_script(
 				'alpine-js',
 				\plugin_dir_url( dirname( __FILE__ ) ) . 'dist/scripts/alpine.js',
 				[],
-				$this->plugin->get_version(),
+				$version,
 				true );
 
 			\wp_enqueue_script(
 				'us-app',
 				\plugin_dir_url( dirname( __FILE__ ) ) . 'dist/scripts/app.js',
 				[ 'jquery' ],
-				$this->plugin->get_version(),
+				$version,
 				true );
 
 			\wp_enqueue_script(
 				'us-select2',
 				'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js',
 				[ 'jquery' ],
-				$this->plugin->get_version(),
+				$version,
 				true );
 
 			\wp_enqueue_script(
 				'us-frappe',
 				'https://unpkg.com/frappe-charts@1.5.0/dist/frappe-charts.min.iife.js',
 				[ 'jquery' ],
-				$this->plugin->get_version(),
+				$version,
 				true );
 
 			\wp_enqueue_script(
 				'url-shortify-admin',
 				\plugin_dir_url( dirname( __FILE__ ) ) . 'dist/scripts/url-shortify-admin.js',
 				[ 'jquery' ],
-				$this->plugin->get_version(),
+				$version,
 				true );
 
 			\wp_enqueue_script(
 				'jquery-datatables',
 				'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
 				[ 'jquery' ],
-				$this->plugin->get_version(),
+				$version,
 				true );
 
 			if ( ! wp_script_is( 'jquery-ui-core', 'enqueued' ) ) {
@@ -195,15 +198,26 @@ class Admin {
 				wp_enqueue_script( 'jquery-ui-datepicker' );
 			}
 
+			$us_params = [
+				'ajaxurl'  => admin_url( 'admin-ajax.php' ),
+				'security' => wp_create_nonce( KC_US_AJAX_SECURITY ),
+				'is_pro'   => US()->is_pro(),
+			];
+
 			wp_localize_script(
 				'url-shortify-admin',
+				'usParams',
+				$us_params
+			);
+		} else {
+			wp_localize_script(
+				'url-shortify',
 				'usParams',
 				[
 					'ajaxurl' => admin_url( 'admin-ajax.php' ),
 					'security' => wp_create_nonce( KC_US_AJAX_SECURITY ),
 				]
 			);
-
 		}
 
 		\wp_enqueue_script(
@@ -219,16 +233,6 @@ class Admin {
 			[ 'jquery' ],
 			$this->plugin->get_version(),
 			true );
-
-		wp_localize_script(
-			'url-shortify',
-			'usParams',
-			[
-				'ajaxurl' => admin_url( 'admin-ajax.php' ),
-				'security' => wp_create_nonce( KC_US_AJAX_SECURITY ),
-			]
-		);
-
 	}
 
 	/**
