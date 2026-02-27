@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 1.13.0
+Stable tag: 1.13.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -473,7 +473,7 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 1.13.0 =
+= 1.13.1 =
 
 * New: Added support to filter links by tags by clicking on tags from links list page. **PRO**
 * New: Added support to perform bulk actions on all links not just selected. **PRO**
@@ -481,6 +481,11 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 1.13.1 [2026-02-27] =
+
+* Update: UI Improvements.
+* Translations: Updated .POT file for new translations
 
 = 1.13.0 [2026-02-17] =
 
@@ -554,4 +559,4 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * Update: UX improvements
 * Translations: Updated .POT file for new translations
 
-[See changelog for all versions](https://kaizencoders.com/docs/url-shortify/changelog) file.
+[See changelog for all versions](https://docs.kaizencoders.com/url-shortify/changelog) file.

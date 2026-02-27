@@ -123,8 +123,27 @@ class Promo {
      * @since 1.5.12.2
      */
     public function handle_promotions() {
-        $dismiss_url  = $this->get_dismiss_url( 'survey_2025' );
-        $external_url = $this->get_external_url( 'survey_2025', [], 'https://forms.gle/s4mmv1BCJc6yFQGWA' );
+        $current_url = home_url( $_SERVER['REQUEST_URI'] );
+        $external_url = 'https://kaizencoders.com/url-shortify';
+
+        $dismiss_url  = $this->get_dismiss_url( 'us_2_0_launch', [], $current_url );
+
+        $us_2_0_launch = [
+                'title'                         => "<b class='text-red-600 text-xl'>" . __( 'URL Shortify 2.0 Launch Offer',
+                                'url-shortify' ) . "</b>",
+                'start_date'                    => '2026-02-26',
+                'end_date'                      => '2026-03-04',
+                'total_links'                   => 1,
+                'start_after_installation_days' => 0,
+                'pricing_url'                   => US()->get_pricing_url( 'yearly' ),
+                'promotion'                     => 'us_2_0_launch',
+                'show_plan'                     => 'free',
+                'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
+                'message'                       => '<p class="text-xl mt-4">URL Shortify 2.0 is going to release on <b>4th March</b> and it\'s a big one.<br><br> 💡 We appreciate you for your input. As a thank you, we would like to give you <strong class="text-red-500">Flat 20% OFF</strong> on URL Shortify PRO!<br><br> Use Coupon Code - <b>LAUNCH20</b> <br><br>  <a href="' . $external_url . '" target="_blank" class="button-primary bg-indigo-600 text-white focus:bg-indigo-800"> 👉 Upgrade Now </a> <a href="' . $dismiss_url . '" target="_blank" class="text-red-500 text-sm hover:text-red-600"> Close </a> </p>',
+                'show_upgrade'                  => false,
+                'show_dismiss_button'           => false,
+                'banner'                        => false,
+        ];
 
         $bfcm_2025_offer = [
                 'title'                         => "<b class='text-red-600 text-xl'>" . __( 'BFCM Sale is live',
@@ -231,7 +250,9 @@ class Promo {
         ];
 
         // Promotion.
-        if ( Helper::can_show_promotion( $bfcm_2025_offer ) ) {
+        if ( Helper::can_show_promotion( $us_2_0_launch ) ) {
+            $this->show_promotion( 'us_2_0_launch', $us_2_0_launch );
+        } elseif ( Helper::can_show_promotion( $bfcm_2025_offer ) ) {
             $this->show_promotion( 'bfcm_2025_offer', $bfcm_2025_offer );
         } elseif ( Helper::can_show_promotion( $survey_2025 ) ) {
             $this->show_promotion( 'survey_2025', $survey_2025 );
@@ -345,11 +366,13 @@ class Promo {
         $query_strings['kc_us_dismiss_admin_notice'] = 1;
         $query_strings['option_name']                = $promotion;
 
+        $external_url = US()->get_pricing_url();
         if ( ! empty( $redirect_to ) ) {
             $query_strings['redirect_to'] = esc_url( $redirect_to );
+            $external_url = home_url( $_SERVER['REQUEST_URI'] );
         }
 
-        return add_query_arg( $query_strings, US()->get_pricing_url() );
+        return add_query_arg( $query_strings, $external_url );
     }
 
     /**
