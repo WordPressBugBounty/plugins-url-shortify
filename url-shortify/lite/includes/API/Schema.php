@@ -148,4 +148,172 @@ trait Schema {
 		];
 	}
 
+	/**
+	 * Groups Schema.
+	 *
+	 * @since 1.13.1
+	 * @return array[]
+	 */
+	public function groups_schema() {
+		return [
+			'id' => [
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+
+			'name' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+
+			'description' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+
+			'created_at' => [
+				'type'   => 'string',
+				'format' => 'date-time',
+			],
+
+			'created_by_id' => [
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+
+			'updated_at' => [
+				'type'   => 'string',
+				'format' => 'date-time',
+			],
+
+			'updated_by_id' => [
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+		];
+	}
+
+	/**
+	 * Create Group schema.
+	 *
+	 * @since 1.13.1
+	 * @return array[]
+	 */
+	public function create_group_schema() {
+		return [
+			'name' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+				'required'          => true,
+			],
+			'description' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+		];
+	}
+
+	/**
+	 * Update Group schema.
+	 *
+	 * @since 1.13.1
+	 * @return array[]
+	 */
+	public function update_group_schema() {
+		return [
+			'name' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'description' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+		];
+	}
+
+	/**
+	 * Tags Schema.
+	 *
+	 * @since 1.13.1
+	 * @return array[]
+	 */
+	public function tags_schema() {
+		return [
+			'id' => [
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+
+			'name' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+
+			'description' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+
+			'created_at' => [
+				'type'   => 'string',
+				'format' => 'date-time',
+			],
+
+			'created_by_id' => [
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+
+			'updated_at' => [
+				'type'   => 'string',
+				'format' => 'date-time',
+			],
+
+			'updated_by_id' => [
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+		];
+	}
+
+	/**
+	 * Create Tag schema.
+	 *
+	 * @since 1.13.1
+	 * @return array[]
+	 */
+	public function create_tag_schema() {
+		return [
+			'name' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+				'required'          => true,
+			],
+			'description' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+		];
+	}
+
+	/**
+	 * Update Tag schema.
+	 *
+	 * @since 1.13.1
+	 * @return array[]
+	 */
+	public function update_tag_schema() {
+		return [
+			'name' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'description' => [
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+		];
+	}
+
 }

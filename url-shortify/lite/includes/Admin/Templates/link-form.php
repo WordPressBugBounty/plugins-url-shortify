@@ -126,6 +126,7 @@ $settings = array(
                                                      value="<?php echo esc_url( Helper::get_data( $form_data, 'url', '' ) ); ?>"/>
 										    </div>
 
+                                            <?php /* translators: %s: URL of the attached post, page, or custom post type */ ?>
                                             <p class="field-desciption mb-10 text-xs italic font-normal leading-snug text-gray-500 helper mt-2"><?php echo sprintf(__('You can not modify this target URL because this is attached to <a href="%s" target="_blank">this</a> post, page or custom post type.', 'url-shortify'),esc_url( Helper::get_data( $form_data, 'url', '' )), esc_url( Helper::get_data( $form_data, 'url', '' ) )); ?></p>
 
 										<?php } ?>
@@ -235,7 +236,8 @@ $settings = array(
                                                 </div>
                                                 <div class="ml-3">
                                                     <h3 class="text-sm leading-5 font-medium text-green-800">
-														<?php echo sprintf( __( 'No Group found. <a href="%s">Create a new Group</a> and add link to group.', 'url-shortify' ), $group_url ); ?>
+														<?php /* translators: %s: URL to create a new group */ ?>
+													<?php echo sprintf( __( 'No Group found. <a href="%s">Create a new Group</a> and add link to group.', 'url-shortify' ), $group_url ); ?>
                                                     </h3>
                                                 </div>
                                             </div>
@@ -318,6 +320,7 @@ $settings = array(
                                                 </div>
                                                 <div class="ml-3">
                                                     <h3 class="text-sm leading-5 font-medium text-green-800">
+                                                        <?php /* translators: %s: URL for the upgrade/pricing page */ ?>
                                                         <h3 class="text-sm leading-5 font-medium text-green-800"><?php echo sprintf( __( 'Want to redirect to different URLs\'s based on geo location, browser, os, device. Or do you want to rotate links and split test? <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?></h3>
                                                     </h3>
                                                 </div>
@@ -357,7 +360,8 @@ $settings = array(
                                                 </div>
                                                 <div class="ml-3">
                                                     <h3 class="text-sm leading-5 font-medium text-green-800">
-														<?php echo sprintf( __( 'Set expiry date of the link with PRO version. <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
+														<?php /* translators: %s: URL for the upgrade/pricing page */ ?>
+													<?php echo sprintf( __( 'Set expiry date of the link with PRO version. <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url() ); ?>
                                                     </h3>
                                                 </div>
                                             </div>
@@ -397,7 +401,8 @@ $settings = array(
                                                 </div>
                                                 <div class="ml-3">
                                                     <h3 class="text-sm leading-5 font-medium text-green-800">
-														<?php echo sprintf( __( 'Protect your short link with password using PRO version. <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_pricing_url() ); ?>
+														<?php /* translators: %s: URL for the upgrade/pricing page */ ?>
+													<?php echo sprintf( __( 'Protect your short link with password using PRO version. <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_pricing_url() ); ?>
                                                     </h3>
                                                 </div>
                                             </div>
@@ -406,6 +411,20 @@ $settings = array(
                                 </div>
                             </div>
 						<?php } } ?>
+
+                        <!-- Splash Redirect Countdown (PRO) - disabled; global setting used instead -->
+						<?php
+						// Per-link splash countdown disabled; re-enable when per-link override is needed.
+						// if ( US()->is_pro() ) {
+						// 	do_action( 'kc_us_add_splash_option', $form_data );
+						// }
+						?>
+
+                        <!-- Auto Link Keywords (PRO) -->
+						<?php
+						if ( US()->is_pro() ) {
+							do_action( 'kc_us_add_auto_link_keywords', $form_data );
+						} ?>
 
                         <!-- Notes -->
                         <div class="flex flex-row border-b border-gray-100">

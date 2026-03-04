@@ -103,6 +103,14 @@ class Install {
 		'1.12.5' => [
 			'kc_us_update_1125_add_color_to_tags_table',
 		],
+
+		'1.13.1' => [
+			'kc_us_update_1131_create_auto_link_keywords_table',
+		],
+
+		'2.0.0' => [
+			'kc_us_update_200_add_broken_link_status_to_links_table',
+		]
 	];
 
 	/**
@@ -590,6 +598,7 @@ class Install {
 		$tables .= self::get_195_schema( $collate );
 		$tables .= self::get_1115_schema( $collate );
 		$tables .= self::get_1122_schema( $collate );
+		$tables .= self::get_1131_schema( $collate );
 
 		return $tables;
 	}
@@ -628,6 +637,7 @@ class Install {
 				`unique_clicks` int(11) DEFAULT null,	
 				`cpt_id` int(11) DEFAULT 0,
 				`cpt_type` varchar(20) DEFAULT NULL,
+				`broken_link_status` varchar(20) DEFAULT NULL,
 				`rules` text DEFAULT NULL,
 				`created_at` datetime DEFAULT NULL,
 				`created_by_id` int(11) DEFAULT NULL,
@@ -1033,6 +1043,33 @@ class Install {
 				UNIQUE KEY user_link (user_id, link_id),
 				KEY user_id (user_id),
 				KEY link_id (link_id)
+			) $collate;
+		";
+	}
+
+	/**
+	 * Create Auto Link Keywords Table.
+	 *
+	 * @since 1.13.1
+	 */
+	public static function get_1131_schema( $collate = '' ) {
+		global $wpdb;
+		return "
+			CREATE TABLE `{$wpdb->prefix}kc_us_auto_link_keywords` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`keyword` text NOT NULL,
+				`link_id` bigint(20) unsigned NOT NULL DEFAULT 0,
+				`post_types` text DEFAULT NULL,
+				`open_new_tab` tinyint(1) DEFAULT 0,
+				`nofollow` tinyint(1) DEFAULT 0,
+				`case_sensitive` tinyint(1) DEFAULT 0,
+				`status` tinyint(1) DEFAULT 1,
+				`created_at` datetime DEFAULT NULL,
+				`updated_at` datetime DEFAULT NULL,
+				PRIMARY KEY  (id),
+				KEY keyword (keyword(191)),
+				KEY link_id (link_id),
+				KEY status (status)
 			) $collate;
 		";
 	}

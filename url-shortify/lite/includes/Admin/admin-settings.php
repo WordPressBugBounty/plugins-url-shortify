@@ -183,6 +183,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 				'url-shortify' ), $html, "<code>%short_url%</code>", "<code>%short_url_without_link%</code>"
 		),
 		'type'    => 'textarea',
+		/* translators: %s: Default short URL template content */
 		'default' => sprintf( __( "<div class='shorten_url'>%s</div>", 'url-shortify' ),
 			"The short URL of the present article is: %short_url%" ),
 	];
@@ -252,6 +253,120 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 
 	array_multisort( $order, SORT_ASC, $reporting_options );
 
+	// -------------------------------------------------------------------------
+	// Email Digest section fields
+	// -------------------------------------------------------------------------
+	$all_settings  = US()->get_settings();
+	$digest_prefix = 'reports_email_digest_';
+
+	$digest_enabled   = ! empty( $all_settings[ $digest_prefix . 'enabled' ] ) ? 1 : 0;
+	$digest_frequency = isset( $all_settings[ $digest_prefix . 'frequency' ] ) ? $all_settings[ $digest_prefix . 'frequency' ] : 'weekly';
+	$digest_day       = isset( $all_settings[ $digest_prefix . 'day' ] ) ? (int) $all_settings[ $digest_prefix . 'day' ] : 1;
+
+	// Build time select choices (00:00 – 23:30 in 30-minute steps).
+	$time_choices = [];
+	for ( $h = 0; $h < 24; $h++ ) {
+		foreach ( [ 0, 30 ] as $m ) {
+			$key                  = sprintf( '%02d:%02d', $h, $m );
+			$time_choices[ $key ] = $key;
+		}
+	}
+
+	// Day selector HTML.
+	ob_start();
+	$day_wrapper_style = ( 'daily' === $digest_frequency ) ? ' style="display:none;"' : '';
+	if ( 'monthly' === $digest_frequency ) {
+		$day_options = [];
+		for ( $d = 1; $d <= 31; $d++ ) {
+			$suffix = 'th';
+			if ( 1 === $d || 21 === $d ) {
+				$suffix = 'st';
+			} elseif ( 2 === $d || 22 === $d ) {
+				$suffix = 'nd';
+			} elseif ( 3 === $d || 23 === $d ) {
+				$suffix = 'rd';
+			}
+			$day_options[ $d ] = $d . $suffix;
+		}
+	} else {
+		$day_options = [
+			1 => __( 'Monday', 'url-shortify' ),
+			2 => __( 'Tuesday', 'url-shortify' ),
+			3 => __( 'Wednesday', 'url-shortify' ),
+			4 => __( 'Thursday', 'url-shortify' ),
+			5 => __( 'Friday', 'url-shortify' ),
+			6 => __( 'Saturday', 'url-shortify' ),
+			7 => __( 'Sunday', 'url-shortify' ),
+		];
+	}
+
+	?>
+	<div id="kc-us-digest-day-wrapper" class="kc-us-digest-conditional"<?php echo $day_wrapper_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<select id="kc-us-digest-day" name="kc_us_settings[<?php echo esc_attr( $digest_prefix . 'day' ); ?>]">
+			<?php foreach ( $day_options as $val => $label ) : ?>
+			<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $digest_day, $val ); ?>>
+				<?php echo esc_html( $label ); ?>
+			</option>
+			<?php endforeach; ?>
+		</select>
+	</div>
+	<?php
+	$day_selector_html = ob_get_clean();
+
+	// Status + test HTML.
+	ob_start();
+	$last_sent  = (int) \KaizenCoders\URL_Shortify\Option::get( 'email_report_last_sent', 0 );
+	$wp_tz      = wp_timezone_string();
+	$status_str = $digest_enabled
+		? '<span style="color:#16a34a;font-weight:600;">&#10003; ' . esc_html__( 'Active', 'url-shortify' ) . '</span>'
+		: '<span style="color:#6b7280;">' . esc_html__( 'Inactive', 'url-shortify' ) . '</span>';
+	$last_sent_str = $last_sent > 0 ? esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_sent ) ) : esc_html__( 'Never', 'url-shortify' );
+	?>
+	<div class="kc-us-digest-conditional">
+		<div class="kc-us-digest-status-grid">
+			<div class="kc-us-digest-status-item">
+				<span class="kc-us-digest-status-label"><?php esc_html_e( 'Status', 'url-shortify' ); ?></span>
+				<span class="kc-us-digest-status-value"><?php echo wp_kses( $status_str, [ 'span' => [ 'style' => [] ] ] ); ?></span>
+			</div>
+			<div class="kc-us-digest-status-item">
+				<span class="kc-us-digest-status-label"><?php esc_html_e( 'Frequency', 'url-shortify' ); ?></span>
+				<span class="kc-us-digest-status-value"><?php echo esc_html( ucfirst( $digest_frequency ) ); ?></span>
+			</div>
+			<div class="kc-us-digest-status-item">
+				<span class="kc-us-digest-status-label"><?php esc_html_e( 'Last Sent', 'url-shortify' ); ?></span>
+				<span class="kc-us-digest-status-value"><?php echo esc_html( $last_sent_str ); ?></span>
+			</div>
+			<div class="kc-us-digest-status-item">
+				<span class="kc-us-digest-status-label"><?php esc_html_e( 'Timezone', 'url-shortify' ); ?></span>
+				<span class="kc-us-digest-status-value"><?php echo esc_html( $wp_tz ); ?></span>
+			</div>
+		</div>
+
+		<div class="kc-us-digest-preview-section">
+			<div class="kc-us-digest-card">
+				<strong><?php esc_html_e( 'Preview Email', 'url-shortify' ); ?></strong>
+				<p style="margin:6px 0 10px;color:#6b7280;font-size:13px;"><?php esc_html_e( 'Open a preview of the email in a new window using sample data from the last 7 days.', 'url-shortify' ); ?></p>
+				<button type="button" id="kc-us-digest-preview-btn" class="button button-secondary">
+					<?php esc_html_e( 'Preview Email', 'url-shortify' ); ?>
+				</button>
+			</div>
+
+			<div class="kc-us-digest-card">
+				<strong><?php esc_html_e( 'Send Test Email', 'url-shortify' ); ?></strong>
+				<p style="margin:6px 0 10px;color:#6b7280;font-size:13px;"><?php esc_html_e( 'Send a test email to verify formatting and delivery.', 'url-shortify' ); ?></p>
+				<div class="kc-us-digest-test-row">
+					<input type="email" id="kc-us-digest-test-email" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" class="regular-text">
+					<button type="button" id="kc-us-digest-test-btn" class="button button-secondary">
+						<?php esc_html_e( 'Send Test', 'url-shortify' ); ?>
+					</button>
+				</div>
+				<span id="kc-us-digest-test-status" style="display:none;margin-top:8px;font-size:13px;"></span>
+			</div>
+		</div>
+	</div>
+	<?php
+	$status_and_test_html = ob_get_clean();
+
 	$cpt_array = [
 		'post' => __( 'Posts', 'url-shortify' ),
 		'page' => __( 'Pages', 'url-shortify' ),
@@ -312,6 +427,64 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 			'section_title' => __( 'Reporting Options', 'url-shortify' ),
 			'section_order' => 10,
 			'fields'        => $reporting_options,
+		],
+
+		[
+			'tab_id'        => 'reports',
+			'section_id'    => 'email_digest',
+			'section_title' => __( 'Email Digest', 'url-shortify' ),
+			'section_order' => 20,
+			'fields'        => [
+				[
+					'id'      => 'enabled',
+					'title'   => __( 'Enable Email Digest', 'url-shortify' ),
+					'desc'    => __( 'Automatically send a summary of your link activity via email.', 'url-shortify' ),
+					'type'    => 'switch',
+					'default' => 0,
+				],
+				[
+					'id'      => 'frequency',
+					'title'   => __( 'Frequency', 'url-shortify' ),
+					'type'    => 'radio',
+					'default' => 'weekly',
+					'choices' => [
+						'daily'   => __( 'Daily', 'url-shortify' ),
+						'weekly'  => __( 'Weekly', 'url-shortify' ),
+						'monthly' => __( 'Monthly', 'url-shortify' ),
+					],
+				],
+				[
+					'id'      => 'day',
+					'title'   => __( 'Day', 'url-shortify' ),
+					'desc'    => __( 'Day of the week (weekly) or day of the month (monthly) to send the digest. Not used for daily frequency.', 'url-shortify' ),
+					'type'    => 'custom',
+					'default' => '',
+					'output'  => $day_selector_html,
+				],
+				[
+					'id'      => 'time',
+					'title'   => __( 'Send Time', 'url-shortify' ),
+					'desc'    => __( 'Time of day to send the digest (site timezone).', 'url-shortify' ),
+					'type'    => 'select',
+					'default' => '14:00',
+					'choices' => $time_choices,
+				],
+				[
+					'id'          => 'recipients',
+					'title'       => __( 'Recipients', 'url-shortify' ),
+					'desc'        => __( 'One email address per line. Leave blank to use the admin email.', 'url-shortify' ),
+					'type'        => 'textarea',
+					'default'     => '',
+					'placeholder' => "user@example.com\nanother@example.com",
+				],
+				[
+					'id'      => 'status',
+					'title'   => __( 'Digest Status', 'url-shortify' ),
+					'type'    => 'custom',
+					'default' => '',
+					'output'  => $status_and_test_html,
+				],
+			],
 		],
 
 	];

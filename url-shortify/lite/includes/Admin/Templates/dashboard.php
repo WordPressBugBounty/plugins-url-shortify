@@ -100,6 +100,7 @@ if ( $show_kpis && ! $show_landing_page) {
 
 				<div class="flex mt-4 md:mt-0 md:ml-4">
 					<span class="rounded-md shadow-sm">
+						<?php /* translators: %s: Human-readable elapsed time since last update */ ?>
 						<button type="button" class="w-full text-white bg-green-500 kc-us-primary-button hover:bg-green-400" title="<?php echo sprintf(__('Last Updated On: %s', 'url-shortify'), $elapsed_time ); ?>">
 							<a href="<?php echo $page_refresh_url; ?>" class="text-white hover:text-white"><?php _e('Refresh', 'url-shortify'); ?></a>
 						</button>
@@ -176,7 +177,8 @@ if ( $show_kpis && ! $show_landing_page) {
 				<div class="flex w-full mt-2 border-b-2 border-gray-100">
 					<div class="w-11/12">
 						<span class="text-xl font-medium leading-6 text-gray-900"><?php _e( 'Clicks History', 'url-shortify' ); ?></span>
-						<p class="max-w-2xl mt-1 mb-2 text-sm leading-5 text-gray-500"><?php echo sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ); ?></p>
+						<?php /* translators: %d: Total number of clicks */ ?>
+					<p class="max-w-2xl mt-1 mb-2 text-sm leading-5 text-gray-500"><?php echo sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ); ?></p>
 					</div>
 				</div>
 				<!-- Click Chart will draw here -->
@@ -213,6 +215,7 @@ if ( $show_kpis && ! $show_landing_page) {
 									</div>
 									<div class="mt-3 text-center sm:mt-5">
 										<h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+											<?php /* translators: %s: URL for the upgrade/pricing page */ ?>
 											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
 										</h3>
 										<div class="mt-2">

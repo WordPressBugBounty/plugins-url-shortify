@@ -351,18 +351,23 @@ class Links_Table extends US_List_Table {
 			$star_html, $url, $url, $name );
 
 		$actions = [
+			/* translators: %s: URL for editing the link */
 			'edit'   => sprintf( __( '<a href="%s" class="text-indigo-600">Edit</a>', 'url-shortify' ),
 				Helper::get_link_action_url( $link_id, 'edit' ) ),
+			/* translators: %s: URL for the link statistics page */
 			'stats'  => sprintf( __( '<a href="%s">Statistics</a>', 'url-shortify' ),
 				Helper::get_link_action_url( $link_id, 'statistics' ) ),
+			/* translators: %s: URL for deleting the link */
 			'delete' => sprintf( __( '<a href="%s" onclick="return confirmDelete();" >Delete</a>', 'url-shortify' ),
 				Helper::get_link_action_url( $link_id, 'delete' ) ),
+			/* translators: %s: URL for resetting link statistics */
 			'reset'  => sprintf( __( '<a href="%s" onclick="return confirmReset();" >Reset Stats</a>', 'url-shortify' ),
 				Helper::get_link_action_url( $link_id, 'reset' ) ),
 		];
 
 		$actions = apply_filters( 'kc_us_filter_links_actions', $actions, $item );
 
+		/* translators: %s: Short URL to visit */
 		$actions['link'] = sprintf( __( '<a href="%s" target="_blank" title="Visit Link"><i class="fa fa-external-link-square"></i></a>',
 			'url-shortify' ), $short_link );
 

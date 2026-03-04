@@ -155,6 +155,43 @@ abstract class Base_DB {
 	}
 
 	/**
+	 * Get a paginated slice of rows from the table.
+	 *
+	 * Returns an associative array with:
+	 *   - 'items' (array)  — the rows for the requested page
+	 *   - 'total' (int)    — total number of rows in the table
+	 *
+	 * @since 1.13.1
+	 *
+	 * @param int    $per_page Number of items per page (1–100). Default 20.
+	 * @param int    $page     1-based page number. Default 1.
+	 * @param string $where    Optional raw SQL WHERE clause (without the WHERE keyword).
+	 *
+	 * @return array{items: array, total: int}
+	 */
+	public function get_paginated( $per_page = 20, $page = 1, $where = '' ) {
+		global $wpdb;
+
+		$per_page  = max( 1, min( 100, absint( $per_page ) ) );
+		$page      = max( 1, absint( $page ) );
+		$offset    = ( $page - 1 ) * $per_page;
+		$where_sql = ! empty( $where ) ? "WHERE {$where}" : '';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$items = $wpdb->get_results(
+			$wpdb->prepare( "SELECT * FROM {$this->table_name} {$where_sql} ORDER BY {$this->primary_key} DESC LIMIT %d OFFSET %d", $per_page, $offset ),
+			ARRAY_A
+		);
+
+		$total = (int) $this->count( $where );
+
+		return [
+			'items' => $items ?: [],
+			'total' => $total,
+		];
+	}
+
+	/**
 	 * Retrieve a specific column's value by the primary key
 	 *
 	 * @since 1.0.0

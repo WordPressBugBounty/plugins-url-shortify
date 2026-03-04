@@ -89,6 +89,13 @@ class DB {
 	public $favorites_links;
 
 	/**
+	 * @since 1.13.1
+	 * @var Object|Auto_Link_Keywords
+	 *
+	 */
+	public $auto_link_keywords;
+
+	/**
 	 * constructor.
 	 *
 	 * @since 1.0.0
@@ -129,5 +136,8 @@ class DB {
 
 		/* @var Object|Favorites_Links $this */
 		$this->favorites_links = new Favorites_Links();
+
+		/* @var Object|Auto_Link_Keywords $this */
+		$this->auto_link_keywords = new Auto_Link_Keywords();
 	}
 }

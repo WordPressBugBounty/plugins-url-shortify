@@ -84,6 +84,44 @@ class Links_Tags extends Base_DB {
 	}
 
 	/**
+	 * Get count of links based on tag id.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param null $tag_id
+	 *
+	 * @return int|string|null
+	 */
+	public function count_by_tag_id( $tag_id = null ) {
+		global $wpdb;
+
+		if ( empty( $tag_id ) ) {
+			return 0;
+		}
+
+		$where = $wpdb->prepare( 'tag_id = %d', $tag_id );
+
+		return $this->count( $where );
+	}
+
+	/**
+	 * Delete links based on tag_id.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param null $tag_id
+	 *
+	 * @return bool
+	 */
+	public function delete_links_by_tag_id( $tag_id = null ) {
+		if ( empty( $tag_id ) ) {
+			return false;
+		}
+
+		return $this->delete_by( 'tag_id', $tag_id );
+	}
+
+	/**
 	 * Get tag ids based on link ids.
 	 * Used for displaying tags in the main Links table.
 	 * * @since 1.11.5

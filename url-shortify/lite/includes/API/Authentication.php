@@ -58,7 +58,7 @@ class Authentication {
 	 */
 	public function authenticate( $user_id ) {
 
-		if ( ! empty( $user_id ) || ! is_ssl() || ! $this->is_rest_request() ) {
+		if ( ! empty( $user_id ) || ! $this->is_rest_request() ) {
 			return $user_id;
 		}
 

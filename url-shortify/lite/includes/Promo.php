@@ -220,6 +220,7 @@ class Promo {
                 'promotion'                     => 'jully_2022_month_end_promotion',
                 'message'                       => __( 'Your plugin plan is limited to 1 week of historical data. Upgrade your plan to see all historical data.',
                         'url-shortify' ),
+                /* translators: %s: Coupon code */
                 'coupon_message'                => sprintf( __( 'Use coupon code <b class="text-green-800 px-1 py-1 text-xl">%s</b> to get flat <b class="text-2xl">$30</b> off on any plan',
                         'url-shortify' ), 'WELCOME30' ),
         ];

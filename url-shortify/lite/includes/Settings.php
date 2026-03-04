@@ -643,14 +643,52 @@ class Settings {
 
 		$field_html = '<label class="inline-flex items-center mb-1 cursor-pointer"><span class="relative">';
 		$field_html .= '<input type="hidden" name="' . $args['name'] . '" value="0" />';
-		$field_html .= '<input id="' . $args['id'] . '" type="checkbox" name="' . $args['name'] . '"  value="1" class="absolute w-0 h-0 mt-6 opacity-0 kc-us-check-toggle ' . $args['class'] . '" ' . $checked . ' />' . $args['desc'];
+		$field_html .= '<input id="' . $args['id'] . '" type="checkbox" name="' . $args['name'] . '"  value="1" class="absolute w-0 h-0 mt-6 opacity-0 kc-us-check-toggle ' . $args['class'] . '" ' . $checked . ' />';
 
 		$field_html .= '<span class="kc-us-mail-toggle-line"></span>';
 		$field_html .= '<span class="kc-us-mail-toggle-dot"></span>';
 		$field_html .= '</span></label>';
 
-		echo $field_html;
+        if ( ! empty( $args['desc'] ) ) {
+            $field_html .= '<span class="ml-3 text-sm text-gray-700">' . $args['desc'] . '</span>';
+        }
+
+        echo $this->generate_field_wrapper( $args, $field_html );
 	}
+
+    /**
+     * Add dependency attributes to field wrapper
+     */
+    private function generate_field_wrapper( $args, $content ) {
+        $attributes = [];
+
+        if ( ! empty( $args['parent'] ) ) {
+            $attributes[] = 'data-parent="' . esc_attr( $args['parent'] ) . '"';
+
+            if ( ! empty( $args['show_if'] ) ) {
+                $attributes[] = 'data-show-if="' . esc_attr( json_encode( $args['show_if'] ) ) . '"';
+            }
+
+            if ( ! empty( $args['hide_if'] ) ) {
+                $attributes[] = 'data-hide-if="' . esc_attr( json_encode( $args['hide_if'] ) ) . '"';
+            }
+
+            //$attributes[] = 'style="display:none;"';
+        }
+
+        if ( ! empty( $this->dependent_fields[ $args['id'] ] ) ) {
+            $attributes[] = 'data-has-dependencies="true"';
+        }
+
+        $wrapper_attrs = ! empty( $attributes ) ? ' ' . implode( ' ', $attributes ) : '';
+
+        return sprintf(
+                '<div class="wpsf-field%s"%s>%s</div>',
+                ! empty( $args['parent'] ) ? ' wpsf-field--dependent' : '',
+                $wrapper_attrs,
+                $content
+        );
+    }
 
 	/**
 	 * Generate: Checkboxes field

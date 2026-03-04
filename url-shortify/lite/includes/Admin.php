@@ -209,6 +209,34 @@ class Admin {
 				'usParams',
 				$us_params
 			);
+			// Email digest JS/CSS — settings page only.
+			$screen = get_current_screen();
+			if ( $screen && 'url-shortify_page_kc-us-settings' === $screen->id ) {
+				wp_enqueue_script(
+					'url-shortify-email-digest',
+					plugin_dir_url( dirname( __FILE__ ) ) . 'dist/scripts/url-shortify-email-digest.js',
+					[ 'jquery' ],
+					$version,
+					true
+				);
+
+				wp_enqueue_style(
+					'url-shortify-email-digest',
+					plugin_dir_url( dirname( __FILE__ ) ) . 'dist/styles/url-shortify-email-digest.css',
+					[],
+					$version
+				);
+
+				wp_localize_script(
+					'url-shortify-email-digest',
+					'kcUsEmailDigest',
+					[
+						'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+						'ajaxNonce'  => wp_create_nonce( 'kc_us_email_digest_test' ),
+						'previewUrl' => admin_url( 'admin-post.php?action=kc_us_email_preview&_wpnonce=' . wp_create_nonce( 'kc_us_email_preview' ) ),
+					]
+				);
+			}
 		} else {
 			wp_localize_script(
 				'url-shortify',

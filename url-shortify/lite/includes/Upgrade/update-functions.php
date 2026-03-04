@@ -369,3 +369,40 @@ function kc_us_update_1125_add_color_to_tags_table() {
         }
     }
 }
+
+/**************** 1.13.1 *******************/
+
+/**
+ * Create Auto Link Keywords table.
+ *
+ * @since 1.13.1
+ */
+function kc_us_update_1131_create_auto_link_keywords_table() {
+	Install::create_tables( '1.13.1' );
+}
+
+/**
+ * Add `broken_link_status` column to the links table.
+ *
+ * Stores the most recent broken-link-checker result directly on the link row
+ * so stats can be computed without a JOIN against kc_us_linkmeta.
+ *
+ * Values: NULL = not yet scanned | 'ok' = reachable | 'broken' = HTTP 4xx/5xx | 'error' = connection error
+ *
+ * @since 2.0.0
+ */
+function kc_us_update_200_add_broken_link_status_to_links_table() {
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'kc_us_links';
+
+	if ( ! $wpdb->query( "SHOW TABLES LIKE '{$table}'" ) ) {
+		return;
+	}
+
+	$cols = $wpdb->get_col( "SHOW COLUMNS FROM {$table}" );
+
+	if ( ! in_array( 'broken_link_status', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `broken_link_status` varchar(10) DEFAULT NULL AFTER `status`" );
+	}
+}

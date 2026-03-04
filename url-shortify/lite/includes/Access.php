@@ -95,7 +95,8 @@ class Access {
 				'manage_settings',
 				'manage_custom_domains',
 				'manage_utm_presets',
-				'manage_tracking_pixels'
+				'manage_tracking_pixels',
+				'manage_auto_link_keywords',
 			];
 		}
 

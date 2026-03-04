@@ -228,12 +228,15 @@ class Groups_Table extends US_List_Table {
 
 		$title = '<span class="flex w-full"><strong>' . stripslashes( $item['name'] ) . '</strong></span>';
 
+		/* translators: %s: URL for editing the group */
 		$actions['edit'] = sprintf( __( '<a href="%s" class="text-indigo-600">Edit</a>', 'url-shortify' ), Helper::get_group_action_url( $group_id, 'edit' ) );
 
 		if ( $total_links > 0 ) {
+			/* translators: %s: URL for the group statistics page */
 			$actions['stats'] = sprintf( __( '<a href="%s">Statistics</a>', 'url-shortify' ), Helper::get_group_action_url( $group_id, 'statistics' ) );
 		}
 
+		/* translators: %s: URL for deleting the group */
 		$actions['delete'] = sprintf( __( '<a href="%s">Delete</a>', 'url-shortify' ), Helper::get_group_action_url( $group_id, 'delete' ) );
 
 		return $title . $this->row_actions( $actions );
@@ -255,7 +258,8 @@ class Groups_Table extends US_List_Table {
 		$total_links = count( Helper::get_data( $this->links_ids_by_group_ids, $item['id'], [] ) );
 
 		if ( $total_links > 0 ) {
-			return sprintf( __( '<a href="%1$s"  title="%2$s" class="kc-us-group"/>%3$s</a>', 'url-shortify' ), $stats_url, __( 'Total Links', 'url-shortify' ), $total_links );
+			/* translators: 1: URL for the statistics page, 2: Link title attribute text, 3: Number of links in group */
+		return sprintf( __( '<a href="%1$s"  title="%2$s" class="kc-us-group"/>%3$s</a>', 'url-shortify' ), $stats_url, __( 'Total Links', 'url-shortify' ), $total_links );
 		} else {
 			return 0;
 		}

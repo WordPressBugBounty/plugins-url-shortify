@@ -437,6 +437,8 @@ class Helper {
                 "{$prefix}_page_kc-us-settings",
                 "{$prefix}_page_kc-us-tools-settings",
                 "{$prefix}_page_url_shortify-account",
+                "{$prefix}_page_us_auto_link_keywords",
+                "{$prefix}_page_us_broken_links",
         ];
 
         $screens = apply_filters( 'kc_us_admin_screens', $screens );
@@ -958,6 +960,24 @@ class Helper {
     }
 
     /**
+     * Get Auto Link Keyword action URL.
+     *
+     * @param int|null $id
+     * @param string   $action
+     *
+     * @return string
+     *
+     * @since 1.13.1
+     */
+    public static function get_auto_link_keyword_action_url( $id = null, $action = 'edit' ) {
+        if ( empty( $id ) || empty( $action ) ) {
+            return '#';
+        }
+
+        return self::get_action_url( $id, 'auto_link_keywords', $action );
+    }
+
+    /**
      * Get UTM Presets action url
      *
      * @param  string  $action
@@ -1014,6 +1034,8 @@ class Helper {
         } elseif ( 'api-keys' === $type ) {
             $page = 'us_tools';
             $tab  = 'rest-api';
+        } elseif ( 'auto_link_keywords' === $type ) {
+            $page = 'us_auto_link_keywords';
         } else {
             $page = 'us_links';
         }
@@ -2942,7 +2964,8 @@ class Helper {
         $options = [];
         foreach ( $cpt_array as $key => $value ) {
             foreach ( [ 'top', 'bottom' ] as $position ) {
-                $options[ $position . '_' . $key ] = sprintf( __( 'At the %1$s of <b>%2$s</b>', 'url-shortify' ), $position,
+                /* translators: 1: Position (top or bottom), 2: Post type label */
+            $options[ $position . '_' . $key ] = sprintf( __( 'At the %1$s of <b>%2$s</b>', 'url-shortify' ), $position,
                         $value );
             }
         }

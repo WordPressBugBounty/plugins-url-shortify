@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 1.13.1
+Stable tag: 2.0.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -108,6 +108,9 @@ generated after that.
 
 > 👉 **REST API to create short links.**
 > Able to create short links using WordPress REST API from anywhere.
+
+> 👉 **Email Digest**
+> Get daily, weekly and monthly summary of new links and clicks report via email.
 
 === One click Import from other WordPress plugins ===
 
@@ -216,8 +219,14 @@ We have one click import setup for following WordPress Plugin. If you are using 
 > 👉 **Favorite Links**
 > Mark links as Favorite and access them quickly using Favorite filter.
 
-> 👉 **Broken Link Checker** [Coming Soon!]
+> 👉 **Broken Link Checker**
 > Quickly find the broken links and restore their functionality, ensuring your website is up and running smoothly.
+
+> 👉 **Auto Link Keywords**
+> Automatically link keywords in the content to short links. This is a great way to increase the traffic to your website and also to increase the sales if you are an affiliate marketer.
+
+> 👉 **Splash Page**
+> Create a splash page for your short links. A splash page is a landing page that is displayed to the visitors before they are redirected to the destination URL. This is a great way to show some information to the visitors before they are redirected to the destination URL.
 
 > 👉 **Amazon Affiliates** [Coming Soon!]
 > Adds your Amazon Affiliate-Tag to all Amazon URLs before redirection.
@@ -473,14 +482,33 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 1.13.1 =
+= 2.0.1 =
 
-* New: Added support to filter links by tags by clicking on tags from links list page. **PRO**
-* New: Added support to perform bulk actions on all links not just selected. **PRO**
-* Update: Improved UI.
+* New: Added support to Broken Link Checker. [Learn More](https://docs.kaizencoders.com/url-shortify/broken-link-checker) **PRO**
+* New: Added support to Automatically link keywords in the content to short links. [Learn More](https://docs.kaizencoders.com/url-shortify/how-to-setup-auto-link-keywords) **PRO**
+* New: Added support to splash page. **PRO**
+* New: Added Daily, Weekly and Monthly summary of new links and clicks report via email. [Learn More](https://docs.kaizencoders.com/url-shortify/email-digest)
+* New: Added REST API support for Links, Groups, Tags, Domains, UTM Presets, Tracking Pixels. [Learn More](https://docs.kaizencoders.com/url-shortify/api-reference) **PRO**
+* Fix: Bulk Delete Tags issue. **PRO**
+* Update: UI Improvements.
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 2.0.1 [2026-03-04] =
+
+* Minor bug fixes and improvements.
+
+= 2.0.0 [2026-03-04] =
+
+* New: Added support to Broken Link Checker. [Learn More](https://docs.kaizencoders.com/url-shortify/broken-link-checker) **PRO**
+* New: Added support to Automatically link keywords in the content to short links. [Learn More](https://docs.kaizencoders.com/url-shortify/how-to-setup-auto-link-keywords) **PRO**
+* New: Added support to splash page. **PRO**
+* New: Added Daily, Weekly and Monthly summary of new links and clicks report via email. [Learn More](https://docs.kaizencoders.com/url-shortify/email-digest)
+* New: Added REST API support for Links, Groups, Tags, Domains, UTM Presets, Tracking Pixels. [Learn More](https://docs.kaizencoders.com/url-shortify/api-reference) **PRO**
+* Fix: Bulk Delete Tags issue. **PRO**
+* Update: UI Improvements.
+* Translations: Updated .POT file for new translations
 
 = 1.13.1 [2026-02-27] =
 

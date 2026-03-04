@@ -29,6 +29,7 @@
         </div>
         <div class="mt-5 text-center text-xs leading-5 text-gray-500">
             <p>
+                <?php /* translators: %s: URL for the KaizenCoders website */ ?>
                 <?php echo sprintf( __( "Made with ❤️ by the team <a href='%s' target='_blank'>KaizenCoders</a>",
                     'url-shortify' ), 'https://kaizencoders.com' ); ?>
             </p>
