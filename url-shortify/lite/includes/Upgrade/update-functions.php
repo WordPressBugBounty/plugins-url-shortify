@@ -406,3 +406,29 @@ function kc_us_update_200_add_broken_link_status_to_links_table() {
 		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `broken_link_status` varchar(10) DEFAULT NULL AFTER `status`" );
 	}
 }
+
+/**************** 2.1.0 *******************/
+
+/**
+ * Enable Email Digest with default settings for all users upgrading to 2.1.0.
+ *
+ * Only applies defaults when the digest has not already been configured by the
+ * site owner — never overwrites an existing deliberate configuration.
+ *
+ * @since 2.1.0
+ */
+function kc_us_update_210_enable_email_digest() {
+	$settings = (array) get_option( 'kc_us_settings', [] );
+
+	if ( empty( $settings['reports_email_digest_enabled'] ) ) {
+		$settings['reports_email_digest_enabled']    = 1;
+		$settings['reports_email_digest_frequency']  = 'daily';
+		$settings['reports_email_digest_day']        = 1;
+		$settings['reports_email_digest_time']       = '14:00';
+		$settings['reports_email_digest_recipients'] = '';
+
+		update_option( 'kc_us_settings', $settings );
+	}
+
+	return false;
+}

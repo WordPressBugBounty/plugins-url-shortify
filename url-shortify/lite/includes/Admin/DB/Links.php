@@ -648,4 +648,30 @@ class Links extends Base_DB {
 		return $this->count( $where );
 	}
 
+	/**
+	 * Get recently created links within a time range, ordered newest first.
+	 *
+	 * @param int $start_date Start timestamp.
+	 * @param int $end_date   End timestamp.
+	 * @param int $limit      Maximum number of rows to return.
+	 *
+	 * @return array
+	 */
+	public function get_recent_links_by_time_range( $start_date, $end_date, $limit = 5 ) {
+		global $wpdb;
+
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, name, slug, url, created_at
+				 FROM {$this->table_name}
+				 WHERE created_at >= %s AND created_at <= %s
+				 ORDER BY created_at DESC
+				 LIMIT %d",
+				date( 'Y-m-d H:i:s', $start_date ),
+				date( 'Y-m-d H:i:s', $end_date ),
+				$limit
+			)
+		);
+	}
+
 }

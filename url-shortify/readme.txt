@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 2.0.1
+Stable tag: 2.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -482,18 +482,21 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.0.1 =
+= 2.1 =
 
-* New: Added support to Broken Link Checker. [Learn More](https://docs.kaizencoders.com/url-shortify/broken-link-checker) **PRO**
-* New: Added support to Automatically link keywords in the content to short links. [Learn More](https://docs.kaizencoders.com/url-shortify/how-to-setup-auto-link-keywords) **PRO**
-* New: Added support to splash page. **PRO**
-* New: Added Daily, Weekly and Monthly summary of new links and clicks report via email. [Learn More](https://docs.kaizencoders.com/url-shortify/email-digest)
-* New: Added REST API support for Links, Groups, Tags, Domains, UTM Presets, Tracking Pixels. [Learn More](https://docs.kaizencoders.com/url-shortify/api-reference) **PRO**
-* Fix: Bulk Delete Tags issue. **PRO**
-* Update: UI Improvements.
+* Fix: Tags dropdown not showing tags in the links creation form. **PRO**
+* Update: Added recently added links in the Email Digest report.
+* Update: Compatibility with WordPress 6.9.3
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 2.1 [2026-03-11] =
+
+* Fix: Tags dropdown not showing tags in the links creation form. **PRO**
+* Update: Added recently added links in the Email Digest report.
+* Update: Compatibility with WordPress 6.9.3
+* Translations: Updated .POT file for new translations
 
 = 2.0.1 [2026-03-04] =
 

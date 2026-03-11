@@ -110,7 +110,11 @@ class Install {
 
 		'2.0.0' => [
 			'kc_us_update_200_add_broken_link_status_to_links_table',
-		]
+		],
+
+		'2.1.0' => [
+			'kc_us_update_210_enable_email_digest',
+		],
 	];
 
 	/**
@@ -540,6 +544,13 @@ class Install {
 			],
 			'display_options_html'                                  => $html,
 			'display_options_css'                                   => $css,
+
+			// Email Digest Settings.
+			'reports_email_digest_enabled'                          => 1,
+			'reports_email_digest_frequency'                        => 'daily',
+			'reports_email_digest_day'                              => 1,
+			'reports_email_digest_time'                             => '14:00',
+			'reports_email_digest_recipients'                       => '',
 		];
 
 		return [

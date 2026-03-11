@@ -680,7 +680,7 @@ class Clicks extends Base_DB {
 
 		return $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT l.url, COUNT(c.id) as clicks
+				"SELECT l.id, l.url, l.slug, l.name, COUNT(c.id) as clicks
 	  FROM {$links_table} l
 	  LEFT JOIN {$this->table_name} c ON l.id = c.link_id
 	  WHERE c.created_at >= %s AND c.created_at <= %s

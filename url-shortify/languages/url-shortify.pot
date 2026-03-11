@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 2.0.0\n"
+"Project-Id-Version: URL Shortify 2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-04T16:45:28+00:00\n"
+"POT-Creation-Date: 2026-03-11T12:20:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
@@ -31,6 +31,7 @@ msgid "URL Shortify helps you beautify, manage, share & cloak any links on or of
 msgstr ""
 
 #. Author of the plugin
+#: lite/includes/EmailReports/EmailTemplate.php:497
 #: lite/language.php:10
 msgid "KaizenCoders"
 msgstr ""
@@ -516,7 +517,7 @@ msgid "Total Groups"
 msgstr ""
 
 #: lite/includes/Admin/Controllers/DashboardController.php:79
-#: lite/includes/EmailReports/EmailTemplate.php:203
+#: lite/includes/EmailReports/EmailTemplate.php:204
 #: lite/language.php:32
 msgid "Total Clicks"
 msgstr ""
@@ -608,7 +609,7 @@ msgstr ""
 #: lite/includes/Admin/Links_Table.php:209
 #: lite/includes/Admin/Templates/group-stats.php:110
 #: lite/includes/Common/Actions.php:336
-#: lite/includes/EmailReports/EmailTemplate.php:217
+#: lite/includes/EmailReports/EmailTemplate.php:293
 #: lite/language.php:40
 #: pro/includes/Admin/Widgets/PopularLinksWidget.php:37
 msgid "Clicks"
@@ -752,6 +753,7 @@ msgstr ""
 #: lite/includes/Admin/Templates/dashboard.php:45
 #: lite/includes/Admin/Templates/group-stats.php:96
 #: lite/includes/Admin/Templates/group-stats.php:112
+#: lite/includes/EmailReports/EmailTemplate.php:291
 #: lite/language.php:59
 msgid "Link"
 msgstr ""
@@ -1331,7 +1333,7 @@ msgstr ""
 #: lite/includes/Admin/Templates/dashboard.php:198
 #: lite/includes/Admin/Templates/group-stats.php:177
 #: lite/includes/Admin/Templates/link-stats.php:171
-#: lite/includes/EmailReports/EmailTemplate.php:247
+#: lite/includes/EmailReports/EmailTemplate.php:335
 #: lite/language.php:98
 msgid "Top Locations"
 msgstr ""
@@ -1380,7 +1382,7 @@ msgstr ""
 #: lite/includes/Admin/Templates/dashboard.php:277
 #: lite/includes/Admin/Templates/group-stats.php:254
 #: lite/includes/Admin/Templates/link-stats.php:248
-#: lite/includes/EmailReports/EmailTemplate.php:279
+#: lite/includes/EmailReports/EmailTemplate.php:367
 #: lite/language.php:103
 msgid "Top Devices"
 msgstr ""
@@ -1823,6 +1825,7 @@ msgid "Short Link [URL Shortify]"
 msgstr ""
 
 #: lite/includes/Common/Actions.php:337
+#: lite/includes/EmailReports/EmailTemplate.php:238
 #: lite/language.php:143
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:77
 #: pro/includes/Admin/Templates/auto-link-keyword-form.php:81
@@ -1968,61 +1971,145 @@ msgstr ""
 msgid "Your Weekly URL Shortify Link Summary for %s"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:130
+#. translators: %d: positive percentage number
+#: lite/includes/EmailReports/EmailTemplate.php:61
+msgid "+%d%%"
+msgstr ""
+
+#. translators: %d: negative percentage number
+#: lite/includes/EmailReports/EmailTemplate.php:66
+msgid "%d%%"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:70
+msgid "0%"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:135
 msgid "Your %1$s link performance summary for %2$s — %3$s"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:147
+#: lite/includes/EmailReports/EmailTemplate.php:152
 msgid "Preview"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:151
+#: lite/includes/EmailReports/EmailTemplate.php:156
 msgid "Performance Report"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:166
+#: lite/includes/EmailReports/EmailTemplate.php:171
 msgid "Here's your %1$s link performance summary for %2$s."
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:181
+#: lite/includes/EmailReports/EmailTemplate.php:183
 msgid "Reporting Period"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:193
+#: lite/includes/EmailReports/EmailTemplate.php:194
 msgid "Summary"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:198
+#: lite/includes/EmailReports/EmailTemplate.php:199
 msgid "New Links Created"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:211
+#. translators: %s: frequency label e.g. "week"
+#: lite/includes/EmailReports/EmailTemplate.php:220
+msgid "vs previous %s"
+msgstr ""
+
+#. translators: %s: frequency label e.g. "week"
+#: lite/includes/EmailReports/EmailTemplate.php:220
+msgid "day"
+msgstr ""
+
+#. translators: %s: frequency label e.g. "week"
+#: lite/includes/EmailReports/EmailTemplate.php:220
+msgid "month"
+msgstr ""
+
+#. translators: %s: frequency label e.g. "week"
+#: lite/includes/EmailReports/EmailTemplate.php:220
+msgid "week"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:234
+msgid "Recently Added Links"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:239
+msgid "Destination"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:240
+msgid "Created"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:254
+msgid "ago"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:286
 msgid "Top Performing Links"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:216
+#: lite/includes/EmailReports/EmailTemplate.php:292
 msgid "Destination URL"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:250
-#: lite/includes/EmailReports/EmailTemplate.php:282
+#: lite/includes/EmailReports/EmailTemplate.php:338
+#: lite/includes/EmailReports/EmailTemplate.php:370
 msgid "Unknown"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:303
+#: lite/includes/EmailReports/EmailTemplate.php:398
 msgid "No activity recorded during this period."
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:310
-msgid "View Full Analytics"
+#: lite/includes/EmailReports/EmailTemplate.php:407
+msgid "News, Tips & Announcements"
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:320
+#: lite/includes/EmailReports/EmailTemplate.php:414
+#: lite/includes/EmailReports/ReportGenerator.php:190
+#: lite/includes/EmailReports/ReportGenerator.php:198
+#: lite/includes/EmailReports/ReportGenerator.php:206
+#: lite/includes/EmailReports/ReportGenerator.php:214
+#: lite/includes/EmailReports/ReportGenerator.php:221
+#: lite/includes/EmailReports/ReportGenerator.php:229
+msgid "Learn more →"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:455
+msgid "Free Plan"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:458
+msgid "Unlock deeper link analytics"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:461
+msgid "See your top performing links, visitor locations, device breakdown, referrers, and more — all in your inbox."
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:464
+msgid "Upgrade to PRO &rarr;"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:474
+msgid "View basic analytics &rarr;"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:486
 msgid "You are receiving this email because you have email digest enabled in URL Shortify settings."
 msgstr ""
 
-#: lite/includes/EmailReports/EmailTemplate.php:323
+#: lite/includes/EmailReports/EmailTemplate.php:489
 msgid "Manage Email Preferences"
+msgstr ""
+
+#: lite/includes/EmailReports/EmailTemplate.php:501
+msgid "Documentation"
 msgstr ""
 
 #: lite/includes/EmailReports/Init.php:171
@@ -2042,6 +2129,54 @@ msgstr ""
 #: lite/includes/EmailReports/Init.php:214
 #: lite/includes/EmailReports/Init.php:260
 msgid "Test email sent to %s"
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:187
+msgid "Link Rotation in URL Shortify"
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:188
+msgid "Link Rotation enables you to assign multiple destination URLs to a single short link. This feature distributes traffic across various pages, facilitates A/B testing, or directs users based on predetermined traffic weightage."
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:195
+msgid "How to implement parameter forwarding in URL Shortify?"
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:196
+msgid "Parameter forwarding in URL Shortify is a feature that allows any parameters added to a short URL to be automatically appended to the target URL when the link is accessed."
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:203
+msgid "How to use link tracking?"
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:204
+msgid "Link tracking involves monitoring how your URLs perform by collecting data on clicks, their sources, and user behavior."
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:211
+msgid "How to use the Broken Link Checker."
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:212
+msgid "The Broken Link Checker is a powerful tool that automatically scans all your short links to verify their target URLs are still reachable."
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:218
+msgid "Organise links with Tags"
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:219
+msgid "Organize your short links with color-coded tags. Filter, sort, and group links by tag directly from the links table."
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:226
+msgid "How to setup Auto Link Keywords"
+msgstr ""
+
+#: lite/includes/EmailReports/ReportGenerator.php:227
+msgid "Automatically convert keywords or phrases in your post content into clickable short links — without editing each post manually."
 msgstr ""
 
 #: lite/includes/Helper.php:706
