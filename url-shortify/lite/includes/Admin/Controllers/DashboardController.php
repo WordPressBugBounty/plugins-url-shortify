@@ -55,6 +55,7 @@ class DashboardController extends StatsController {
 					$total_groups  = US()->db->groups->count();
 					$total_clicks  = US()->db->clicks->count();
 					$unique_clicks = US()->db->clicks->get_total_unique_clicks();
+					$has_clicks_data = $total_clicks > 0;
 
 					$links_url  = admin_url( 'admin.php?page=us_links' );
 					$groups_url = admin_url( 'admin.php?page=us_groups' );
@@ -93,10 +94,11 @@ class DashboardController extends StatsController {
 
 					$stats_controller = new StatsController();
 
-					$reports_data = $stats_controller->prepare_data();
+					$reports_data = $stats_controller->prepare_data( false );
 
-					$data['reports']              = $reports_data['reports'];
+					$data['reports']              = Helper::get_data( $reports_data, 'reports', [] );
 					$data['click_data_for_graph'] = $reports_data['click_data_for_graph'];
+					$data['has_clicks_data']      = $has_clicks_data;
 
 					$link_ids = US()->db->links->get_column( 'id' );
 

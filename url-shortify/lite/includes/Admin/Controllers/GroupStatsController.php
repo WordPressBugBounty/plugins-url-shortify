@@ -37,7 +37,7 @@ class GroupStatsController extends StatsController {
 	 * @since 1.1.7
 	 */
 	public function render() {
-		$data = $this->prepare_data();
+		$data = $this->prepare_data( false );
 
 		include KC_US_ADMIN_TEMPLATES_DIR . '/group-stats.php';
 	}
@@ -49,7 +49,7 @@ class GroupStatsController extends StatsController {
 	 * @return array|object|void|null
 	 *
 	 */
-	public function prepare_data() {
+	public function prepare_data( $include_click_history = true ) {
 		$refresh = (int) Helper::get_request_data( 'refresh', 0 );
 
 		// If we have the data in cache, get it from it.

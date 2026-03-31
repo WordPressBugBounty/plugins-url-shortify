@@ -49,8 +49,8 @@ class Report {
 			$site_domain .= $home_url['path'];
 		}
 
-		/* translators: %s: Site domain name */
 		return sprintf(
+			/* translators: %s: Site domain name */
 			esc_html__( 'Your Weekly URL Shortify Link Summary for %s', 'url-shortify' ),
 			$site_domain
 		);

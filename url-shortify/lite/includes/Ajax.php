@@ -12,6 +12,7 @@
 
 namespace KaizenCoders\URL_Shortify;
 
+use KaizenCoders\URL_Shortify\Admin\Controllers\ClicksController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\ImportController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\LinksController;
 use KaizenCoders\URL_Shortify\Admin\DB\Links;
@@ -47,6 +48,7 @@ class Ajax {
 	public function get_accessible_commands() {
 		$accessible_commands = [
 			'create_short_link',
+			'get_dashboard_clicks_page',
 			'handle_plugin_management',
 		];
 
@@ -94,6 +96,88 @@ class Ajax {
 		$response = $link_controller->create( $data );
 
 		wp_send_json( $response );
+	}
+
+	/**
+	 * Server-side callback for DataTables click history.
+	 *
+	 * @param array $params
+	 */
+	public function get_dashboard_clicks_page( $params = [] ) {
+		try {
+			if ( ! current_user_can( 'read' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ] );
+			}
+
+			$draw = absint( Helper::get_data( $params, 'draw', 0 ) );
+
+			$start  = max( 0, absint( Helper::get_data( $params, 'start', 0 ) ) );
+			$length = max( 1, min( 100, absint( Helper::get_data( $params, 'length', 10 ) ) ) );
+
+			$order        = Helper::get_data( $params, 'order', [] );
+			$order_index  = isset( $order[0]['column'] ) ? absint( $order[0]['column'] ) : 5;
+			$order_dir    = isset( $order[0]['dir'] ) ? $order[0]['dir'] : 'desc';
+			$search_value = Helper::get_data( $params, 'search', [] );
+			$search_term  = Helper::get_data( $search_value, 'value', '' );
+
+			$days = absint( Helper::get_data( $params, 'days', 0 ) );
+			if ( 0 === $days ) {
+				$days = apply_filters( 'kc_us_clicks_info_for_days', 365 );
+			}
+
+			$link_id = absint( Helper::get_data( $params, 'link_id', 0 ) );
+			$link_ids = Helper::get_data( $params, 'link_ids', '' );
+
+			if ( $link_id > 0 ) {
+				$link_ids = [ $link_id ];
+			} elseif ( is_string( $link_ids ) && ! empty( $link_ids ) ) {
+				$link_ids = array_filter( array_map( 'absint', explode( ',', $link_ids ) ) );
+			}
+
+			$column_map = [
+				0 => 'ip',
+				1 => 'uri',
+				2 => 'name',
+				3 => 'host',
+				4 => 'referer',
+				5 => 'created_at',
+				6 => 'created_at',
+			];
+
+			$order_by = isset( $column_map[ $order_index ] ) ? $column_map[ $order_index ] : 'created_at';
+
+			// Default to last 12 months so dashboard table has data; site owners can override.
+			$days = apply_filters( 'kc_us_clicks_info_for_days', 365 );
+
+			$total_records    = US()->db->clicks->count_clicks_for_dashboard( $days, '', $link_ids );
+			$filtered_records = US()->db->clicks->count_clicks_for_dashboard( $days, $search_term, $link_ids );
+			$items            = US()->db->clicks->get_clicks_for_dashboard( $days, $length, $start, $search_term, $order_by, $order_dir, $link_ids );
+
+			$columns       = ClicksController::get_table_columns();
+			$click_history = new ClicksController();
+			$click_history->set_columns( $columns );
+
+			$data = [];
+			if ( ! empty( $items ) ) {
+				foreach ( $items as $click ) {
+					$data[] = $click_history->get_row_cells( $click );
+				}
+			}
+
+			wp_send_json_success( [
+				'draw'            => $draw,
+				'recordsTotal'    => $total_records,
+				'recordsFiltered' => $filtered_records,
+				'data'            => $data,
+			] );
+		} catch ( \Throwable $e ) {
+			error_log( '[url-shortify] get_dashboard_clicks_page failed: ' . $e->getMessage() );
+			$message = __( 'Failed to load clicks. Please try again.', 'url-shortify' );
+			if ( current_user_can( 'manage_options' ) ) {
+				$message .= ' [' . $e->getMessage() . ']';
+			}
+			wp_send_json_error( [ 'message' => $message ] );
+		}
 	}
 
 	/**

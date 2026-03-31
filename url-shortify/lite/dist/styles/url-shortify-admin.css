@@ -13,16 +13,6 @@
 }
 
 
-/* Frappe Chart CSS */
-
-
-/* Remove background horizontal lines from chart also remove label from X-axis */
-.frappe-chart .x.axis .line-vertical,
-.frappe-chart .x.axis text {
-    display: none;
-}
-
-
 /* Progress Bar - Start */
 .meter {
     height: 30px;
@@ -157,6 +147,274 @@
 .qrcode {
     background-color: #000000;
 }
+.kc-us-dashboard-visuals {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+}
+.kc-us-chart-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.kc-us-chart-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 35px rgba(15, 23, 42, 0.12);
+}
+.kc-us-spline-card {
+    background: linear-gradient(135deg, #f4f4f6 0%, #e7e4ff 55%, #dfe7ff 100%);
+    color: #0f172a;
+}
+.kc-us-heatmap-card {
+    background: #ffffff;
+    padding-bottom: 0;
+}
+.kc-us-heatmap-card .kc-us-heatmap-chart-wrapper {
+    background: #f8fafc;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 6px 24px rgba(15,23,42,0.08);
+    padding: 14px 14px 6px;
+}
+.kc-us-heatmap-empty-state {
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.kc-us-heatmap-card .kc-us-heatmap-month-row {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.68rem;
+    letter-spacing: 0.45em;
+    text-transform: lowercase;
+    color: #94a3b8;
+}
+.kc-us-heatmap-card .kc-us-heatmap-month-row span {
+    text-align: center;
+    opacity: 0;
+}
+.kc-us-heatmap-card .kc-us-heatmap-month-row span.kc-us-heatmap-month--label {
+    opacity: 1;
+}
+.kc-us-heatmap-card .kc-us-heatmap-month-row span.kc-us-heatmap-month {
+    line-height: 1;
+    font-weight: 600;
+}
+#activity-heatmap .apexcharts-heatmap-rect {
+    border-radius: 4px;
+    stroke: #ffffff;
+    stroke-width: 3;
+    transition: stroke-width 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+#activity-heatmap .apexcharts-heatmap-rect:hover {
+    stroke-width: 4;
+    filter: saturate(1.3) brightness(1.05);
+}
+
+#activity-heatmap .apexcharts-heatmap-rect.inactive {
+    opacity: 0.15;
+    filter: grayscale(0.3);
+}
+
+#activity-heatmap .apexcharts-heatmap-rect.active-highlight {
+    filter: saturate(1.4) brightness(1.08);
+    animation: cellGlow 0.4s ease-out;
+}
+
+@keyframes cellGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+    }
+    70% {
+        box-shadow: 0 0 8px 3px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+#activity-heatmap {
+    width: 100%;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+#heatmap-month-row {
+    order: -1;
+}
+
+#activity-heatmap svg {
+    width: 100% !important;
+    order: 0;
+}
+
+.kc-us-heatmap-chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.kc-us-heatmap-month-row {
+    display: grid;
+    gap: 0;
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-bottom: 0px;
+}
+
+.kc-us-heatmap-month {
+    text-align: center;
+    padding: 2px 0;
+    min-height: 20px;
+}
+
+.kc-us-heatmap-month--label {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* Enhanced legend styling */
+#activity-heatmap .apexcharts-legend {
+    margin-top: 12px !important;
+    padding: 8px 0 !important;
+}
+
+#activity-heatmap .apexcharts-legend-series {
+    margin: 4px 8px !important;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#activity-heatmap .apexcharts-legend-series:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(1.02);
+}
+
+#activity-heatmap .apexcharts-legend-marker {
+    margin-right: 6px !important;
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#spline-area-chart {
+    min-height: 220px;
+    animation: chartFadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    position: relative;
+}
+
+#spline-area-chart.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 2s infinite;
+    z-index: 10;
+    border-radius: 8px;
+}
+
+#spline-area-chart .chart-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    height: 100%;
+    justify-content: space-between;
+}
+
+#spline-area-chart .skeleton-line {
+    height: 3px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 2s infinite;
+    border-radius: 2px;
+}
+
+#spline-area-chart .skeleton-line:nth-child(1) {
+    opacity: 0.6;
+    width: 85%;
+}
+
+#spline-area-chart .skeleton-line:nth-child(2) {
+    opacity: 0.5;
+    width: 95%;
+}
+
+#spline-area-chart .skeleton-line:nth-child(3) {
+    opacity: 0.4;
+    width: 70%;
+}
+
+#spline-area-chart .skeleton-line:nth-child(4) {
+    opacity: 0.5;
+    width: 90%;
+}
+
+#spline-area-chart .skeleton-line:nth-child(5) {
+    opacity: 0.6;
+    width: 80%;
+}
+
+@keyframes skeletonLoading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Chart entrance animations */
+@keyframes chartFadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth animation for area fill */
+#spline-area-chart .apexcharts-series {
+    animation: seriesFadeIn 1s ease-out both;
+}
+
+@keyframes seriesFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Hover effect for data points */
+#spline-area-chart .apexcharts-marker {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s ease;
+}
+
+#spline-area-chart .apexcharts-marker:hover {
+    transform: scale(1.3);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
 
 .share-button.sharer {
     height: 20px;
@@ -233,3 +491,851 @@ p.search-box, .search-box #form-search-input, .search-box #search-submit {
     color : #ffb900;
 }
 /** Tooltip Custom CSS - END */
+.kc-us-loading-overlay{
+    /* min-height:40px; */
+    min-height:0px;
+    background:rgba(0,0,0,0.05);
+    border-radius:6px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+    position:relative;
+}
+.dataTables_processing{
+    background:transparent !important;
+}
+
+/* =========================================================
+   Theme Toggle Widget
+   ========================================================= */
+
+#kc-us-theme-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+}
+
+.kc-us-theme-current {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    border-radius: 9999px;
+    cursor: pointer;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.kc-us-theme-current:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    background: #f9fafb;
+}
+
+.kc-us-theme-current svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.kc-us-theme-current-caret {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #6b7280;
+    margin-left: 2px;
+}
+
+.kc-us-theme-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 6px;
+    min-width: 160px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    display: none;
+}
+
+#kc-us-theme-toggle.is-open .kc-us-theme-menu {
+    display: block;
+}
+
+.kc-us-theme-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.1;
+    text-align: left;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.kc-us-theme-option:hover {
+    background: #f3f4f6;
+}
+
+.kc-us-theme-option svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.kc-us-theme-option.is-active {
+    background: #4f46e5;
+    color: #ffffff;
+}
+
+/* =========================================================
+   Dark Mode — scoped to URL Shortify pages only
+   (#wpbody-content.kc-us-dark)
+   ========================================================= */
+
+html.kc-us-dark,
+html.kc-us-dark-active,
+body.kc-us-dark-active,
+#wpbody-content.kc-us-dark {
+    background-color: #0f172a;
+}
+
+html.kc-us-dark body,
+html.kc-us-dark #wpcontent,
+html.kc-us-dark #wpbody,
+html.kc-us-dark #wpbody-content,
+html.kc-us-dark-active body,
+html.kc-us-dark-active #wpcontent,
+html.kc-us-dark-active #wpbody,
+html.kc-us-dark-active #wpbody-content,
+body.kc-us-dark-active #wpcontent,
+body.kc-us-dark-active #wpbody,
+body.kc-us-dark-active #wpbody-content,
+#wpbody-content.kc-us-dark {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+/* Page wrapper background */
+html.kc-us-dark .wrap,
+html.kc-us-dark-active .wrap,
+body.kc-us-dark-active .wrap,
+#wpbody-content.kc-us-dark .wrap {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+/* Headings */
+html.kc-us-dark .wrap h1,
+html.kc-us-dark .wrap h2,
+html.kc-us-dark .wrap h3,
+html.kc-us-dark .wrap h4,
+html.kc-us-dark-active .wrap h1,
+html.kc-us-dark-active .wrap h2,
+html.kc-us-dark-active .wrap h3,
+html.kc-us-dark-active .wrap h4,
+body.kc-us-dark-active .wrap h1,
+body.kc-us-dark-active .wrap h2,
+body.kc-us-dark-active .wrap h3,
+body.kc-us-dark-active .wrap h4,
+#wpbody-content.kc-us-dark .wrap h1,
+#wpbody-content.kc-us-dark .wrap h2,
+#wpbody-content.kc-us-dark .wrap h3,
+#wpbody-content.kc-us-dark .wrap h4 {
+    color: #f1f5f9;
+}
+
+/* Tailwind text color overrides */
+#wpbody-content.kc-us-dark .wrap .text-gray-900 { color: #f1f5f9 !important; }
+#wpbody-content.kc-us-dark .wrap .text-gray-800 { color: #e2e8f0 !important; }
+#wpbody-content.kc-us-dark .wrap .text-gray-700 { color: #cbd5e1 !important; }
+#wpbody-content.kc-us-dark .wrap .text-gray-600 { color: #94a3b8 !important; }
+#wpbody-content.kc-us-dark .wrap .text-gray-500 { color: #94a3b8 !important; }
+#wpbody-content.kc-us-dark .wrap .text-gray-400 { color: #64748b !important; }
+#wpbody-content.kc-us-dark .wrap .text-black    { color: #f1f5f9 !important; }
+
+/* Background overrides */
+#wpbody-content.kc-us-dark .wrap .bg-white      { background-color: #1e293b !important; }
+#wpbody-content.kc-us-dark .wrap .bg-gray-50    { background-color: #0f172a !important; }
+#wpbody-content.kc-us-dark .wrap .bg-gray-100   { background-color: #1e293b !important; }
+#wpbody-content.kc-us-dark .wrap .bg-gray-200   { background-color: #334155 !important; }
+
+/* Border overrides */
+#wpbody-content.kc-us-dark .wrap .border-gray-100 { border-color: #1e293b !important; }
+#wpbody-content.kc-us-dark .wrap .border-gray-200 { border-color: #334155 !important; }
+#wpbody-content.kc-us-dark .wrap .border-gray-300 { border-color: #475569 !important; }
+#wpbody-content.kc-us-dark .wrap .border-b        { border-color: #334155 !important; }
+#wpbody-content.kc-us-dark .wrap .border-b-2      { border-color: #334155 !important; }
+#wpbody-content.kc-us-dark .wrap .divide-y > *    { border-color: #334155 !important; }
+
+/* Shadows */
+#wpbody-content.kc-us-dark .wrap .shadow,
+#wpbody-content.kc-us-dark .wrap .shadow-md,
+#wpbody-content.kc-us-dark .wrap .shadow-lg,
+#wpbody-content.kc-us-dark .wrap .shadow-sm {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
+}
+
+/* WordPress List Table (links, groups, tags, etc.) */
+#wpbody-content.kc-us-dark .wrap .wp-list-table,
+#wpbody-content.kc-us-dark .wrap table.widefat {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .wp-list-table th,
+#wpbody-content.kc-us-dark .wrap .wp-list-table td,
+#wpbody-content.kc-us-dark .wrap table.widefat th,
+#wpbody-content.kc-us-dark .wrap table.widefat td {
+    background-color: #1e293b;
+    border-bottom-color: #334155;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .wp-list-table thead th,
+#wpbody-content.kc-us-dark .wrap table.widefat thead th {
+    background-color: #0f172a;
+    color: #94a3b8;
+}
+
+#wpbody-content.kc-us-dark .wrap .wp-list-table tr:hover td,
+#wpbody-content.kc-us-dark .wrap table.widefat tr:hover td {
+    background-color: #273548 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wp-list-table .alternate,
+#wpbody-content.kc-us-dark .wrap table.widefat .alternate {
+    background-color: #172032 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wp-list-table .alternate td {
+    background-color: #172032 !important;
+}
+
+/* DataTables */
+#wpbody-content.kc-us-dark .wrap table.dataTable,
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper {
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable thead th,
+#wpbody-content.kc-us-dark .wrap table.dataTable thead td {
+    background-color: #0f172a;
+    border-bottom-color: #334155;
+    color: #94a3b8;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr {
+    background-color: #1e293b;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr:hover {
+    background-color: #273548;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody td {
+    border-bottom-color: #334155;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_length,
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_filter,
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_info,
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_paginate {
+    color: #94a3b8;
+}
+
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #94a3b8 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #334155 !important;
+    border-color: #475569 !important;
+    color: #f1f5f9 !important;
+}
+
+/* Form elements — handled by universal input rule below */
+
+/* Select2 */
+#wpbody-content.kc-us-dark .wrap .select2-container--default .select2-selection--multiple,
+#wpbody-content.kc-us-dark .wrap .select2-container--default .select2-selection--single {
+    background-color: #0f172a;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .select2-dropdown {
+    background-color: #1e293b;
+    border-color: #475569;
+}
+
+#wpbody-content.kc-us-dark .wrap .select2-container--default .select2-results__option {
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #4f46e5;
+    color: #fff;
+}
+
+#wpbody-content.kc-us-dark .wrap .select2-search__field {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    border-color: #475569;
+}
+
+/* Nav tabs (time filter buttons) */
+#wpbody-content.kc-us-dark .wrap .nav-tab-wrapper {
+    border-bottom-color: #334155;
+}
+
+#wpbody-content.kc-us-dark .wrap .nav-tab {
+    color: #94a3b8;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#wpbody-content.kc-us-dark .wrap .nav-tab-active,
+#wpbody-content.kc-us-dark .wrap .nav-tab:hover {
+    color: #f1f5f9;
+    background-color: #1e293b;
+    border-color: #334155;
+    border-bottom-color: #1e293b;
+}
+
+/* WordPress notices */
+#wpbody-content.kc-us-dark .wrap .notice,
+#wpbody-content.kc-us-dark .wrap .updated,
+#wpbody-content.kc-us-dark .wrap .error {
+    background-color: #1e293b;
+    border-left-color: #6366f1;
+    color: #e2e8f0;
+}
+
+/* Tablenav (bulk actions, pagination) */
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages a,
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .current {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .tablenav .bulkactions select,
+#wpbody-content.kc-us-dark .wrap .tablenav .actions select {
+    background-color: #0f172a;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+/* Submenu / tabbed navigation */
+#wpbody-content.kc-us-dark .wrap .subsubsub a {
+    color: #94a3b8;
+}
+
+#wpbody-content.kc-us-dark .wrap .subsubsub a.current,
+#wpbody-content.kc-us-dark .wrap .subsubsub a:hover {
+    color: #f1f5f9;
+}
+
+/* Stats page: inline progress bars */
+#wpbody-content.kc-us-dark .wrap .bg-indigo-200 { background-color: #312e81 !important; }
+#wpbody-content.kc-us-dark .wrap .bg-indigo-100 { background-color: #1e1b4b !important; }
+#wpbody-content.kc-us-dark .wrap .text-indigo-800 { color: #a5b4fc !important; }
+#wpbody-content.kc-us-dark .wrap .text-indigo-700 { color: #818cf8 !important; }
+
+/* Amber/yellow (upgrade banners stay light-ish) */
+#wpbody-content.kc-us-dark .wrap .bg-amber-50  { background-color: #1c1500 !important; }
+#wpbody-content.kc-us-dark .wrap .border-amber-200 { border-color: #713f12 !important; }
+
+/* Green badges */
+#wpbody-content.kc-us-dark .wrap .bg-green-100  { background-color: #052e16 !important; }
+#wpbody-content.kc-us-dark .wrap .text-green-800 { color: #86efac !important; }
+#wpbody-content.kc-us-dark .wrap .text-green-700 { color: #4ade80 !important; }
+
+/* Red badges */
+#wpbody-content.kc-us-dark .wrap .bg-red-100  { background-color: #450a0a !important; }
+#wpbody-content.kc-us-dark .wrap .text-red-800 { color: #fca5a5 !important; }
+#wpbody-content.kc-us-dark .wrap .text-red-700 { color: #f87171 !important; }
+
+/* Hover states on links */
+#wpbody-content.kc-us-dark .wrap a:not([class*="button"]):not([class*="btn"]):not([class*="page-title"]):not([class*="kc-us-primary"]) {
+    color: #818cf8;
+}
+
+#wpbody-content.kc-us-dark .wrap a:not([class*="button"]):not([class*="btn"]):not([class*="page-title"]):not([class*="kc-us-primary"]):hover {
+    color: #a5b4fc;
+}
+
+/* WP heading link (like "Add New") */
+#wpbody-content.kc-us-dark .wrap .page-title-action {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .page-title-action:hover {
+    background-color: #334155;
+    color: #f1f5f9;
+}
+
+/* Check boxes / row actions */
+#wpbody-content.kc-us-dark .wrap .row-actions span a {
+    color: #94a3b8;
+}
+
+/* Postbox / meta box */
+#wpbody-content.kc-us-dark .wrap .postbox,
+#wpbody-content.kc-us-dark .wrap .card {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .postbox .hndle,
+#wpbody-content.kc-us-dark .wrap .postbox h2 {
+    border-bottom-color: #334155;
+    color: #f1f5f9;
+}
+
+/* ApexCharts */
+#wpbody-content.kc-us-dark .wrap .apexcharts-canvas .apexcharts-tooltip {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .apexcharts-canvas text {
+    fill: #94a3b8 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .apexcharts-canvas .apexcharts-gridline {
+    stroke: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .apexcharts-canvas .apexcharts-xaxistooltip,
+#wpbody-content.kc-us-dark .wrap .apexcharts-canvas .apexcharts-yaxistooltip {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+/* Dark theme toggle button itself in dark mode */
+#wpbody-content.kc-us-dark ~ #kc-us-theme-toggle,
+.kc-us-dark ~ #kc-us-theme-toggle {
+    background: #1e293b;
+    border-color: #475569;
+}
+
+#wpbody-content.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-current,
+.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-current {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-menu,
+.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-menu {
+    background: #1e293b;
+    border-color: #475569;
+}
+
+#wpbody-content.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-option,
+.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-option {
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-option:hover,
+.kc-us-dark ~ #kc-us-theme-toggle .kc-us-theme-option:hover {
+    background: #334155;
+    color: #e2e8f0;
+}
+
+/* Handle toggle styling when dark is active (sibling selector won't always work, use body class) */
+body.kc-us-dark-active #kc-us-theme-toggle .kc-us-theme-current {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+body.kc-us-dark-active #kc-us-theme-toggle .kc-us-theme-menu {
+    background: #1e293b;
+    border-color: #475569;
+}
+
+body.kc-us-dark-active #kc-us-theme-toggle .kc-us-theme-option {
+    color: #e2e8f0;
+}
+
+body.kc-us-dark-active #kc-us-theme-toggle .kc-us-theme-option:hover {
+    background: #334155;
+    color: #e2e8f0;
+}
+
+body.kc-us-dark-active #kc-us-theme-toggle .kc-us-theme-current-caret {
+    border-top-color: #94a3b8;
+}
+
+body.kc-us-dark-active #footer-thankyou,
+body.kc-us-dark-active #footer-upgrade {
+    color: #e2e8f0 !important;
+}
+
+body.kc-us-dark-active #footer-thankyou a,
+body.kc-us-dark-active #footer-upgrade a {
+    color: #93c5fd !important;
+}
+
+body.kc-us-dark-active #wpfooter {
+    background: transparent;
+}
+
+/* =========================================================
+   Settings page (WPSF / WordPress form-table) — dark mode
+   ========================================================= */
+
+/* WordPress form-table: th labels — use !important to beat wp-admin.css specificity */
+#wpbody-content.kc-us-dark .wrap .form-table th {
+    color: #e2e8f0 !important;
+    background-color: transparent !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .form-table td {
+    color: #e2e8f0 !important;
+    background-color: transparent !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .form-table label {
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .form-table p,
+#wpbody-content.kc-us-dark .wrap .form-table .description {
+    color: #94a3b8 !important;
+}
+
+/* form-table row borders */
+#wpbody-content.kc-us-dark .wrap .form-table tr {
+    border-bottom-color: #334155 !important;
+    background-color: transparent !important;
+}
+
+/* WPSF section wrappers */
+#wpbody-content.kc-us-dark .wrap .wpsf-section {
+    color: #e2e8f0;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-section h2 {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-section-description {
+    color: #94a3b8;
+}
+
+/* WPSF postbox (tabbed settings) */
+#wpbody-content.kc-us-dark .wrap .wpsf-section .postbox {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-section .postbox h2,
+#wpbody-content.kc-us-dark .wrap .wpsf-section .postbox h3 {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
+}
+
+/* WPSF group labels */
+#wpbody-content.kc-us-dark .wrap .wpsf-group__field-label {
+    color: #e2e8f0;
+}
+
+/* Radio and checkbox inline labels */
+#wpbody-content.kc-us-dark .wrap .form-table label,
+#wpbody-content.kc-us-dark .wrap .form-table li label {
+    color: #e2e8f0 !important;
+}
+
+/* WPSF list (checkbox group) */
+#wpbody-content.kc-us-dark .wrap .wpsf-list li {
+    color: #e2e8f0;
+}
+
+/* Nav tab wrapper for settings tabs */
+#wpbody-content.kc-us-dark .wrap h2.nav-tab-wrapper {
+    background-color: transparent;
+    border-bottom-color: #334155;
+}
+
+#wpbody-content.kc-us-dark .wrap .nav-tab-wrapper .nav-tab {
+    color: #94a3b8;
+    border-color: transparent;
+    background: transparent;
+}
+
+#wpbody-content.kc-us-dark .wrap .nav-tab-wrapper .nav-tab-active,
+#wpbody-content.kc-us-dark .wrap .nav-tab-wrapper .nav-tab:hover {
+    color: #f1f5f9;
+    background-color: #1e293b;
+    border-color: #475569 #475569 #1e293b;
+}
+
+/* Save settings button row */
+#wpbody-content.kc-us-dark .wrap .wpsf-settings__submit p {
+    border-top-color: #334155;
+}
+
+/* WordPress description text */
+#wpbody-content.kc-us-dark .wrap .description,
+#wpbody-content.kc-us-dark .wrap p.description {
+    color: #94a3b8;
+}
+
+/* Generic label/span text in settings */
+#wpbody-content.kc-us-dark .wrap label,
+#wpbody-content.kc-us-dark .wrap .wpsf-section span:not([class*="bg-"]):not([class*="text-"]) {
+    color: #e2e8f0;
+}
+
+/* Submit button hover */
+#wpbody-content.kc-us-dark .wrap #submit:hover,
+#wpbody-content.kc-us-dark .wrap input[type="submit"]:hover {
+    background-color: #4338ca !important;
+}
+
+/* Toggle switch label text */
+#wpbody-content.kc-us-dark .wrap .inline-flex.items-center.mb-1 {
+    color: #e2e8f0;
+}
+
+/* Code elements */
+#wpbody-content.kc-us-dark .wrap code {
+    background-color: #0f172a;
+    color: #a5b4fc;
+}
+
+/* WPSF repeater/group rows (hardcoded borders in main.css) */
+#wpbody-content.kc-us-dark .wrap .wpsf-group__row td {
+    border-bottom-color: #334155 !important;
+    color: #e2e8f0 !important;
+    background-color: transparent !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-group__field-wrapper {
+    border-bottom-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-group__row-index {
+    border-right-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-group__row-index span {
+    background-color: #334155 !important;
+    box-shadow: inset 0px 1px #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-group__row-actions {
+    border-left-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .wpsf-group__row-add {
+    background-color: #1e293b !important;
+}
+
+/* WPSF subtitle / multifields caption */
+#wpbody-content.kc-us-dark .wrap .wpsf-subtitle,
+#wpbody-content.kc-us-dark .wrap .wpsf-multifields__field span {
+    color: #64748b !important;
+}
+
+/* WPSF section description border */
+#wpbody-content.kc-us-dark .wrap .wpsf-tab .wpsf-section-description {
+    border-bottom-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+/* WPSF section description headings and text */
+#wpbody-content.kc-us-dark .wrap .wpsf-section-description h3,
+#wpbody-content.kc-us-dark .wrap .wpsf-section-description p {
+    color: #e2e8f0 !important;
+}
+
+/* Generic label dark mode (covers all settings labels) */
+#wpbody-content.kc-us-dark .wrap label {
+    color: #e2e8f0 !important;
+}
+
+/* Input with datepicker (hardcoded bg in main.css) */
+#wpbody-content.kc-us-dark .wrap .wpsf-section input.hasDatepicker {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #475569 !important;
+}
+
+/* =========================================================
+   ALL input fields — universal dark mode override
+   ========================================================= */
+
+#wpbody-content.kc-us-dark .wrap input,
+#wpbody-content.kc-us-dark .wrap input[type],
+#wpbody-content.kc-us-dark .wrap textarea,
+#wpbody-content.kc-us-dark .wrap select {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
+}
+
+#wpbody-content.kc-us-dark .wrap input:focus,
+#wpbody-content.kc-us-dark .wrap textarea:focus,
+#wpbody-content.kc-us-dark .wrap select:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 1px #6366f1 !important;
+    outline: none !important;
+}
+
+/* Keep checkbox and radio inputs unstyled */
+#wpbody-content.kc-us-dark .wrap input[type="checkbox"],
+#wpbody-content.kc-us-dark .wrap input[type="radio"] {
+    background-color: unset !important;
+    border-color: unset !important;
+    color: unset !important;
+    box-shadow: unset !important;
+}
+
+/* Submit / button inputs keep their colour */
+#wpbody-content.kc-us-dark .wrap input[type="submit"],
+#wpbody-content.kc-us-dark .wrap input[type="button"] {
+    background-color: #4f46e5 !important;
+    border-color: #4338ca !important;
+    color: #fff !important;
+}
+
+/* WordPress .regular-text class */
+#wpbody-content.kc-us-dark .wrap .regular-text {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Placeholder text */
+#wpbody-content.kc-us-dark .wrap input::placeholder,
+#wpbody-content.kc-us-dark .wrap textarea::placeholder {
+    color: #64748b !important;
+}
+
+/* =========================================================
+   Digest settings cards (url-shortify-email-digest.css overrides)
+   ========================================================= */
+
+#wpbody-content.kc-us-dark .wrap .kc-us-digest-status-item {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-digest-status-label {
+    color: #94a3b8 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-digest-status-value {
+    color: #f1f5f9 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-digest-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-digest-card strong {
+    color: #f1f5f9 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-status-success {
+    background-color: #052e16 !important;
+    color: #86efac !important;
+    border-color: #166534 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-status-error {
+    background-color: #450a0a !important;
+    color: #fca5a5 !important;
+    border-color: #991b1b !important;
+}
+
+/* =========================================================
+   Meta Info column icons (SVGs with fill="#000000")
+   ========================================================= */
+
+#wpbody-content.kc-us-dark .wrap .column-meta_info img {
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+}
+
+/* =========================================================
+   DataTables — fix .odd/.even row backgrounds
+   ========================================================= */
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr.odd,
+#wpbody-content.kc-us-dark .wrap table.dataTable.display tbody tr.odd,
+#wpbody-content.kc-us-dark .wrap table.dataTable.stripe tbody tr.odd {
+    background-color: #172032 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr.odd td,
+#wpbody-content.kc-us-dark .wrap table.dataTable.display tbody tr.odd td {
+    background-color: #172032 !important;
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr.even,
+#wpbody-content.kc-us-dark .wrap table.dataTable.display tbody tr.even,
+#wpbody-content.kc-us-dark .wrap table.dataTable.stripe tbody tr.even {
+    background-color: #1e293b !important;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr.even td,
+#wpbody-content.kc-us-dark .wrap table.dataTable.display tbody tr.even td {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr:hover.odd td,
+#wpbody-content.kc-us-dark .wrap table.dataTable tbody tr:hover.even td,
+#wpbody-content.kc-us-dark .wrap table.dataTable.display tbody tr:hover td {
+    background-color: #273548 !important;
+}
+
+/* DataTables search input */
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_filter input {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+}
+
+/* DataTables length select */
+#wpbody-content.kc-us-dark .wrap .dataTables_wrapper .dataTables_length select {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+}

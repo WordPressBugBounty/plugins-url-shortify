@@ -115,6 +115,11 @@ class Install {
 		'2.1.0' => [
 			'kc_us_update_210_enable_email_digest',
 		],
+
+		'2.2.0' => [
+			'kc_us_update_220_add_r_index_to_clicks_rotations',
+			'kc_us_update_220_create_linkmeta_table',
+		],
 	];
 
 	/**
@@ -610,6 +615,7 @@ class Install {
 		$tables .= self::get_1115_schema( $collate );
 		$tables .= self::get_1122_schema( $collate );
 		$tables .= self::get_1131_schema( $collate );
+		$tables .= self::get_220_schema( $collate );
 
 		return $tables;
 	}
@@ -1081,6 +1087,26 @@ class Install {
 				KEY keyword (keyword(191)),
 				KEY link_id (link_id),
 				KEY status (status)
+			) $collate;
+		";
+	}
+
+	/**
+	 * Link meta table schema (stores per-link key/value metadata, e.g. broken-link scan results).
+	 *
+	 * @since 2.2.0
+	 */
+	public static function get_220_schema( $collate = '' ) {
+		global $wpdb;
+		return "
+			CREATE TABLE `{$wpdb->prefix}kc_us_linkmeta` (
+				`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`link_id` bigint(20) unsigned NOT NULL DEFAULT 0,
+				`meta_key` varchar(255) DEFAULT NULL,
+				`meta_value` longtext DEFAULT NULL,
+				PRIMARY KEY  (meta_id),
+				KEY link_id (link_id),
+				KEY meta_key (meta_key(191))
 			) $collate;
 		";
 	}

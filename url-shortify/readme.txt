@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 2.1
+Stable tag: 2.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -228,11 +228,11 @@ We have one click import setup for following WordPress Plugin. If you are using 
 > 👉 **Splash Page**
 > Create a splash page for your short links. A splash page is a landing page that is displayed to the visitors before they are redirected to the destination URL. This is a great way to show some information to the visitors before they are redirected to the destination URL.
 
+> 👉 **A/B Testing**
+> Learn how new page components influence users' behavior by doing A/B Testing
+
 > 👉 **Amazon Affiliates** [Coming Soon!]
 > Adds your Amazon Affiliate-Tag to all Amazon URLs before redirection.
-
-> 👉 **A/B Testing** [Coming Soon!]
-> Learn how new page components influence users' behavior by doing A/B Testing
 
 Do you want to buy URL Shortify PRO? [Buy Now](http://kaizencoders.com/url-shortify-pricing/)
 
@@ -482,14 +482,25 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.1 =
+= 2.2 =
 
-* Fix: Tags dropdown not showing tags in the links creation form. **PRO**
-* Update: Added recently added links in the Email Digest report.
-* Update: Compatibility with WordPress 6.9.3
+* New: Added support for the A/B Testing. [Learn More](https://docs.kaizencoders.com/url-shortify/ab-testing) **PRO**
+* New: Update dashboard with the clicks heatmap to visualize clicks by time of day and day of week. **PRO**
+* New: Added support for the Dark mode theme.
+* Fix: Broken Link Checker not showing broken links in the list. **PRO**
+* Update: Compatibility with WordPress 6.9.4
 * Translations: Updated .POT file for new translations
 
 == Changelog ==
+
+= 2.2 [2026-03-31] =
+
+* New: Added support for the A/B Testing and show result in link stats page. [Learn More](https://docs.kaizencoders.com/url-shortify/ab-testing) **PRO**
+* New: Update dashboard with the clicks heatmap to visualize clicks by time of day and day of week. **PRO**
+* New: Added support for the Dark mode theme.
+* Fix: Broken Link Checker not showing broken links in the list. **PRO**
+* Update: Compatibility with WordPress 6.9.4
+* Translations: Updated .POT file for new translations
 
 = 2.1 [2026-03-11] =
 
@@ -511,83 +522,6 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * New: Added REST API support for Links, Groups, Tags, Domains, UTM Presets, Tracking Pixels. [Learn More](https://docs.kaizencoders.com/url-shortify/api-reference) **PRO**
 * Fix: Bulk Delete Tags issue. **PRO**
 * Update: UI Improvements.
-* Translations: Updated .POT file for new translations
-
-= 1.13.1 [2026-02-27] =
-
-* Update: UI Improvements.
-* Translations: Updated .POT file for new translations
-
-= 1.13.0 [2026-02-17] =
-
-* New: Added support to filter links by tags by clicking on tags from links list page. **PRO**
-* New: Added support to perform bulk actions on all links not just selected. **PRO**
-* Update: Improved UI.
-* Translations: Updated .POT file for new translations
-
-= 1.12.5 [2026-02-13] =
-
-* New: Add color to tags **PRO**
-* Fix: Duplicate Groups issue when adding via Bulk Add Group
-* Fix: Duplicate Tags issue when adding via Bulk Add Tag **PRO**
-* Translations: Updated .POT file for new translations
-
-= 1.12.4 [2026-02-11] =
-
-* Update: Added support to **Manage Tags** permission in Access Control **PRO**
-* Update: Security enhancements.
-* Translations: Updated .POT file for new translations
-
-= 1.12.3 [2026-02-09] =
-
-* New: Added support to mark links as Favorite and remove from favorite using bulk action. **PRO**
-* New: Added support to add/remove tags using bulk action. **PRO**
-* New: Filter links based on Favorite and Tags. **PRO**
-* Update: Compatibility with WordPress 6.9.1
-* Translations: Updated .POT file for new translations
-
-= 1.12.2 [2026-02-02] =
-
-* New: Added support to mark links as Favorite. **PRO**
-* Update: Enhanced Security.
-* Translations: Updated .POT file for new translations
-
-= 1.12.1 [2026-01-23] =
-
-* Fix: Custom domains not visible in the link creation dropdown. **PRO**
-
-= 1.12.0 [2026-01-20] =
-
-* New: Added support to add tags to created links. **PRO**
-* Update: Converted `Clicked On` time in user defined timezone in exported click history. **PRO**
-* Fix: Link prefix not getting added to the short links created. **PRO**
-* Update: Compatibility with WordPress 6.9
-
-= 1.11.4 [2025-11-20] =
-
-* Fix: Link creation issue.
-
-= 1.11.3 [2025-11-20] =
-
-* New: Weekly summary of new links and clicks report via email.
-* Update: Enhanced security.
-* Update: Compatibility with WordPress 6.8.3.
-
-= 1.11.2 [2025-10-13] =
-
-* New: No more promotion notice for PRO users.
-* Update: UX Improvements.
-* Update: Translations update.
-
-= 1.11.1 [2025-10-09] =
-
-* Update: UX improvements
-* Translations: Updated .POT file for new translations
-* Fix: Plugin version issue
-
-= 1.11.0 [2025-10-09] =
-
-* Update: UX improvements
 * Translations: Updated .POT file for new translations
 
 [See changelog for all versions](https://docs.kaizencoders.com/url-shortify/changelog) file.

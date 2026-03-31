@@ -62,6 +62,7 @@ class Clicks_Rotations extends Base_DB {
 			'click_id' => '%d',
 			'link_id'  => '%d',
 			'url'      => '%s',
+			'r_index'  => '%d',
 		];
 	}
 
@@ -75,6 +76,7 @@ class Clicks_Rotations extends Base_DB {
 			'click_id' => null,
 			'link_id'  => null,
 			'url'      => null,
+			'r_index'  => null,
 		];
 	}
 
@@ -148,5 +150,47 @@ class Clicks_Rotations extends Base_DB {
 		}
 
 		return $this->delete_by( 'link_id', $link_id );
+	}
+
+	/**
+	 * Get split test results grouped by rotation variant for a link.
+	 *
+	 * Returns one row per distinct r_index/url combination with aggregate
+	 * click counts and unique visitor counts. Rows with NULL r_index (recorded
+	 * before the 2.2.0 migration) are excluded.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param int $link_id
+	 *
+	 * @return array  Each element: r_index, url, total_clicks, unique_visitors, first_clicks
+	 */
+	public function get_split_test_results( $link_id ) {
+		global $wpdb;
+
+		$link_id = absint( $link_id );
+		if ( empty( $link_id ) ) {
+			return [];
+		}
+
+		$clicks_table = $wpdb->prefix . 'kc_us_clicks';
+
+		$sql = $wpdb->prepare(
+			"SELECT
+				cr.r_index,
+				cr.url,
+				COUNT( cr.click_id )             AS total_clicks,
+				COUNT( DISTINCT c.visitor_id )   AS unique_visitors,
+				COALESCE( SUM( c.is_first_click ), 0 ) AS first_clicks
+			FROM {$this->table_name} cr
+			LEFT JOIN {$clicks_table} c ON c.id = cr.click_id
+			WHERE cr.link_id = %d
+			  AND cr.r_index IS NOT NULL
+			GROUP BY cr.r_index, cr.url
+			ORDER BY cr.r_index ASC",
+			$link_id
+		);
+
+		return $wpdb->get_results( $sql, ARRAY_A ) ?: [];
 	}
 }

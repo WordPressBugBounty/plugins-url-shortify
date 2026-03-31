@@ -283,6 +283,118 @@ class Clicks extends Base_DB {
 	}
 
 	/**
+	 * Count clicks for the dashboard (optionally filtered).
+	 *
+	 * @param int    $days
+	 * @param string $search
+	 * @param int|int[]|string $link_ids
+	 *
+	 * @return int
+	 */
+	public function count_clicks_for_dashboard( $days = 365, $search = '', $link_ids = [] ) {
+		global $wpdb;
+
+		$clicks_table = "{$wpdb->prefix}kc_us_clicks";
+		$links_table  = "{$wpdb->prefix}kc_us_links";
+
+		$filter = $this->build_dashboard_where_clause( $days, $search, $link_ids );
+
+		$query = "SELECT COUNT(*) FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links {$filter['where']}";
+
+		$args = $filter['args'];
+
+		if ( ! empty( $args ) ) {
+			return (int) $wpdb->get_var( $wpdb->prepare( $query, $args ) );
+		}
+
+		return (int) $wpdb->get_var( $query );
+	}
+
+	/**
+	 * Retrieve dashboard click rows with filtering/pagination.
+	 *
+	 * @param int    $days
+	 * @param int    $length
+	 * @param int    $offset
+	 * @param string $search
+	 * @param string $order_by
+	 * @param string $order_dir
+	 * @param int|int[]|string $link_ids
+	 *
+	 * @return array
+	 */
+	public function get_clicks_for_dashboard( $days = 365, $length = 10, $offset = 0, $search = '', $order_by = 'created_at', $order_dir = 'DESC', $link_ids = [] ) {
+		global $wpdb;
+
+		$clicks_table = "{$wpdb->prefix}kc_us_clicks";
+		$links_table  = "{$wpdb->prefix}kc_us_links";
+
+		$filter = $this->build_dashboard_where_clause( $days, $search, $link_ids );
+
+		$order_by    = in_array( $order_by, [ 'ip', 'uri', 'name', 'host', 'referer', 'created_at' ], true ) ? $order_by : 'created_at';
+		$order_dir   = 'ASC' === strtoupper( $order_dir ) ? 'ASC' : 'DESC';
+
+		$query = "SELECT clicks.*, links.name as name FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links {$filter['where']} ORDER BY {$order_by} {$order_dir} LIMIT %d OFFSET %d";
+
+		$args = array_merge( $filter['args'], [ $length, $offset ] );
+
+		$prepared_query = ! empty( $filter['args'] ) ? $wpdb->prepare( $query, $args ) : $wpdb->prepare( $query, $length, $offset );
+
+		return $wpdb->get_results( $prepared_query, ARRAY_A );
+	}
+
+	/**
+	 * Helper used to build WHERE clause for dashboard queries.
+	 *
+	 * @param int    $days
+	 * @param string $search
+	 * @param int|int[]|string $link_ids
+	 *
+	 * @return array{where:string,args:array}
+	 */
+	private function build_dashboard_where_clause( $days, $search, $link_ids = [] ) {
+		global $wpdb;
+
+		$where = [];
+		$args  = [];
+
+		if ( $days > 0 ) {
+			$where[] = 'clicks.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)';
+			$args[]  = absint( $days );
+		}
+
+		if ( ! empty( $search ) ) {
+			$search_like = '%' . $wpdb->esc_like( $search ) . '%';
+			$where[]     = '(clicks.ip LIKE %s OR clicks.uri LIKE %s OR links.name LIKE %s OR clicks.host LIKE %s OR clicks.referer LIKE %s)';
+			$args[]      = $search_like;
+			$args[]      = $search_like;
+			$args[]      = $search_like;
+			$args[]      = $search_like;
+			$args[]      = $search_like;
+		}
+
+		if ( ! empty( $link_ids ) ) {
+			if ( ! is_array( $link_ids ) ) {
+				$link_ids = array_filter( array_map( 'absint', explode( ',', (string) $link_ids ) ) );
+			} else {
+				$link_ids = array_filter( array_map( 'absint', $link_ids ) );
+			}
+
+			if ( ! empty( $link_ids ) ) {
+				$link_ids_str = $this->prepare_for_in_query( $link_ids );
+				$where[]       = "clicks.link_id IN ($link_ids_str)";
+			}
+		}
+
+		$where_sql = 'WHERE ' . implode( ' AND ', $where );
+
+		return [
+			'where' => $where_sql,
+			'args'  => $args,
+		];
+	}
+
+	/**
 	 * Get clicks data
 	 *
 	 * @since 1.1.6
@@ -693,4 +805,38 @@ class Clicks extends Base_DB {
 			)
 		);
 	}
+
+	/**
+	 * Get data for Spline Chart
+	 */
+	public function get_spline_chart_data() {
+		global $wpdb;
+		$result = $wpdb->get_results( "
+			SELECT 
+				DATE(created_at) as date, 
+				COUNT(id) as total_clicks, 
+				COUNT(DISTINCT ip) as unique_clicks 
+			FROM {$this->table_name} 
+			WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+			GROUP BY DATE(created_at)
+			ORDER BY date ASC
+		", ARRAY_A );
+
+		return ! empty( $result ) ? $result : [];
+	}
+
+	/**
+	 * Get data for Heatmap (Last 1 year)
+	 */
+	public function get_heatmap_intensity_data() {
+		global $wpdb;
+		$result = $wpdb->get_results( "
+			SELECT DATE(created_at) as date, COUNT(id) as count 
+			FROM {$this->table_name} 
+			WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+			GROUP BY DATE(created_at)
+			ORDER BY date ASC
+		", ARRAY_A );
+		return ! empty( $result ) ? $result : [];
+	}	
 }

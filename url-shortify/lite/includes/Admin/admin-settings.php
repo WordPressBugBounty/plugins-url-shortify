@@ -160,6 +160,35 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 
 	$short_link_position_array = Helper::get_link_display_position_options();
 
+	$password_page_choices = [
+		'0' => __( 'Default password page', 'url-shortify' ),
+	];
+
+	$pages = get_pages(
+		[
+			'post_status' => 'publish',
+			'sort_column' => 'post_title',
+		]
+	);
+
+	if ( ! empty( $pages ) ) {
+		foreach ( $pages as $page ) {
+			$password_page_choices[ (string) $page->ID ] = $page->post_title;
+		}
+	}
+
+	$password_page_choices = apply_filters( 'kc_us_password_page_choices', $password_page_choices );
+
+	$default_display_options[] = [
+		'id'      => 'password_page',
+		'title'   => __( 'Password Page', 'url-shortify' ),
+		'desc'    => __( 'Select a page containing the [url-shortify-password] shortcode for password protected links.', 'url-shortify' ),
+		'type'    => 'select',
+		'default' => '0',
+		'choices' => $password_page_choices,
+		'order'   => 1,
+	];
+
 	$default_display_options[] = [
 		'id'      => 'where_to_display',
 		'title'   => __( 'Where to display short URL?', 'url-shortify' ),

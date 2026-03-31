@@ -130,8 +130,8 @@ if ( null !== $click_trend ) {
 <!-- Hidden preheader -->
 <div style="display:none;font-size:1px;color:#f3f4f6;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
 	<?php
-	/* translators: 1: Frequency label, 2: Site name, 3: Date range */
 	printf(
+		/* translators: 1: Frequency label (e.g. Weekly), 2: Site name, 3: Date range */
 		esc_html__( 'Your %1$s link performance summary for %2$s — %3$s', 'url-shortify' ),
 		esc_html( $frequency_label ),
 		esc_html( $site_name ),
@@ -166,8 +166,8 @@ if ( null !== $click_trend ) {
 			<!-- Greeting -->
 			<p class="greeting">
 				<?php
-				/* translators: 1: Frequency label (Weekly/Monthly), 2: Site name */
 				printf(
+					/* translators: 1: Frequency label (e.g. Weekly/Monthly), 2: Site name */
 					esc_html__( "Here's your %1\$s link performance summary for %2\$s.", 'url-shortify' ),
 					'<strong>' . esc_html( $frequency_label ) . '</strong>',
 					'<strong>' . esc_html( $site_name ) . '</strong>'

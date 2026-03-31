@@ -432,3 +432,48 @@ function kc_us_update_210_enable_email_digest() {
 
 	return false;
 }
+
+/**************** 2.2.0 *******************/
+
+/**
+ * Add `r_index` column to the clicks_rotations table for split test variant tracking.
+ *
+ * Records which 0-based URL slot was served for each rotation click so split
+ * test results can be grouped by variant rather than by URL string.
+ *
+ * @since 2.2.0
+ */
+function kc_us_update_220_add_r_index_to_clicks_rotations() {
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'kc_us_clicks_rotations';
+
+	if ( ! $wpdb->query( "SHOW TABLES LIKE '{$table}'" ) ) {
+		return false;
+	}
+
+	$cols = $wpdb->get_col( "SHOW COLUMNS FROM {$table}" );
+
+	if ( ! in_array( 'r_index', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `r_index` smallint(5) UNSIGNED DEFAULT NULL AFTER `url`" );
+	}
+
+	return false;
+}
+
+/**
+ * Create the kc_us_linkmeta table if it does not exist.
+ *
+ * This table stores per-link key/value metadata.  It is used by the Broken
+ * Link Checker to persist the full JSON scan result (http_code, error message,
+ * checked_at timestamp) so the Broken Links admin table can show details beyond
+ * what the broken_link_status column on kc_us_links provides.
+ *
+ * The table was referenced by Link_Meta.php since v1.x but was never included
+ * in the schema creation routine; this migration creates it for existing installs.
+ *
+ * @since 2.2.0
+ */
+function kc_us_update_220_create_linkmeta_table() {
+	Install::create_tables( '2.2.0' );
+}

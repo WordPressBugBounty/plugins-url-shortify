@@ -14,6 +14,25 @@ class ClicksController extends BaseController {
 	public $columns = [];
 
 	/**
+	 * Return default table columns for clicks listings.
+	 *
+	 * @since 2.1.x
+	 *
+	 * @return array
+	 */
+	public static function get_table_columns() {
+		return [
+			'ip'         => [ 'title' => __( 'IP', 'url-shortify' ) ],
+			'uri'        => [ 'title' => __( 'URI', 'url-shortify' ) ],
+			'link'       => [ 'title' => __( 'Link', 'url-shortify' ) ],
+			'host'       => [ 'title' => __( 'Host', 'url-shortify' ) ],
+			'referrer'   => [ 'title' => __( 'Referrer', 'url-shortify' ) ],
+			'clicked_on' => [ 'title' => __( 'Clicked On', 'url-shortify' ) ],
+			'info'       => [ 'title' => __( 'Info', 'url-shortify' ) ],
+		];
+	}
+
+	/**
 	 * ClicksController constructor.
 	 *
 	 * @since 1.1.5
@@ -94,7 +113,7 @@ class ClicksController extends BaseController {
 
 		$td .= '</td>';
 
-		echo $td;
+		return $td;
 	}
 
 	/**
@@ -134,7 +153,7 @@ class ClicksController extends BaseController {
 
 		$td .= '</td>';
 
-		echo $td;
+		return $td;
 	}
 
 	/**
@@ -149,36 +168,68 @@ class ClicksController extends BaseController {
 		echo '<tr>';
 
 		foreach ( $this->columns as $key => $column ) {
-
-			switch ( $key ) {
-				case 'ip':
-					$this->column_ip( $click );
-					break;
-				case 'host':
-					echo '<td>' . esc_html( $click['host'] ) . '</td>';
-					break;
-				case 'referrer':
-					echo "<td class='cursor-default' title='" . esc_attr( $click['referer'] ) . "'>" . esc_html( Helper::str_limit( $click['referer'], 50 ) ) . '</td>';
-					break;
-				case 'uri':
-					echo "<td class='cursor-default' title='" . esc_url( $click['uri'] ) . "'><b>" . esc_url( Helper::str_limit( $click['uri'], 50 ) ) . '</b></td>';
-					break;
-				case 'link':
-					$link_id        = $click['link_id'];
-					$link_stats_url = Helper::get_link_action_url( $link_id, 'statistics' );
-					echo "<td><a href='" . esc_url( $link_stats_url ) . "'>" . esc_html( $click['name'] ) . '</a></td>';
-					break;
-				case 'clicked_on':
-					echo "<td data-order='" . esc_attr( $click['created_at'] ) . "'>" . esc_html( Helper::format_date_time( $click['created_at'] ) ) . '</td>';
-					break;
-				case 'info':
-					$this->column_info( $click );
-					break;
-			}
-
+			echo $this->get_column_html( $key, $click );
 		}
-
 		echo '</tr>';
+	}
+
+	/**
+	 * Return the column HTML string for a given key.
+	 *
+	 * @param string $key
+	 * @param array  $click
+	 *
+	 * @return string
+	 */
+	protected function get_column_html( $key, $click ) {
+		switch ( $key ) {
+			case 'ip':
+				return $this->column_ip( $click );
+			case 'host':
+				return '<td>' . esc_html( $click['host'] ) . '</td>';
+			case 'referrer':
+				return sprintf(
+					"<td class='cursor-default' title='%s'>%s</td>",
+					esc_attr( $click['referer'] ),
+					esc_html( Helper::str_limit( $click['referer'], 50 ) )
+				);
+			case 'uri':
+				return sprintf(
+					"<td class='cursor-default' title='%s'><b>%s</b></td>",
+					esc_url( $click['uri'] ),
+					esc_url( Helper::str_limit( $click['uri'], 50 ) )
+				);
+			case 'link':
+				$link_id        = $click['link_id'];
+				$link_stats_url = Helper::get_link_action_url( $link_id, 'statistics' );
+				return sprintf(
+					"<td><a href='%s'>%s</a></td>",
+					esc_url( $link_stats_url ),
+					esc_html( $click['name'] )
+				);
+			case 'clicked_on':
+				return "<td data-order='" . esc_attr( $click['created_at'] ) . "'>" . esc_html( Helper::format_date_time( $click['created_at'] ) ) . '</td>';
+			case 'info':
+				return $this->column_info( $click );
+			default:
+				return '<td></td>';
+		}
+	}
+
+	/**
+	 * Return the raw cell contents (without <td> wrappers).
+	 *
+	 * @param array $click
+	 *
+	 * @return array
+	 */
+	public function get_row_cells( $click = [] ) {
+		$cells = [];
+		foreach ( $this->columns as $key => $column ) {
+			$cell_html = $this->get_column_html( $key, $click );
+			$cells[]   = preg_replace( array( '/^<td[^>]*>/', '/<\/td>$/' ), '', $cell_html );
+		}
+		return $cells;
 	}
 
 	/**

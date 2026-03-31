@@ -36,7 +36,7 @@ class LinkStatsController extends StatsController {
 	 * @since 1.0.4
 	 */
 	public function render() {
-		$data = $this->prepare_data();
+		$data = $this->prepare_data( false );
 
 		$data['icon_url'] = "https://www.google.com/s2/favicons?domain={$data['url']}";
 
@@ -48,11 +48,13 @@ class LinkStatsController extends StatsController {
 	/**
 	 * Prepare data for report
 	 *
+	 * @param bool $include_click_history Keep signature compatible with parent.
+	 *
 	 * @return array|object|void|null
 	 *
 	 * @since 1.0.4
 	 */
-	public function prepare_data() {
+	public function prepare_data( $include_click_history = true ) {
 		$refresh = (int) Helper::get_request_data( 'refresh', 0 );
 
 		// If we have the data in cache, get it from it.
@@ -107,6 +109,12 @@ class LinkStatsController extends StatsController {
 		$data['country_info'] = $country_info;
 
 		$data['referrers_info'] = $this->get_referrers_info_for_graph( array( $this->link_id ) );
+
+		/**
+		 * Split test results — populated by PRO via the kc_us_get_split_test_results filter.
+		 * Returns an empty array for free users or links that don't use link-rotation.
+		 */
+		$data['split_test_results'] = apply_filters( 'kc_us_get_split_test_results', [], $this->link_id, $data );
 
 		$data['last_updated_on'] = time();
 

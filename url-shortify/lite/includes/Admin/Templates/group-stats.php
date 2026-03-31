@@ -74,15 +74,48 @@ $export_links_url = Helper::get_group_action_url( $group_id, 'export_links' );
 $click_data_for_graph = Helper::get_data( $data, 'click_data_for_graph', array() );
 
 $labels       = $values = '';
+$chart_labels = [];
+$chart_values = [];
 $total_clicks = 0;
-if ( ! empty( $click_data_for_graph ) ) {
-	$labels = json_encode( array_keys( $click_data_for_graph ) );
 
-	$clicks = array_values( $click_data_for_graph );
+$group_link_ids = [];
+if ( ! empty( $data['links'] ) && is_array( $data['links'] ) ) {
+	foreach ( $data['links'] as $link ) {
+		$group_link_ids[] = absint( Helper::get_data( $link, 'id', 0 ) );
+	}
+}
+
+$days = 7;
+switch ( $time_filter ) {
+	case 'today':
+		$days = 1;
+		break;
+	case 'last_7_days':
+		$days = 7;
+		break;
+	case 'last_30_days':
+		$days = 30;
+		break;
+	case 'last_60_days':
+		$days = 60;
+		break;
+	case 'all_time':
+		$days = 0;
+		break;
+}
+
+if ( ! empty( $click_data_for_graph ) ) {
+	$chart_labels = array_keys( $click_data_for_graph );
+
+	$clicks = array_map( 'intval', array_values( $click_data_for_graph ) );
 
 	$total_clicks = array_sum( $clicks );
 
-	$values = json_encode( $clicks );
+	$chart_values = $clicks;
+
+	$labels = wp_json_encode( $chart_labels );
+
+	$values = wp_json_encode( $chart_values );
 }
 
 $last_updated_on = Helper::get_data( $data, 'last_updated_on', time() );
@@ -143,7 +176,7 @@ $links_table_controller->set_columns( $links_columns );
 				<div class="mt-2 flex w-full border-b-2 border-gray-100">
 					<div class="w-5/12">
 						<span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Clicks History', 'url-shortify' ); ?></span>
-						<p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500 mb-2"><?php echo sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ); ?></p>
+						<p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500 mb-2"><?php echo sprintf( /* translators: %d: Total number of clicks */ __( '%d Total Clicks', 'url-shortify' ), $total_clicks ); ?></p>
 					</div>
                     <div class="w-7/12">
                          <span class="relative z-0 inline-flex shadow-sm rounded-md float-right">
@@ -403,17 +436,11 @@ $links_table_controller->set_columns( $links_columns );
 		<div class="bg-white flex-grow sm:px-4 mt-4 pt-6 pb-8">
 
 			<div>
-				<table id="clicks-data" class="display" style="width:100%">
+				<table id="clicks-data" class="display" data-server-side="true" data-link-ids="<?php echo esc_attr( implode( ',', $group_link_ids ) ); ?>" data-days="<?php echo esc_attr( $days ); ?>" style="width:100%">
 					<thead>
 					<?php $click_history->render_header(); ?>
 					</thead>
-					<tbody>
-					<?php 
-					foreach ( $clicks_data as $click ) {
-						$click_history->render_row( $click );
-					} 
-					?>
-					</tbody>
+					<tbody></tbody>
 					<tfoot>
 					<?php $click_history->render_footer(); ?>
 					</tfoot>
@@ -426,59 +453,85 @@ $links_table_controller->set_columns( $links_columns );
 </div>
 
 <script type="text/javascript">
+(function ($) {
+	$(document).ready(function () {
+		const labels = <?php echo wp_json_encode( $chart_labels ); ?>;
+		const values = <?php echo wp_json_encode( $chart_values ); ?>;
+		const target = document.querySelector('#click-chart');
 
-	(function ($) {
+		if (!target || !Array.isArray(labels) || !labels.length || !Array.isArray(values) || !values.length) {
+			return;
+		}
 
-		$(document).ready(function () {
+		if (typeof ApexCharts === 'undefined') {
+			console.error('ApexCharts is not available on this page.');
+			return;
+		}
 
-			var labels = 
-			<?php 
-			if ( ! empty( $labels ) ) {
-				echo $labels;
-			} else {
-				echo "''";
-			} 
-			?>
-			;
-
-			var values = 
-			<?php 
-			if ( ! empty( $values ) ) {
-				echo $values;
-			} else {
-				echo "''";
-			} 
-			?>
-			;
-
-			if (labels != '' && values != '') {
-				const data = {
-					labels: labels,
-					datasets: [
-						{
-							values: values
-						},
-					]
-				};
-
-				const chart = new frappe.Chart("#click-chart", {
-					title: "",
-					data: data,
-					type: 'axis-mixed',
-					colors: ['#5850ec'],
-					lineOptions: {
-						hideDots: 1,
-						regionFill: 1
-					},
-					height: 250,
-					axisOptions: {
-						xIsSeries: true
+		const options = {
+			series: [{
+				name: '<?php echo esc_js( __( 'Clicks', 'url-shortify' ) ); ?>',
+				data: values,
+			}],
+			chart: {
+				type: 'area',
+				height: 320,
+				toolbar: { show: false },
+				zoom: { enabled: false },
+				background: 'transparent',
+			},
+			dataLabels: { enabled: false },
+			stroke: { curve: 'smooth', width: 3 },
+			colors: ['#4f46e5', '#10b981'],
+			fill: {
+				type: 'gradient',
+				gradient: {
+					shadeIntensity: 0.35,
+					opacityFrom: 0.85,
+					opacityTo: 0.15,
+					stops: [0, 40, 100],
+				},
+			},
+			markers: { size: 0, hover: { sizeOffset: 4 } },
+			xaxis: {
+				type: 'category',
+				categories: labels,
+				labels: {
+					rotate: -30,
+					hideOverlappingLabels: true,
+					style: { colors: '#475569' }
+				},
+				axisBorder: { color: 'rgba(148,163,184,0.35)' },
+				axisTicks: { color: 'rgba(148,163,184,0.35)' },
+				tickAmount: 8
+			},
+			yaxis: {
+				labels: {
+					formatter: function (val) { return Math.round(val); },
+					style: { colors: '#475569' }
+				},
+				tickAmount: 6,
+				min: 0
+			},
+			tooltip: {
+				shared: true,
+				y: {
+					formatter: function (value) {
+						return value + ' <?php echo esc_js( __( 'clicks', 'url-shortify' ) ); ?>';
 					}
-				});
-			}
+				}
+			},
+			grid: {
+				borderColor: 'rgba(148,163,184,0.25)',
+				strokeDashArray: 4,
+				padding: { left: 10, right: 10 }
+			},
+		};
 
-		});
-
-	})(jQuery);
+		target.innerHTML = '';
+		const chart = new ApexCharts(target, options);
+		chart.render();
+	});
+})(jQuery);
 
 </script>

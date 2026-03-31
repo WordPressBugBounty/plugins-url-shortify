@@ -1,3 +1,16 @@
+// Apply dark mode immediately (before DOM ready) to prevent FOUC.
+(function () {
+    var mode = 'system';
+    try {
+        mode = localStorage.getItem('kc_us_theme') || 'system';
+    } catch (e) {}
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = (mode === 'dark') || (mode === 'system' && prefersDark);
+    if (isDark) {
+        document.documentElement.classList.add('kc-us-dark', 'kc-us-dark-active');
+    }
+}());
+
 (function ($) {
     'use strict';
 
@@ -58,11 +71,77 @@
 
         // Clicks Reports Datatable.
         if ($('#clicks-data').get(0)) {
-            var sortIndex = $('#clicks-data').find("th[data-key='clicked_on']")[0].cellIndex;
+            var $clicksTable = $('#clicks-data');
+            var serverSide = $clicksTable.data('server-side') === true || $clicksTable.data('server-side') === 'true';
 
-            if ($('#clicks-data').get(0)) {
-                $('#clicks-data').DataTable({
-                    order: [[sortIndex, "desc"]]
+            if (serverSide) {
+                $clicksTable.DataTable({
+                    serverSide: true,
+                    processing: true,
+                    language: {
+                        processing: "<div class='kc-us-loading-overlay'></div>"
+                    },
+                    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                    pageLength: 10,
+                    ajax: function (data, callback) {
+                        var ajaxData = $.extend({}, data, {
+                            action: 'us_handle_request',
+                            cmd: 'get_dashboard_clicks_page',
+                            security: usParams.security,
+                        });
+
+                        var linkId = $clicksTable.data('link-id');
+                        var linkIds = $clicksTable.data('link-ids');
+                        var days = $clicksTable.data('days');
+
+                        if ( linkId ) {
+                            ajaxData.link_id = linkId;
+                        }
+
+                        if ( linkIds ) {
+                            ajaxData.link_ids = linkIds;
+                        }
+
+                        if ( days ) {
+                            ajaxData.days = days;
+                        }
+
+                        $.ajax({
+                            url: usParams.ajaxurl,
+                            method: 'POST',
+                            dataType: 'json',
+                            data: ajaxData,
+                            success: function (response) {
+                                var payload = { draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+                                if (response && response.success && response.data) {
+                                    payload.draw = response.data.draw || data.draw;
+                                    payload.recordsTotal = response.data.recordsTotal || 0;
+                                    payload.recordsFiltered = response.data.recordsFiltered || 0;
+                                    payload.data = response.data.data || [];
+                                }
+                                callback(payload);
+                            },
+                            error: function (xhr, status, err) {
+                                console.error('Clicks table ajax error:', status, err);
+                                callback({ draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
+                            }
+                        });
+                    },
+                    order: [[5, 'desc']],
+                    columns: [
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: true },
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: true },
+                        { orderable: false },
+                    ],
+                });
+            } else {
+                var sortIndex = $clicksTable.find("th[data-key='clicked_on']")[0] ? $clicksTable.find("th[data-key='clicked_on']")[0].cellIndex : 0;
+                $clicksTable.DataTable({
+                    order: [[sortIndex, 'desc']]
                 });
             }
         }
@@ -459,42 +538,151 @@
 
     /* ========  themeSwitcher start ========= */
 
-    // themeSwitcher
-    const themeSwitcher = document.getElementById('themeSwitcher');
+    /**
+     * 3-state theme switcher: light / dark / system
+     * Scoped to URL Shortify admin pages only via #wpbody-content.kc-us-dark
+     */
+    var kcUsTheme = {
+        STORAGE_KEY: 'kc_us_theme',
+        root: document.getElementById('wpbody-content'),
+        labels: {
+            light: 'Light',
+            dark: 'Dark',
+            system: 'System'
+        },
+        icons: {
+            light: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
+        },
 
-    // Theme Vars
-    const userTheme = localStorage.getItem('theme');
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        get: function () {
+            try {
+                return localStorage.getItem(this.STORAGE_KEY) || 'system';
+            } catch (e) {
+                return 'system';
+            }
+        },
 
-    // Initial Theme Check
-    const themeCheck = () => {
-        if (userTheme === 'dark' || (!userTheme && systemTheme)) {
-            document.documentElement.classList.add('dark');
-            return;
+        set: function (mode) {
+            try {
+                localStorage.setItem(this.STORAGE_KEY, mode);
+            } catch (e) {}
+            this.apply(mode);
+            this.updateToggle(mode);
+        },
+
+        apply: function (mode) {
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var isDark = (mode === 'dark') || (mode === 'system' && prefersDark);
+            if (isDark) {
+                document.documentElement.classList.add('kc-us-dark', 'kc-us-dark-active');
+                if (this.root) {
+                    this.root.classList.add('kc-us-dark');
+                }
+                if (document.body) {
+                    document.body.classList.add('kc-us-dark-active');
+                }
+            } else {
+                document.documentElement.classList.remove('kc-us-dark', 'kc-us-dark-active');
+                if (this.root) {
+                    this.root.classList.remove('kc-us-dark');
+                }
+                if (document.body) {
+                    document.body.classList.remove('kc-us-dark-active');
+                }
+            }
+        },
+
+        renderCurrent: function (mode) {
+            return this.icons[mode] + '<span class="kc-us-theme-current-label">' + this.labels[mode] + '</span><span class="kc-us-theme-current-caret"></span>';
+        },
+
+        updateToggle: function (mode) {
+            var currentBtn = document.querySelector('.kc-us-theme-current');
+            if (currentBtn) {
+                currentBtn.innerHTML = this.renderCurrent(mode);
+            }
+
+            var btns = document.querySelectorAll('.kc-us-theme-option');
+            btns.forEach(function (btn) {
+                if (btn.dataset.theme === mode) {
+                    btn.classList.add('is-active');
+                } else {
+                    btn.classList.remove('is-active');
+                }
+            });
+        },
+
+        toggleMenu: function (force) {
+            var toggle = document.getElementById('kc-us-theme-toggle');
+            if (!toggle) { return; }
+            var isOpen = toggle.classList.contains('is-open');
+            var next = (typeof force === 'boolean') ? force : !isOpen;
+            toggle.classList.toggle('is-open', next);
+            var currentBtn = toggle.querySelector('.kc-us-theme-current');
+            if (currentBtn) {
+                currentBtn.setAttribute('aria-expanded', next ? 'true' : 'false');
+            }
+        },
+
+        injectToggle: function () {
+            if (document.getElementById('kc-us-theme-toggle')) { return; }
+            var html = '<div id="kc-us-theme-toggle" class="kc-us-theme-toggle">' +
+                '<button type="button" class="kc-us-theme-current" aria-haspopup="true" aria-expanded="false" title="Switch theme"></button>' +
+                '<div class="kc-us-theme-menu" role="menu">' +
+                    '<button type="button" class="kc-us-theme-option" data-theme="light" role="menuitem">' + this.icons.light + '<span>' + this.labels.light + '</span></button>' +
+                    '<button type="button" class="kc-us-theme-option" data-theme="dark" role="menuitem">' + this.icons.dark + '<span>' + this.labels.dark + '</span></button>' +
+                    '<button type="button" class="kc-us-theme-option" data-theme="system" role="menuitem">' + this.icons.system + '<span>' + this.labels.system + '</span></button>' +
+                '</div>' +
+            '</div>';
+            document.body.insertAdjacentHTML('beforeend', html);
+
+            var self = this;
+            var currentBtn = document.querySelector('.kc-us-theme-current');
+            if (currentBtn) {
+                currentBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    self.toggleMenu();
+                });
+            }
+
+            document.querySelectorAll('.kc-us-theme-option').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    self.set(btn.dataset.theme);
+                    self.toggleMenu(false);
+                });
+            });
+
+            document.addEventListener('click', function () {
+                self.toggleMenu(false);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    self.toggleMenu(false);
+                }
+            });
+        },
+
+        init: function () {
+            var mode = this.get();
+            this.apply(mode);
+            this.injectToggle();
+            this.updateToggle(mode);
+
+            // React to OS-level preference changes when in system mode
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+                if (kcUsTheme.get() === 'system') {
+                    kcUsTheme.apply('system');
+                }
+            });
         }
     };
 
-    // Manual Theme Switch
-    const themeSwitch = () => {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-            return;
-        }
+    kcUsTheme.init();
 
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-    };
-
-    if (themeSwitcher) {
-        // call theme switch on clicking buttons
-        themeSwitcher.addEventListener('click', () => {
-            themeSwitch();
-        });
-
-        // invoke theme check on initial load
-        themeCheck();
-    }
     /* ========  themeSwitcher End ========= */
 
 })(jQuery);
@@ -539,4 +727,332 @@ jQuery(document).on('click', '.us-star-toggle', function() {
             alert(response.data.message);
         }
     });
+});
+
+jQuery(window).ready(function () {
+});
+
+window.usSplineChart = window.usSplineChart || null;
+window.usHeatmapChart = window.usHeatmapChart || null;
+
+// Wrap your code to ensure $ is recognized as jQuery
+ jQuery(document).ready(function($) {
+    'use strict';
+
+    if ( typeof us_chart_data === 'undefined' ) {
+        return;
+    }
+
+    var chartDataAvailable = Array.isArray(us_chart_data.dates) && us_chart_data.dates.length;
+    if ( $('#spline-area-chart').length && chartDataAvailable ) {
+        var splineContainer = document.querySelector("#spline-area-chart");
+        
+        // Show skeleton loader
+        splineContainer.classList.add('loading');
+        splineContainer.innerHTML = '<div class="chart-skeleton">' +
+            '<div class="skeleton-line"></div>' +
+            '<div class="skeleton-line"></div>' +
+            '<div class="skeleton-line"></div>' +
+            '<div class="skeleton-line"></div>' +
+            '<div class="skeleton-line"></div>' +
+            '</div>';
+        
+        if ( window.usSplineChart instanceof ApexCharts ) {
+            window.usSplineChart.destroy();
+        }
+        var splineOptions = {
+            series: [
+                { name: 'Total Clicks', data: us_chart_data.total_series },
+                { name: 'Unique Clicks', data: us_chart_data.unique_series }
+            ],
+            chart: {
+                height: 260,
+                type: 'area',
+                toolbar: { show: false },
+                foreColor: '#475569',
+                background: 'transparent',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: {
+                        enabled: true,
+                        delay: 150
+                    },
+                    dynamicAnimation: {
+                        enabled: true,
+                        speed: 350
+                    }
+                }
+            },
+            stroke: { curve: 'smooth', width: 3 },
+            dataLabels: { enabled: false },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'light',
+                    gradientToColors: ['#a78bfa', '#34d399'],
+                    shadeIntensity: 0.75,
+                    opacityFrom: 0.9,
+                    opacityTo: 0.25,
+                    stops: [0, 60, 100]
+                }
+            },
+            markers: { 
+                size: 0, 
+                hover: { sizeOffset: 6 },
+                shape: 'circle'
+            },
+            xaxis: {
+                type: 'datetime',
+                categories: us_chart_data.dates,
+                labels: { style: { colors: '#94a3b8' } },
+                axisBorder: { show: true, color: 'rgba(148,163,184,0.4)' },
+                axisTicks: { color: 'rgba(148,163,184,0.4)' }
+            },
+            yaxis: {
+                labels: { style: { colors: '#94a3b8' } },
+                tickAmount: 4
+            },
+            colors: ['#6366f1', '#34d399'],
+            grid: {
+                borderColor: 'rgba(148,163,184,0.25)',
+                strokeDashArray: 4
+            },
+            tooltip: {
+                theme: 'dark',
+                marker: { show: true },
+                y: {
+                    formatter: function (value) {
+                        return value.toLocaleString() + ' clicks';
+                    }
+                }
+            }
+        };
+        
+        // Render chart and hide loading skeleton
+        splineContainer.innerHTML = '';
+        splineContainer.classList.remove('loading');
+        window.usSplineChart = new ApexCharts(splineContainer, splineOptions);
+        window.usSplineChart.render();
+    }
+
+    var heatmapSeriesReady = Array.isArray(us_chart_data.heatmap_series) && us_chart_data.heatmap_series.length;
+    var heatmapHasClicksData = !!us_chart_data.has_clicks_data;
+    var heatmapCategories = Array.isArray(us_chart_data.heatmap_week_starts) ? us_chart_data.heatmap_week_starts : [];
+    var heatmapMonthLabels = Array.isArray(us_chart_data.heatmap_month_labels) ? us_chart_data.heatmap_month_labels : [];
+    var dayLabels = Array.isArray(us_chart_data.heatmap_day_labels) ? us_chart_data.heatmap_day_labels : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    var heatmapColorRanges = Array.isArray(us_chart_data.heatmap_color_ranges) ? us_chart_data.heatmap_color_ranges : [];
+    if ( $('#activity-heatmap').length && heatmapSeriesReady && heatmapHasClicksData ) {
+        if ( window.usHeatmapChart instanceof ApexCharts ) {
+            window.usHeatmapChart.destroy();
+        }
+        var heatmapOptions = {
+            series: us_chart_data.heatmap_series,
+            chart: {
+                height: 260,
+                type: 'heatmap',
+                toolbar: { show: false },
+                background: 'transparent',
+                events: {
+                    // Handle legend hover for better highlighting
+                    legendClick: function(chartContext, seriesIndex) {
+                        // Prevent default toggle behavior
+                        return false;
+                    }
+                }
+            },
+            legend: {
+                show: true,
+                position: 'bottom',
+                horizontalAlign: 'center',
+                floating: false,
+                fontSize: 12,
+                markers: {
+                    width: 12,
+                    height: 12,
+                    radius: 2,
+                    strokeWidth: 0
+                },
+                itemMargin: {
+                    horizontal: 8,
+                    vertical: 4
+                },
+                onItemHover: {
+                    highlightDataSeries: true
+                },
+                onItemClick: {
+                    toggleDataSeries: false
+                }
+            },
+            plotOptions: {
+                heatmap: {
+                    shadeIntensity: 0.6,
+                    radius: 4,
+                    distributed: false,
+                    enableShades: true,
+                    useFillColorAsStroke: true,
+                    strokeWidth: 3,
+                    strokeColor: '#ffffff',
+                    cellHeight: 18,
+                    colorScale: {
+                        ranges: heatmapColorRanges.length > 0 ? heatmapColorRanges : [
+                            { from: 0, to: 0, color: '#f0fdf4', name: '0 clicks' },
+                            { from: 1, to: 10, color: '#d3fcca', name: '1-10 clicks' }
+                        ]
+                    }
+                }
+            },
+            dataLabels: { enabled: false },
+            tooltip: {
+                theme: 'dark',
+                shared: false,
+                intersect: true,
+                x: {
+                    formatter: function (value, opts) {
+                        var seriesIndex = opts && opts.seriesIndex ? opts.seriesIndex : 0;
+                        var dataPointIndex = opts && opts.dataPointIndex ? opts.dataPointIndex : 0;
+                        var metaPoint = us_chart_data.heatmap_series[ seriesIndex ] && us_chart_data.heatmap_series[ seriesIndex ].data[ dataPointIndex ];
+                        var dateValue = metaPoint && metaPoint.meta ? metaPoint.meta : value;
+                        return dateValue ? new Date(dateValue).toLocaleDateString() : value;
+                    }
+                },
+                y: {
+                    formatter: function (value) {
+                        return value + ' clicks';
+                    }
+                }
+            },
+            states: {
+                // Enhanced hover effect
+                hover: {
+                    filter: {
+                        type: 'darken',
+                        value: 0.25
+                    }
+                },
+                active: {
+                    filter: {
+                        type: 'darken',
+                        value: 0.15
+                    }
+                }
+            },
+            grid: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
+                },
+                borderColor: 'transparent'
+            },
+            xaxis: {
+                type: 'category',
+                categories: heatmapCategories,
+                tickPlacement: 'between',
+                labels: { show: false },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                opposite: false,
+                labels: { show: false },
+                categories: dayLabels
+            }
+        };
+        var heatmapContainer = document.querySelector("#activity-heatmap");
+        if ( heatmapContainer ) {
+            heatmapContainer.innerHTML = '';
+            window.usHeatmapChart = new ApexCharts(heatmapContainer, heatmapOptions);
+            window.usHeatmapChart.render();
+
+            // Add custom legend interaction handling
+            var legendItems = heatmapContainer.querySelectorAll('.apexcharts-legend-series');
+            legendItems.forEach(function(item, index) {
+                item.addEventListener('mouseenter', function() {
+                    // Get the range for this legend item
+                    var range = heatmapColorRanges[index];
+                    if (!range) return;
+
+                    // Get the color from range
+                    var rangeColor = range.color || '#22c55e';
+
+                    // Highlight cells in this range
+                    var allRects = heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect');
+                    allRects.forEach(function(rect) {
+                        var cellValue = parseInt(rect.getAttribute('val')) || 0;
+                        // Check if cell value is in this range
+                        var isInRange = cellValue >= range.from && cellValue <= range.to;
+                        
+                        if (isInRange) {
+                            rect.style.strokeWidth = '4';
+                            rect.style.filter = 'saturate(1.5) brightness(1.1)';
+                            
+                            // Add glow effect using box-shadow with range color
+                            var rgb = hexToRgb(rangeColor);
+                            rect.style.boxShadow = '0 0 6px 2px rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ', 0.6)';
+                            
+                            rect.classList.add('active-highlight');
+                            rect.classList.remove('inactive');
+                        } else {
+                            rect.classList.add('inactive');
+                            rect.classList.remove('active-highlight');
+                            rect.style.boxShadow = 'none';
+                        }
+                    });
+
+                    // Highlight the legend item
+                    item.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                    item.style.fontWeight = '600';
+                    item.style.borderLeft = '3px solid ' + rangeColor;
+                    item.style.paddingLeft = '5px';
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    // Reset all cells
+                    var allRects = heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect');
+                    allRects.forEach(function(rect) {
+                        rect.style.strokeWidth = '3';
+                        rect.style.filter = 'none';
+                        rect.style.boxShadow = 'none';
+                        rect.classList.remove('inactive');
+                        rect.classList.remove('active-highlight');
+                    });
+
+                    // Reset legend item
+                    item.style.backgroundColor = 'transparent';
+                    item.style.fontWeight = '400';
+                    item.style.borderLeft = 'none';
+                    item.style.paddingLeft = '0px';
+                });
+            });
+
+            // Helper function to convert hex color to RGB
+            function hexToRgb(hex) {
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : { r: 34, g: 197, b: 94 };
+            }
+        }
+        var heatmapMonthContainer = document.querySelector('#heatmap-month-row');
+        if ( heatmapMonthContainer ) {
+            if ( heatmapMonthLabels.length ) {
+                heatmapMonthContainer.style.gridTemplateColumns = 'repeat(' + heatmapMonthLabels.length + ', minmax(0, 1fr))';
+                heatmapMonthContainer.innerHTML = heatmapMonthLabels.map(function(label) {
+                    var classes = 'kc-us-heatmap-month';
+                    if ( label ) {
+                        classes += ' kc-us-heatmap-month--label';
+                    }
+                    return '<span class="' + classes + '">' + ( label ? label : '&nbsp;' ) + '</span>';
+                }).join('');
+            } else {
+                heatmapMonthContainer.innerHTML = '';
+            }
+        }
+    }
 });

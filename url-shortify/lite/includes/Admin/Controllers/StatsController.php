@@ -23,14 +23,16 @@ class StatsController extends BaseController {
 	 * @return array|object|void|null
 	 *
 	 */
-	public function prepare_data() {
+	public function prepare_data( $include_click_history = true ) {
 
-		// Click History for last 7 days
-		$days = apply_filters( 'kc_us_clicks_info_for_days', 3 );
+		if ( $include_click_history ) {
+			// Keep in sync with Ajax dashboard table (defaults to 12 months).
+			$days = apply_filters( 'kc_us_clicks_info_for_days', 365 );
 
-		$clicks_data = $this->get_clicks_info( $days );
+			$clicks_data = $this->get_clicks_info( $days );
 
-		$data['reports']['clicks'] = $clicks_data;
+			$data['reports']['clicks'] = $clicks_data;
+		}
 
 		$days = apply_filters( 'kc_us_clicks_count_for_days', 7 );
 
