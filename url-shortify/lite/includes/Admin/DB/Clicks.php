@@ -299,7 +299,7 @@ class Clicks extends Base_DB {
 
 		$filter = $this->build_dashboard_where_clause( $days, $search, $link_ids );
 
-		$query = "SELECT COUNT(*) FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links {$filter['where']}";
+		$query = "SELECT COUNT(*) FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links ON clicks.link_id = links.id {$filter['where']}";
 
 		$args = $filter['args'];
 
@@ -334,7 +334,7 @@ class Clicks extends Base_DB {
 		$order_by    = in_array( $order_by, [ 'ip', 'uri', 'name', 'host', 'referer', 'created_at' ], true ) ? $order_by : 'created_at';
 		$order_dir   = 'ASC' === strtoupper( $order_dir ) ? 'ASC' : 'DESC';
 
-		$query = "SELECT clicks.*, links.name as name FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links {$filter['where']} ORDER BY {$order_by} {$order_dir} LIMIT %d OFFSET %d";
+		$query = "SELECT clicks.*, links.name as name FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links ON clicks.link_id = links.id {$filter['where']} ORDER BY {$order_by} {$order_dir} LIMIT %d OFFSET %d";
 
 		$args = array_merge( $filter['args'], [ $length, $offset ] );
 

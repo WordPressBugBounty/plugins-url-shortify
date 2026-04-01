@@ -277,11 +277,17 @@ if ( null !== $click_trend ) {
                 </div>
             <?php endif; ?>
 
-			<?php if ( $is_pro ) : ?>
 			<!-- ====================================================== -->
-			<!-- PRO: TOP PERFORMING LINKS                               -->
+			<!-- TOP PERFORMING LINKS (PRO: full · Free: teaser)         -->
 			<!-- ====================================================== -->
-			<?php if ( ! empty( $top_links ) ) : ?>
+			<?php
+			// For free users show the table only when there are at least 4 top links,
+			// so we can lock #1–3 and reveal #4 as a genuine teaser.
+			$free_teaser = ! $is_pro && count( $top_links ) >= 4;
+			if ( ( $is_pro && ! empty( $top_links ) ) || $free_teaser ) :
+				// Free users: display rows 1–4 only (3 locked + 1 visible).
+				$display_links = $is_pro ? $top_links : array_slice( $top_links, 0, 4 );
+			?>
 			<div style="margin-top:28px;margin-bottom:28px;">
 				<p class="section-title"><?php esc_html_e( 'Top Performing Links', 'url-shortify' ); ?></p>
 				<table class="data-table" cellpadding="0" cellspacing="0" border="0">
@@ -294,16 +300,30 @@ if ( null !== $click_trend ) {
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ( $top_links as $i => $link ) :
-							$rank         = $i + 1;
-							$link_id      = isset( $link->id ) ? (int) $link->id : 0;
-							$destination  = isset( $link->url ) ? $link->url : '';
-							$slug         = isset( $link->slug ) ? $link->slug : '';
-							$link_name    = ! empty( $link->name ) ? $link->name : '';
-							$clicks       = isset( $link->clicks ) ? (int) $link->clicks : 0;
-							$stats_url    = $link_id ? \KaizenCoders\URL_Shortify\Helper::create_link_stats_url( $link_id ) : '';
+						<?php foreach ( $display_links as $i => $link ) :
+							$rank        = $i + 1;
+							$is_locked   = ! $is_pro && $rank <= 3;
+							$link_id     = isset( $link->id ) ? (int) $link->id : 0;
+							$destination = isset( $link->url ) ? $link->url : '';
+							$slug        = isset( $link->slug ) ? $link->slug : '';
+							$link_name   = ! empty( $link->name ) ? $link->name : '';
+							$clicks      = isset( $link->clicks ) ? (int) $link->clicks : 0;
+							$stats_url   = ( ! $is_locked && $link_id ) ? \KaizenCoders\URL_Shortify\Helper::create_link_stats_url( $link_id ) : '';
 							$display_dest = strlen( $destination ) > 50 ? substr( $destination, 0, 47 ) . '...' : $destination;
 						?>
+						<?php if ( $is_locked ) : ?>
+						<tr>
+							<td style="vertical-align:middle;padding-top:12px;padding-bottom:12px;">
+								<span class="rank-badge top"><?php echo esc_html( $rank ); ?></span>
+							</td>
+							<td class="url-cell" colspan="2" style="vertical-align:middle;">
+								<span style="display:inline-block;background-color:#f3f4f6;color:#9ca3af;font-size:12px;font-weight:600;letter-spacing:3px;padding:4px 10px;border-radius:4px;">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span>
+							</td>
+							<td class="right" style="vertical-align:middle;padding-top:12px;">
+								<span style="display:inline-block;background-color:#f3f4f6;color:#d1d5db;font-size:12px;font-weight:700;letter-spacing:2px;padding:2px 6px;border-radius:3px;">•••</span>
+							</td>
+						</tr>
+						<?php else : ?>
 						<tr>
 							<td style="vertical-align:top;padding-top:12px;">
 								<span class="rank-badge <?php echo $rank <= 3 ? 'top' : ''; ?>"><?php echo esc_html( $rank ); ?></span>
@@ -311,24 +331,29 @@ if ( null !== $click_trend ) {
 							<td class="url-cell">
 								<?php if ( ! empty( $stats_url ) ) : ?>
 								<a href="<?php echo esc_url( $stats_url ); ?>" style="font-size:13px;font-weight:600;color:#2563eb;text-decoration:none;display:block;margin-bottom:2px;"><?php echo esc_html( $link_name ); ?></a>
+								<?php else : ?>
+								<span style="font-size:13px;font-weight:600;color:#111827;display:block;margin-bottom:2px;"><?php echo esc_html( $link_name ); ?></span>
 								<?php endif; ?>
 								<span class="url-destination" title="<?php echo esc_attr( $slug ); ?>">/<?php echo esc_html( $slug ); ?></span>
 							</td>
-                            <td class="url-cell">
-                                <?php if ( ! empty( $destination ) ) : ?>
-                                    <a href="<?php echo esc_url( $destination ); ?>" style="font-size:13px;font-weight:600;color:#2563eb;text-decoration:none;display:block;margin-bottom:2px;"><?php echo esc_html( $destination ); ?></a>
-                                <?php endif; ?>
-                            </td>
+							<td class="url-cell">
+								<?php if ( ! empty( $destination ) ) : ?>
+								<a href="<?php echo esc_url( $destination ); ?>" style="font-size:13px;color:#2563eb;text-decoration:none;display:block;margin-bottom:2px;"><?php echo esc_html( $display_dest ); ?></a>
+								<?php endif; ?>
+							</td>
 							<td class="right" style="vertical-align:top;padding-top:12px;">
 								<span class="clicks-count"><?php echo esc_html( number_format_i18n( $clicks ) ); ?></span>
 							</td>
 						</tr>
+						<?php endif; ?>
 						<?php endforeach; ?>
 					</tbody>
 				</table>
-			</div>
-			<?php endif; ?>
 
+			</div>
+			<?php endif; // end top links ?>
+
+			<?php if ( $is_pro ) : ?>
 			<!-- PRO: TOP LOCATIONS -->
 			<?php if ( ! empty( $top_locations ) ) : ?>
 			<div style="margin-top:28px;margin-bottom:28px;">
@@ -385,12 +410,7 @@ if ( null !== $click_trend ) {
 			</div>
 			<?php endif; ?>
 
-			<?php else : ?>
-
-
-
-
-			<?php endif; // end free/pro ?>
+			<?php endif; // end $is_pro ?>
 
 			<!-- No data message -->
 			<?php if ( 0 === $new_links && 0 === $total_clicks ) : ?>

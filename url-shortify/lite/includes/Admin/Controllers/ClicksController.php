@@ -131,7 +131,7 @@ class ClicksController extends BaseController {
 
 		$td = '';
 
-		$td .= "<td data-search='" . $device . '|' . $browser . "'";
+		$td .= "<td data-search='" . $device . '|' . $browser . "'>";
 
 		$td .= "<span class='flex inline'>";
 

@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 2.2
+Stable tag: 2.2.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -482,16 +482,17 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.2 =
+= 2.2.1 =
 
-* New: Added support for the A/B Testing. [Learn More](https://docs.kaizencoders.com/url-shortify/ab-testing) **PRO**
-* New: Update dashboard with the clicks heatmap to visualize clicks by time of day and day of week. **PRO**
-* New: Added support for the Dark mode theme.
-* Fix: Broken Link Checker not showing broken links in the list. **PRO**
-* Update: Compatibility with WordPress 6.9.4
-* Translations: Updated .POT file for new translations
+* Fix: Fixed the issue of showing incorrect click count in link clicks details page.
+* Fix: Improve UI and fixed datatables.
 
 == Changelog ==
+
+= 2.2.1 [2026-04-01] =
+
+* Fix: Fixed the issue of showing incorrect click count in link clicks details page.
+* Fix: Improve UI and fixed datatables.
 
 = 2.2 [2026-03-31] =
 

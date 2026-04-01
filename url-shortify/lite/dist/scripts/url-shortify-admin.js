@@ -84,33 +84,38 @@
                     lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                     pageLength: 10,
                     ajax: function (data, callback) {
-                        var ajaxData = $.extend({}, data, {
+                        var postData = {
                             action: 'us_handle_request',
                             cmd: 'get_dashboard_clicks_page',
                             security: usParams.security,
-                        });
+                            draw: data.draw,
+                            start: data.start,
+                            length: data.length,
+                            order: data.order,
+                            search: data.search,
+                        };
 
                         var linkId = $clicksTable.data('link-id');
                         var linkIds = $clicksTable.data('link-ids');
                         var days = $clicksTable.data('days');
 
                         if ( linkId ) {
-                            ajaxData.link_id = linkId;
+                            postData.link_id = linkId;
                         }
 
                         if ( linkIds ) {
-                            ajaxData.link_ids = linkIds;
+                            postData.link_ids = linkIds;
                         }
 
                         if ( days ) {
-                            ajaxData.days = days;
+                            postData.days = days;
                         }
 
                         $.ajax({
                             url: usParams.ajaxurl,
                             method: 'POST',
                             dataType: 'json',
-                            data: ajaxData,
+                            data: postData,
                             success: function (response) {
                                 var payload = { draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
                                 if (response && response.success && response.data) {
@@ -129,13 +134,13 @@
                     },
                     order: [[5, 'desc']],
                     columns: [
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: true },
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: true },
-                        { orderable: false },
+                        { data: 0, orderable: false },
+                        { data: 1, orderable: false },
+                        { data: 2, orderable: true },
+                        { data: 3, orderable: false },
+                        { data: 4, orderable: false },
+                        { data: 5, orderable: true },
+                        { data: 6, orderable: false },
                     ],
                 });
             } else {

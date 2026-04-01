@@ -173,7 +173,7 @@ class Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		$version = $this->plugin->get_version();
+		$version = KC_US_PLUGIN_VERSION;
 		if(defined('KC_US_DEV_MODE') && KC_US_DEV_MODE) {
 			$version = time();
 		}

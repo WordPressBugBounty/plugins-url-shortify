@@ -7,8 +7,8 @@ class ReportGenerator {
 	/**
 	 * Generate report data.
 	 *
-	 * @param string $frequency  'daily', 'weekly', or 'monthly'.
-	 * @param bool   $is_preview Whether this is a preview (uses last 7 days regardless).
+	 * @param  string  $frequency   'daily', 'weekly', or 'monthly'.
+	 * @param  bool    $is_preview  Whether this is a preview (uses last 7 days regardless).
 	 *
 	 * @return array
 	 */
@@ -22,29 +22,29 @@ class ReportGenerator {
 		$click_trend  = $this->get_click_trend( $start, $end, $total_clicks, $is_preview );
 
 		return [
-			'start_date'        => $start,
-			'end_date'          => $end,
-			'date_range_label'  => date( 'M j, Y', $start ) . ' – ' . date( 'M j, Y', $end ),
-			'frequency'         => $frequency,
-			'is_preview'        => $is_preview,
-			'site_name'         => get_bloginfo( 'name' ),
-			'site_url'          => home_url(),
-			'new_links'         => $this->get_new_links_count( $start, $end ),
-			'total_clicks'      => $total_clicks,
-			'click_trend'       => $click_trend,
-			'top_locations'     => $this->get_top_locations( $start, $end ),
-			'top_devices'       => $this->get_top_devices( $start, $end ),
-			'top_links'         => $this->get_top_links( $start, $end ),
-			'recent_links'      => $this->get_recent_links( $start, $end ),
-			'news_items'        => $this->get_news_items(),
+			'start_date'       => $start,
+			'end_date'         => $end,
+			'date_range_label' => date( 'M j, Y', $start ) . ' – ' . date( 'M j, Y', $end ),
+			'frequency'        => $frequency,
+			'is_preview'       => $is_preview,
+			'site_name'        => get_bloginfo( 'name' ),
+			'site_url'         => home_url(),
+			'new_links'        => $this->get_new_links_count( $start, $end ),
+			'total_clicks'     => $total_clicks,
+			'click_trend'      => $click_trend,
+			'top_locations'    => $this->get_top_locations( $start, $end ),
+			'top_devices'      => $this->get_top_devices( $start, $end ),
+			'top_links'        => $this->get_top_links( $start, $end ),
+			'recent_links'     => $this->get_recent_links( $start, $end ),
+			'news_items'       => $this->get_news_items(),
 		];
 	}
 
 	/**
 	 * Get time range based on frequency.
 	 *
-	 * @param string $frequency
-	 * @param bool   $is_preview
+	 * @param  string  $frequency
+	 * @param  bool    $is_preview
 	 *
 	 * @return array [ start_timestamp, end_timestamp ]
 	 */
@@ -52,6 +52,7 @@ class ReportGenerator {
 		if ( $is_preview ) {
 			$end   = current_time( 'timestamp' );
 			$start = $end - 7 * DAY_IN_SECONDS;
+
 			return [ $start, $end ];
 		}
 
@@ -116,10 +117,10 @@ class ReportGenerator {
 	 * Returns an integer (can be negative), or null when not applicable
 	 * (preview mode, or both periods have zero clicks).
 	 *
-	 * @param int  $start         Current period start timestamp.
-	 * @param int  $end           Current period end timestamp.
-	 * @param int  $curr_clicks   Already-fetched current period click count.
-	 * @param bool $is_preview    Skip trend for preview sends.
+	 * @param  int   $start        Current period start timestamp.
+	 * @param  int   $end          Current period end timestamp.
+	 * @param  int   $curr_clicks  Already-fetched current period click count.
+	 * @param  bool  $is_preview   Skip trend for preview sends.
 	 *
 	 * @return int|null
 	 */
@@ -228,9 +229,48 @@ class ReportGenerator {
 				'url'         => 'https://docs.kaizencoders.com/url-shortify/how-to-setup-auto-link-keywords',
 				'url_label'   => __( 'Learn more →', 'url-shortify' ),
 			],
+
+			[
+				'badge'       => 'Announcement',
+				'title'       => __( 'REST API is available since URL Shortify 2.0', 'url-shortify' ),
+				'description' => __( 'Generate short links programatically using URL Shortify API.', 'url-shortify' ),
+				'url'         => 'https://docs.kaizencoders.com/url-shortify/api-reference',
+				'url_label'   => __( 'Learn more →', 'url-shortify' ),
+			],
+
+			[
+				'badge'       => 'Tip',
+				'title'       => __( 'Monitor WordPress Activity using Logify', 'url-shortify' ),
+				'description' => __( 'Gain clear insights into events happening on your site, track changes effortlessly, and ensure accountability.', 'url-shortify' ),
+				'url'         => 'https://kaizencoders.com/logify',
+				'url_label'   => __( 'Learn more →', 'url-shortify' ),
+			],
+			[
+				'badge'       => 'Tip',
+				'title'       => __( 'Do you want passwordless login for your WordPress site?', 'url-shortify' ),
+				'description' => __( 'Say goodbye to forgotten passwords. Enable a secure, passwordless login experience for your WordPress site using Magic Link', 'url-shortify' ),
+				'url'         => 'https://wordpress.org/plugins/magic-link/',
+				'url_label'   => __( 'Learn more →', 'url-shortify' ),
+			],
+
+			[
+				'badge'       => 'Tip',
+				'title'       => __( 'Ever wanted to do search and replace in WordPress?', 'url-shortify' ),
+				'description' => __( 'Search & Replace Everything – Quick and Easy Way to Find and Replace Text, Links using Update URLS', 'url-shortify' ),
+				'url'         => 'https://wordpress.org/plugins/update-urls/',
+				'url_label'   => __( 'Learn more →', 'url-shortify' ),
+			],
+
+			[
+				'badge'       => 'Tip',
+				'title'       => __( 'See When Your Links Come Alive — Link Activity Intensity Heatmap', 'url-shortify' ),
+				'description' => __( 'Numbers tell you how many clicks you got. The Link Activity Intensity heatmap tells you when — at a glance, across an entire year.', 'url-shortify' ),
+				'url'         => 'https://docs.kaizencoders.com/url-shortify/link-activity-intensity-heatmap',
+				'url_label'   => __( 'Learn more →', 'url-shortify' ),
+			],
 		];
 
-		$items = [$items[array_rand($items)]];
+		$items = [ $items[ array_rand( $items ) ] ];
 
 		return (array) apply_filters( 'kc_us_email_digest_news_items', $items );
 	}
