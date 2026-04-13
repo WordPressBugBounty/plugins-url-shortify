@@ -19,9 +19,13 @@ if ( empty( $time_filter ) ) {
 	$time_filter = ( US()->is_pro() ) ? 'all_time' : 'last_7_days';
 }
 
-if ( empty( $time_filter ) ) {
-	$time_filter = ( US()->is_pro() ) ? 'all_time' : 'last_7_days';
+// Custom date filter is PRO-only; fall back gracefully for free users.
+if ( 'custom' === $time_filter && ! US()->is_pro() ) {
+	$time_filter = 'last_7_days';
 }
+
+$current_start_date = ( 'custom' === $time_filter ) ? Helper::get_data( $_GET, 'start_date', '' ) : '';
+$current_end_date   = ( 'custom' === $time_filter ) ? Helper::get_data( $_GET, 'end_date', '' ) : '';
 
 $buttons = [
 	'today' => [
@@ -100,6 +104,7 @@ switch ( $time_filter ) {
 		$days = 60;
 		break;
 	case 'all_time':
+	case 'custom':
 		$days = 0;
 		break;
 }
@@ -173,25 +178,59 @@ $links_table_controller->set_columns( $links_columns );
 		<!-- Click History Report -->
 		<div class="mt-5">
 			<div class="grid grid-cols-1">
-				<div class="mt-2 flex w-full border-b-2 border-gray-100">
-					<div class="w-5/12">
+				<div class="mt-2 flex w-full items-center justify-between border-b-2 border-gray-100 pb-4">
+					<div>
 						<span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Clicks History', 'url-shortify' ); ?></span>
 						<p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500 mb-2"><?php echo sprintf( /* translators: %d: Total number of clicks */ __( '%d Total Clicks', 'url-shortify' ), $total_clicks ); ?></p>
 					</div>
-                    <div class="w-7/12">
-                         <span class="relative z-0 inline-flex shadow-sm rounded-md float-right">
-                              <?php foreach ($buttons as $key => $button) { ?>
-                                  <button type="button" class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-green-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 <?php if ( 'active' === $button['class'] ) { echo "bg-green-100 hover:bg-green-100"; } else { echo "bg-white"; } ?>">
-                                        <a href="<?php echo $button['url']; ?>" id="kc-us-7-days" class="text-black hover:text-black"><?php echo $button['label']; ?></a>
-                                    </button>
-                              <?php } ?>
-                              <button type="button" class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-green-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                                  <a href="<?php echo $page_refresh_url; ?>" class="text-white hover:text-white" title="Refresh">
-                                      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1.7em" height="1.7em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 20 20"><path
-                                                  d="M10.2 3.28c3.53 0 6.43 2.61 6.92 6h2.08l-3.5 4l-3.5-4h2.32a4.439 4.439 0 0 0-4.32-3.45c-1.45 0-2.73.71-3.54 1.78L4.95 5.66a6.965 6.965 0 0 1 5.25-2.38zm-.4 13.44c-3.52 0-6.43-2.61-6.92-6H.8l3.5-4c1.17 1.33 2.33 2.67 3.5 4H5.48a4.439 4.439 0 0 0 4.32 3.45c1.45 0 2.73-.71 3.54-1.78l1.71 1.95a6.95 6.95 0 0 1-5.25 2.38z" fill="#626262"/></svg>
-                                  </a>
-                             </button>
-                        </span>
+                    <div class="flex flex-wrap items-center justify-end gap-2">
+                        <!-- Segmented pill filter -->
+                        <div class="inline-flex items-center rounded-xl border border-gray-200 bg-gray-100 p-1 gap-0.5">
+                            <?php foreach ( $buttons as $key => $button ) : ?>
+                                <a href="<?php echo esc_url( $button['url'] ); ?>"
+                                   class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 no-underline <?php echo 'active' === $button['class'] ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                    <?php echo esc_html( $button['label'] ); ?>
+                                </a>
+                            <?php endforeach; ?>
+                            <?php if ( US()->is_pro() ) : ?>
+                                <button type="button"
+                                        id="kc-us-group-custom-pill"
+                                        class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 <?php echo 'custom' === $time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                    <span class="dashicons dashicons-calendar-alt" style="width:14px;height:14px;font-size:14px;vertical-align:middle;margin-right:3px;" aria-hidden="true"></span><?php esc_html_e( 'Custom', 'url-shortify' ); ?>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ( US()->is_pro() ) : ?>
+                        <!-- Custom date range picker (visible when Custom is active) -->
+                        <div id="kc-us-group-custom-control" class="<?php echo ( 'custom' === $time_filter ) ? '' : 'hidden'; ?> inline-flex flex-wrap items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 shadow-sm">
+                            <input type="text"
+                                   id="kc-us-group-start-date"
+                                   class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                   placeholder="<?php esc_attr_e( 'Start date', 'url-shortify' ); ?>"
+                                   value="<?php echo esc_attr( $current_start_date ); ?>" />
+                            <span class="text-xs font-medium text-slate-400"><?php esc_html_e( '→', 'url-shortify' ); ?></span>
+                            <input type="text"
+                                   id="kc-us-group-end-date"
+                                   class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                   placeholder="<?php esc_attr_e( 'End date', 'url-shortify' ); ?>"
+                                   value="<?php echo esc_attr( $current_end_date ); ?>" />
+                            <button type="button"
+                                    id="kc-us-group-custom-apply"
+                                    class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                                    title="<?php esc_attr_e( 'Apply custom date range', 'url-shortify' ); ?>">
+                                <?php esc_html_e( 'Apply', 'url-shortify' ); ?>
+                            </button>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Refresh -->
+                        <a href="<?php echo esc_url( $page_refresh_url ); ?>"
+                           id="kc-us-group-refresh"
+                           class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-600 transition-colors duration-150"
+                           title="<?php esc_attr_e( 'Refresh', 'url-shortify' ); ?>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10.2 3.28c3.53 0 6.43 2.61 6.92 6h2.08l-3.5 4l-3.5-4h2.32a4.439 4.439 0 0 0-4.32-3.45c-1.45 0-2.73.71-3.54 1.78L4.95 5.66a6.965 6.965 0 0 1 5.25-2.38zm-.4 13.44c-3.52 0-6.43-2.61-6.92-6H.8l3.5-4c1.17 1.33 2.33 2.67 3.5 4H5.48a4.439 4.439 0 0 0 4.32 3.45c1.45 0 2.73-.71 3.54-1.78l1.71 1.95a6.95 6.95 0 0 1-5.25 2.38z" fill="currentColor"/></svg>
+                        </a>
                     </div>
 				</div>
 				<div class="bg-white mt-2" id="click-chart">
@@ -532,6 +571,46 @@ $links_table_controller->set_columns( $links_columns );
 		const chart = new ApexCharts(target, options);
 		chart.render();
 	});
+
+	// Custom date filter (PRO only).
+	var $customPill    = $('#kc-us-group-custom-pill');
+	var $customControl = $('#kc-us-group-custom-control');
+	var $customApply   = $('#kc-us-group-custom-apply');
+	var $startDate     = $('#kc-us-group-start-date');
+	var $endDate       = $('#kc-us-group-end-date');
+
+	if ($customPill.length) {
+		$customPill.on('click', function () {
+			$customControl.toggleClass('hidden');
+		});
+	}
+
+	if ($customApply.length) {
+		$customApply.on('click', function () {
+			var start = $startDate.val().trim();
+			var end   = $endDate.val().trim();
+
+			if (!start || !end) {
+				alert('<?php echo esc_js( __( 'Please enter both a start date and an end date.', 'url-shortify' ) ); ?>');
+				return;
+			}
+
+			var url = new URL(window.location.href);
+			url.searchParams.set('time_filter', 'custom');
+			url.searchParams.set('start_date', start);
+			url.searchParams.set('end_date', end);
+			url.searchParams.set('refresh', '1');
+			window.location.href = url.toString();
+		});
+
+		// Allow Enter key inside date inputs to apply.
+		$startDate.add($endDate).on('keydown', function (e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				$customApply.trigger('click');
+			}
+		});
+	}
 })(jQuery);
 
 </script>

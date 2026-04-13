@@ -501,7 +501,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 				[
 					'id'          => 'recipients',
 					'title'       => __( 'Recipients', 'url-shortify' ),
-					'desc'        => __( 'One email address per line. Leave blank to use the admin email.', 'url-shortify' ),
+					'desc'        => sprintf( __( 'Enter one email address per line. If left blank, the email digest will be sent to the admin email: <b>%s</b>', 'url-shortify' ), get_option( 'admin_email' ) ),
 					'type'        => 'textarea',
 					'default'     => '',
 					'placeholder' => "user@example.com\nanother@example.com",

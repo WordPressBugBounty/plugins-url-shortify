@@ -48,8 +48,10 @@ class Ajax {
 	public function get_accessible_commands() {
 		$accessible_commands = [
 			'create_short_link',
+			'get_link_stats_chart_data',
 			'get_dashboard_clicks_page',
 			'handle_plugin_management',
+			'toggle_link_status',
 		];
 
 		return apply_filters( 'kc_us_accessible_commands', $accessible_commands );
@@ -99,6 +101,54 @@ class Ajax {
 	}
 
 	/**
+	 * Toggle link status via ajax.
+	 *
+	 * @param array $data
+	 */
+	public function toggle_link_status( $data = [] ) {
+		if ( ! is_user_logged_in() ) {
+			wp_send_json_error( [ 'message' => __( 'You must be logged in to update links.', 'url-shortify' ) ] );
+		}
+
+		$link_id = absint( Helper::get_data( $data, 'link_id', 0 ) );
+
+		if ( empty( $link_id ) ) {
+			wp_send_json_error( [ 'message' => __( 'Link not found.', 'url-shortify' ) ] );
+		}
+
+		$link = US()->db->links->get_by_id( $link_id );
+
+		if ( empty( $link ) ) {
+			wp_send_json_error( [ 'message' => __( 'Link not found.', 'url-shortify' ) ] );
+		}
+
+		if ( ! US()->access->can( 'manage_links' ) ) {
+			$created_by_id = absint( Helper::get_data( $link, 'created_by_id', 0 ) );
+
+			if ( get_current_user_id() !== $created_by_id ) {
+				wp_send_json_error( [ 'message' => __( 'You do not have permission to update this link.', 'url-shortify' ) ] );
+			}
+		}
+
+		$current_status = (int) Helper::get_data( $link, 'status', 1 );
+		$new_status     = 1 === $current_status ? 0 : 1;
+		$updated        = US()->db->links->update( $link_id, [ 'status' => $new_status ] );
+
+		if ( ! $updated ) {
+			wp_send_json_error( [ 'message' => __( 'Unable to update link status.', 'url-shortify' ) ] );
+		}
+
+		do_action( 'kc_us_link_updated', $link_id );
+
+		wp_send_json_success( [
+			'link_id' => $link_id,
+			'status'  => $new_status,
+			'label'   => 1 === $new_status ? __( 'Enabled', 'url-shortify' ) : __( 'Disabled', 'url-shortify' ),
+			'tip'     => 1 === $new_status ? __( 'Click to Disable', 'url-shortify' ) : __( 'Click to Enable', 'url-shortify' ),
+		] );
+	}
+
+	/**
 	 * Server-side callback for DataTables click history.
 	 *
 	 * @param array $params
@@ -120,8 +170,16 @@ class Ajax {
 			$search_value = Helper::get_data( $params, 'search', [] );
 			$search_term  = Helper::get_data( $search_value, 'value', '' );
 
-			$days = absint( Helper::get_data( $params, 'days', 0 ) );
-			if ( 0 === $days ) {
+			$time_filter = sanitize_key( Helper::get_data( $params, 'time_filter', '' ) );
+			$days        = absint( Helper::get_data( $params, 'days', 0 ) );
+			$start_date  = sanitize_text_field( Helper::get_data( $params, 'start_date', '' ) );
+			$end_date    = sanitize_text_field( Helper::get_data( $params, 'end_date', '' ) );
+
+			if ( 'custom' === $time_filter && ! empty( $start_date ) && ! empty( $end_date ) ) {
+				$days = 0;
+			} elseif ( 'all_time' === $time_filter ) {
+				$days = 0;
+			} elseif ( 0 === $days ) {
 				$days = apply_filters( 'kc_us_clicks_info_for_days', 365 );
 			}
 
@@ -146,12 +204,9 @@ class Ajax {
 
 			$order_by = isset( $column_map[ $order_index ] ) ? $column_map[ $order_index ] : 'created_at';
 
-			// Default to last 12 months so dashboard table has data; site owners can override.
-			$days = apply_filters( 'kc_us_clicks_info_for_days', 365 );
-
-			$total_records    = US()->db->clicks->count_clicks_for_dashboard( $days, '', $link_ids );
-			$filtered_records = US()->db->clicks->count_clicks_for_dashboard( $days, $search_term, $link_ids );
-			$items            = US()->db->clicks->get_clicks_for_dashboard( $days, $length, $start, $search_term, $order_by, $order_dir, $link_ids );
+			$total_records    = US()->db->clicks->count_clicks_for_dashboard( $days, '', $link_ids, $start_date, $end_date );
+			$filtered_records = US()->db->clicks->count_clicks_for_dashboard( $days, $search_term, $link_ids, $start_date, $end_date );
+			$items            = US()->db->clicks->get_clicks_for_dashboard( $days, $length, $start, $search_term, $order_by, $order_dir, $link_ids, $start_date, $end_date );
 
 			$columns       = ClicksController::get_table_columns();
 			$click_history = new ClicksController();
@@ -173,6 +228,36 @@ class Ajax {
 		} catch ( \Throwable $e ) {
 			error_log( '[url-shortify] get_dashboard_clicks_page failed: ' . $e->getMessage() );
 			$message = __( 'Failed to load clicks. Please try again.', 'url-shortify' );
+			if ( current_user_can( 'manage_options' ) ) {
+				$message .= ' [' . $e->getMessage() . ']';
+			}
+			wp_send_json_error( [ 'message' => $message ] );
+		}
+	}
+
+	/**
+	 * AJAX callback for refreshing link stats charts without reloading the page.
+	 *
+	 * @param array $params
+	 */
+	public function get_link_stats_chart_data( $params = [] ) {
+		try {
+			if ( ! current_user_can( 'read' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ] );
+			}
+
+			$link_id = absint( Helper::get_data( $params, 'link_id', 0 ) );
+			if ( $link_id <= 0 ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid link selected.', 'url-shortify' ) ] );
+			}
+
+			$controller = new \KaizenCoders\URL_Shortify\Admin\Controllers\LinkStatsController( $link_id );
+			$response   = $controller->get_chart_data_response();
+
+			wp_send_json_success( $response );
+		} catch ( \Throwable $e ) {
+			error_log( '[url-shortify] get_link_stats_chart_data failed: ' . $e->getMessage() );
+			$message = __( 'Failed to load link stats. Please try again.', 'url-shortify' );
 			if ( current_user_can( 'manage_options' ) ) {
 				$message .= ' [' . $e->getMessage() . ']';
 			}

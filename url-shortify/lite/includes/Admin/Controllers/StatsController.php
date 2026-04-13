@@ -55,8 +55,8 @@ class StatsController extends BaseController {
 	 * @return array
 	 *
 	 */
-	public function get_clicks_info( $days = 7, $link_ids = [] ) {
-		return US()->db->clicks->get_clicks_info( $days, $link_ids );
+	public function get_clicks_info( $days = 7, $link_ids = [], $start_date = '', $end_date = '' ) {
+		return US()->db->clicks->get_clicks_info( $days, $link_ids, $start_date, $end_date );
 	}
 
 	/**
@@ -71,8 +71,8 @@ class StatsController extends BaseController {
 	 * @return array
 	 *
 	 */
-	public function get_all_clicks_info( $days = 7, $link_ids = [] ) {
-		return US()->db->clicks->get_all_clicks_info( $days, $link_ids );
+	public function get_all_clicks_info( $days = 7, $link_ids = [], $start_date = '', $end_date = '' ) {
+		return US()->db->clicks->get_all_clicks_info( $days, $link_ids, $start_date, $end_date );
 	}
 
 	/**
@@ -87,7 +87,16 @@ class StatsController extends BaseController {
 	 * @return array
 	 *
 	 */
-	public function get_clicks_count_by_days( $days = 7, $link_ids = [] ) {
+	public function get_clicks_count_by_days( $days = 7, $link_ids = [], $start_date = '', $end_date = '' ) {
+		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+			return US()->db->clicks->get_clicks_count_by_days( $start_date, $end_date, $link_ids );
+		}
+
+		if ( 0 === (int) $days ) {
+			// All-time: span from a far-past date to today.
+			return US()->db->clicks->get_clicks_count_by_days( '2000-01-01', date( 'Y-m-d' ), $link_ids );
+		}
+
 		$dates = Helper::get_start_and_end_date_from_last_days( $days );
 
 		return US()->db->clicks->get_clicks_count_by_days( $dates['start_date'], $dates['end_date'], $link_ids );

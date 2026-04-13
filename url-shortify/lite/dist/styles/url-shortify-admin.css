@@ -179,6 +179,29 @@
     box-shadow: 0 6px 24px rgba(15,23,42,0.08);
     padding: 14px 14px 6px;
 }
+
+#wpbody-content.kc-us-dark .wrap .kc-us-heatmap-card {
+    background: #111827 !important;
+    border-color: #1f2937 !important;
+    box-shadow: 0 20px 45px rgba(2, 6, 23, 0.35) !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-heatmap-card .kc-us-heatmap-chart-wrapper {
+    background: #0f172a !important;
+    border-color: #243041 !important;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35) !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-heatmap-card .kc-us-heatmap-empty-state {
+    background: #0f172a !important;
+    border-color: #243041 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-spline-card .kc-us-heatmap-chart-wrapper {
+    background: #0f172a;
+    border-color: #334155;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
+}
 .kc-us-heatmap-empty-state {
     min-height: 220px;
     display: flex;
@@ -189,9 +212,9 @@
     display: grid;
     gap: 6px;
     margin-top: 10px;
-    font-size: 0.68rem;
-    letter-spacing: 0.45em;
-    text-transform: lowercase;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    text-transform: none;
     color: #94a3b8;
 }
 .kc-us-heatmap-card .kc-us-heatmap-month-row span {
@@ -205,26 +228,98 @@
     line-height: 1;
     font-weight: 600;
 }
+
+.kc-us-inline-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    line-height: 1;
+    color: #64748b;
+    flex: 0 0 auto;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-inline-icon {
+    color: #cbd5e1;
+}
+
+#kc-us-clicks-custom-apply {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+#kc-us-clicks-custom-apply:hover {
+    background: #cbd5e1;
+    color: #0f172a;
+}
+
+#wpbody-content.kc-us-dark .wrap #kc-us-clicks-custom-apply {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+#wpbody-content.kc-us-dark .wrap #kc-us-clicks-custom-apply:hover {
+    background: #111827;
+    color: #ffffff;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-heatmap-card .kc-us-heatmap-month-row {
+    color: #64748b !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-heatmap-card .kc-us-heatmap-month--label {
+    color: #cbd5e1 !important;
+}
+
 #activity-heatmap .apexcharts-heatmap-rect {
     border-radius: 4px;
-    stroke: #ffffff;
-    stroke-width: 3;
-    transition: stroke-width 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+    stroke: rgba(226, 232, 240, 0.92);
+    stroke-width: 1.5;
+    transition: stroke-width 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+#wpbody-content.kc-us-dark .wrap #activity-heatmap .apexcharts-heatmap-rect {
+    stroke: rgba(71, 85, 105, 0.72);
+}
+
+#wpbody-content.kc-us-dark .wrap #activity-heatmap .apexcharts-heatmap-rect:hover {
+    filter: saturate(1.05) brightness(1.02);
 }
 
 #activity-heatmap .apexcharts-heatmap-rect:hover {
-    stroke-width: 4;
-    filter: saturate(1.3) brightness(1.05);
+    stroke-width: 2;
+    filter: saturate(1.12) brightness(1.03);
+}
+
+#activity-heatmap .apexcharts-heatmap-rect.kc-us-heatmap-future,
+#activity-heatmap .apexcharts-heatmap-rect.kc-us-heatmap-future:hover {
+    opacity: 0 !important;
+    fill-opacity: 0 !important;
+    stroke: transparent !important;
+    stroke-width: 0 !important;
+    filter: none !important;
+    pointer-events: none !important;
 }
 
 #activity-heatmap .apexcharts-heatmap-rect.inactive {
     opacity: 0.15;
     filter: grayscale(0.3);
+    stroke: transparent !important;
+    stroke-width: 0 !important;
 }
 
 #activity-heatmap .apexcharts-heatmap-rect.active-highlight {
     filter: saturate(1.4) brightness(1.08);
     animation: cellGlow 0.4s ease-out;
+}
+
+#wpbody-content.kc-us-dark .wrap #activity-heatmap .apexcharts-heatmap-rect.active-highlight {
+    filter: saturate(1.1) brightness(1.03);
 }
 
 @keyframes cellGlow {
@@ -253,6 +348,12 @@
 #activity-heatmap svg {
     width: 100% !important;
     order: 0;
+}
+
+#activity-heatmap .apexcharts-canvas,
+#activity-heatmap .apexcharts-inner,
+#activity-heatmap svg {
+    background: transparent !important;
 }
 
 .kc-us-heatmap-chart-wrapper {
@@ -287,6 +388,11 @@
     padding: 8px 0 !important;
 }
 
+#wpbody-content.kc-us-dark .wrap #activity-heatmap .apexcharts-legend,
+#wpbody-content.kc-us-dark .wrap #activity-heatmap .apexcharts-legend-text {
+    color: #e2e8f0 !important;
+}
+
 #activity-heatmap .apexcharts-legend-series {
     margin: 4px 8px !important;
     cursor: pointer;
@@ -298,6 +404,10 @@
 #activity-heatmap .apexcharts-legend-series:hover {
     background-color: rgba(0, 0, 0, 0.05);
     transform: scale(1.02);
+}
+
+#wpbody-content.kc-us-dark .wrap #activity-heatmap .apexcharts-legend-series:hover {
+    background-color: rgba(148, 163, 184, 0.12);
 }
 
 #activity-heatmap .apexcharts-legend-marker {
@@ -328,6 +438,10 @@
     border-radius: 8px;
 }
 
+#wpbody-content.kc-us-dark .wrap .kc-us-spline-card #spline-area-chart.loading::before {
+    background: linear-gradient(90deg, rgba(15,23,42,0) 0%, rgba(148,163,184,0.18) 50%, rgba(15,23,42,0) 100%);
+}
+
 #spline-area-chart .chart-skeleton {
     display: flex;
     flex-direction: column;
@@ -343,6 +457,11 @@
     background-size: 200% 100%;
     animation: skeletonLoading 2s infinite;
     border-radius: 2px;
+}
+
+#wpbody-content.kc-us-dark .wrap .kc-us-spline-card #spline-area-chart .skeleton-line {
+    background: linear-gradient(90deg, #273548 25%, #334155 50%, #273548 75%);
+    background-size: 200% 100%;
 }
 
 #spline-area-chart .skeleton-line:nth-child(1) {
@@ -879,7 +998,7 @@ body.kc-us-dark-active .wrap h4,
 
 /* Hover states on links */
 #wpbody-content.kc-us-dark .wrap a:not([class*="button"]):not([class*="btn"]):not([class*="page-title"]):not([class*="kc-us-primary"]) {
-    color: #818cf8;
+    color: #ffffff;
 }
 
 #wpbody-content.kc-us-dark .wrap a:not([class*="button"]):not([class*="btn"]):not([class*="page-title"]):not([class*="kc-us-primary"]):hover {
@@ -922,6 +1041,15 @@ body.kc-us-dark-active .wrap h4,
     background-color: #1e293b !important;
     border-color: #475569 !important;
     color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .apexcharts-legend,
+#wpbody-content.kc-us-dark .wrap .apexcharts-legend-text {
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .apexcharts-legend-text {
+    opacity: 1 !important;
 }
 
 #wpbody-content.kc-us-dark .wrap .apexcharts-canvas text {

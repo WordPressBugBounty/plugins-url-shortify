@@ -165,7 +165,7 @@ if ( $show_kpis && ! $show_landing_page ) {
 
         <!-- Click History Report -->
         <div class="kc-us-dashboard-visuals flex flex-col gap-6 mt-6">
-            <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
+            <section class="kc-us-chart-card kc-us-spline-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
                 <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                         <h2 class="text-2xl font-semibold leading-tight text-slate-900"><?php
@@ -177,33 +177,30 @@ if ( $show_kpis && ! $show_landing_page ) {
                 </div>
             </section>
 
-            <!-- Clicks Heatmap -->
-            <?php if(US()->is_pro()) { ?>
-                <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
-                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                            <h2 class="text-xl font-semibold text-slate-900"><?php
-                                _e( 'Link Activity Intensity', 'url-shortify' ); ?></h2>
-                        </div>
+            <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
+                <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-900"><?php
+                            _e( 'Link Activity Intensity', 'url-shortify' ); ?></h2>
                     </div>
-                    <?php
-                    if ( $has_clicks_data ) { ?>
-                        <div class="kc-us-heatmap-chart-wrapper mt-2 w-full">
-                            <div id="activity-heatmap" class="w-full"></div>
-                            <div id="heatmap-month-row" class="kc-us-heatmap-month-row" aria-hidden="true"></div>
-                        </div>
-                    <?php
-                    } else { ?>
-                        <div class="kc-us-heatmap-empty-state mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
-                            <p class="text-base font-medium text-slate-700">
-                                <?php
-                                _e( 'No clicks data available. Once your link is visited, analytics will appear here', 'url-shortify' ); ?>
-                            </p>
-                        </div>
-                    <?php
-                    } ?>
-                </section>
-            <?php } ?>
+                </div>
+                <?php
+                if ( $has_clicks_data ) { ?>
+                    <div class="kc-us-heatmap-chart-wrapper mt-2 w-full">
+                        <div id="activity-heatmap" class="w-full"></div>
+                        <div id="heatmap-month-row" class="kc-us-heatmap-month-row" aria-hidden="true"></div>
+                    </div>
+                <?php
+                } else { ?>
+                    <div class="kc-us-heatmap-empty-state mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
+                        <p class="text-base font-medium text-slate-700">
+                            <?php
+                            _e( 'No clicks data available. Once your link is visited, analytics will appear here', 'url-shortify' ); ?>
+                        </p>
+                    </div>
+                <?php
+                } ?>
+            </section>
         </div>
 
         <!-- Country & Referrer Info -->
@@ -216,7 +213,6 @@ if ( $show_kpis && ! $show_landing_page ) {
                         <span class="text-xl font-medium leading-6 text-gray-900"><?php
                             _e( 'Top Locations', 'url-shortify' ); ?></span>
                     </div>
-
                     <div class="bg-white border-2">
                         <?php
                         if ( US()->is_pro() ) {

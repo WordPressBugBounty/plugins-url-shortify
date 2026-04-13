@@ -73,9 +73,294 @@
         if ($('#clicks-data').get(0)) {
             var $clicksTable = $('#clicks-data');
             var serverSide = $clicksTable.data('server-side') === true || $clicksTable.data('server-side') === 'true';
+            var clicksDataTable = null;
+            var $filterPills = $('.kc-us-filter-pill');
+            var $customApply = $('#kc-us-clicks-custom-apply');
+            var $customStart = $('#kc-us-start-date');
+            var $customEnd = $('#kc-us-end-date');
+            var $refreshButton = $('#kc-us-clicks-refresh');
+            var $totalClicks = $('#kc-us-total-clicks');
+            var $customControl = $('#kc-us-clicks-custom-control');
+            var currentTimeFilter = $clicksTable.data('time-filter') || 'last_7_days';
+            var currentStartDate = ($clicksTable.data('start-date') || '').toString();
+            var currentEndDate = ($clicksTable.data('end-date') || '').toString();
+            var currentLinkId = $clicksTable.data('link-id');
+            var currentLinkIds = $clicksTable.data('link-ids');
+            var currentDays = $clicksTable.data('days');
+
+            function getDaysForFilter(timeFilter) {
+                switch (timeFilter) {
+                    case 'today':
+                        return 1;
+                    case 'last_7_days':
+                        return 7;
+                    case 'last_30_days':
+                        return 30;
+                    case 'last_60_days':
+                        return 60;
+                    case 'all_time':
+                        return 0;
+                    case 'custom':
+                        return 0;
+                    default:
+                        return currentDays;
+                }
+            }
+
+            function setTableState() {
+                $clicksTable.attr('data-time-filter', currentTimeFilter);
+                $clicksTable.attr('data-start-date', currentStartDate);
+                $clicksTable.attr('data-end-date', currentEndDate);
+                $clicksTable.attr('data-days', currentDays);
+            }
+
+            function syncFilterStyles() {
+                $filterPills.each(function () {
+                    var isActive = $(this).data('filter') === currentTimeFilter;
+                    $(this)
+                        .toggleClass('bg-white text-slate-900 shadow-sm', isActive)
+                        .toggleClass('text-slate-500 hover:text-slate-700 hover:bg-white/60', !isActive);
+                });
+
+                if ($customControl.length) {
+                    $customControl.toggleClass('hidden', currentTimeFilter !== 'custom');
+                }
+            }
+
+            function syncRefreshHref() {
+                if (!$refreshButton.length) {
+                    return;
+                }
+
+                var url = new URL(window.location.href);
+                url.searchParams.set('refresh', '1');
+                url.searchParams.set('time_filter', currentTimeFilter);
+
+                if (currentTimeFilter === 'custom') {
+                    if (currentStartDate) {
+                        url.searchParams.set('start_date', currentStartDate);
+                    } else {
+                        url.searchParams.delete('start_date');
+                    }
+
+                    if (currentEndDate) {
+                        url.searchParams.set('end_date', currentEndDate);
+                    } else {
+                        url.searchParams.delete('end_date');
+                    }
+                } else {
+                    url.searchParams.delete('start_date');
+                    url.searchParams.delete('end_date');
+                }
+
+                $refreshButton.attr('href', url.toString());
+            }
+
+            function syncBrowserUrl() {
+                var url = new URL(window.location.href);
+                url.searchParams.set('time_filter', currentTimeFilter);
+
+                if (currentTimeFilter === 'custom') {
+                    if (currentStartDate) {
+                        url.searchParams.set('start_date', currentStartDate);
+                    } else {
+                        url.searchParams.delete('start_date');
+                    }
+
+                    if (currentEndDate) {
+                        url.searchParams.set('end_date', currentEndDate);
+                    } else {
+                        url.searchParams.delete('end_date');
+                    }
+                } else {
+                    url.searchParams.delete('start_date');
+                    url.searchParams.delete('end_date');
+                }
+
+                url.searchParams.delete('refresh');
+                window.history.replaceState({}, '', url.toString());
+            }
+
+            function updateChartSummary(chartData, totalClicks) {
+                if ($totalClicks.length) {
+                    $totalClicks.text((totalClicks || 0).toLocaleString() + ' clicks');
+                }
+
+                if (window.usSplineChart instanceof ApexCharts && chartData && Array.isArray(chartData.dates)) {
+                    window.usSplineChart.updateSeries([
+                        { name: 'Total Clicks', data: chartData.total_series || [] },
+                        { name: 'Unique Clicks', data: chartData.unique_series || [] }
+                    ], true);
+                    window.usSplineChart.updateOptions({
+                        xaxis: {
+                            categories: chartData.dates || []
+                        }
+                    }, false, true, false);
+                }
+
+                if (window.usHeatmapChart instanceof ApexCharts && chartData && Array.isArray(chartData.heatmap_series)) {
+                    if (Array.isArray(chartData.heatmap_color_ranges) && chartData.heatmap_color_ranges.length) {
+                        heatmapColorRanges = chartData.heatmap_color_ranges;
+                        window.us_chart_data = window.us_chart_data || {};
+                        window.us_chart_data.heatmap_color_ranges = chartData.heatmap_color_ranges;
+                    }
+
+                    window.usHeatmapChart.updateSeries(chartData.heatmap_series || [], true);
+                    window.usHeatmapChart.updateOptions({
+                        xaxis: {
+                            categories: chartData.heatmap_week_starts || []
+                        },
+                        yaxis: {
+                            categories: chartData.heatmap_day_labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                        },
+                        plotOptions: {
+                            heatmap: {
+                                colorScale: {
+                                    ranges: usBuildHeatmapRanges(usGetIsDarkMode())
+                                }
+                            }
+                        }
+                    }, false, true, false);
+
+                    var heatmapContainer = document.querySelector('#activity-heatmap');
+                    var heatmapMonthContainer = document.querySelector('#heatmap-month-row');
+                    if (heatmapMonthContainer) {
+                        if (Array.isArray(chartData.heatmap_month_labels) && chartData.heatmap_month_labels.length) {
+                            heatmapMonthContainer.style.gridTemplateColumns = 'repeat(' + chartData.heatmap_month_labels.length + ', minmax(0, 1fr))';
+                            heatmapMonthContainer.innerHTML = chartData.heatmap_month_labels.map(function (label) {
+                                var classes = 'kc-us-heatmap-month';
+                                if (label) {
+                                    classes += ' kc-us-heatmap-month--label';
+                                }
+                                return '<span class="' + classes + '">' + (label ? label : '&nbsp;') + '</span>';
+                            }).join('');
+                        } else {
+                            heatmapMonthContainer.innerHTML = '';
+                        }
+                    }
+
+                    if (heatmapContainer) {
+                        usMarkFutureHeatmapCells(heatmapContainer);
+                        usApplyHeatmapCellTheme(heatmapContainer, usGetIsDarkMode());
+                    }
+                }
+            }
+
+            function applyStatsResponse(response) {
+                if (!response || !response.success || !response.data) {
+                    return;
+                }
+
+                window.us_chart_data = response.data.chart_data || window.us_chart_data;
+                updateChartSummary(response.data.chart_data || {}, response.data.clicks_total || 0);
+                syncRefreshHref();
+                syncBrowserUrl();
+
+                if (clicksDataTable) {
+                    clicksDataTable.ajax.reload(null, true);
+                }
+            }
+
+            function fetchStats() {
+                if (!currentLinkId) {
+                    return;
+                }
+
+                $.ajax({
+                    url: usParams.ajaxurl,
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'us_handle_request',
+                        cmd: 'get_link_stats_chart_data',
+                        security: usParams.security,
+                        link_id: currentLinkId,
+                        time_filter: currentTimeFilter,
+                        start_date: currentStartDate,
+                        end_date: currentEndDate
+                    },
+                    success: applyStatsResponse,
+                    error: function (xhr, status, err) {
+                        console.error('Link stats ajax error:', status, err);
+                    }
+                });
+            }
+
+            function setFilter(timeFilter, startDate, endDate) {
+                currentTimeFilter = timeFilter;
+                currentStartDate = startDate || '';
+                currentEndDate = endDate || '';
+                currentDays = getDaysForFilter(timeFilter);
+
+                if ($customStart.length) {
+                    $customStart.val(currentStartDate);
+                }
+
+                if ($customEnd.length) {
+                    $customEnd.val(currentEndDate);
+                }
+
+                setTableState();
+                syncFilterStyles();
+                syncRefreshHref();
+                syncBrowserUrl();
+                fetchStats();
+            }
+
+            if ($filterPills.length) {
+                $filterPills.on('click', function () {
+                    var timeFilter = $(this).data('filter') || 'last_7_days';
+
+                    if (timeFilter === 'custom') {
+                        currentTimeFilter = 'custom';
+                        syncFilterStyles();
+                        syncRefreshHref();
+                        syncBrowserUrl();
+                        return;
+                    }
+
+                    setFilter(timeFilter, '', '');
+                });
+            }
+
+            if ($customApply.length) {
+                $customApply.on('click', function () {
+                    var startDate = $customStart.length ? ($customStart.val() || '').trim() : '';
+                    var endDate = $customEnd.length ? ($customEnd.val() || '').trim() : '';
+
+                    if (!startDate || !endDate) {
+                        alert('Please enter both a start date and an end date.');
+                        return;
+                    }
+
+                    setFilter('custom', startDate, endDate);
+                });
+            }
+
+            if ($customStart.length) {
+                $customStart.on('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        $customApply.trigger('click');
+                    }
+                });
+            }
+
+            if ($customEnd.length) {
+                $customEnd.on('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        $customApply.trigger('click');
+                    }
+                });
+            }
+
+            syncFilterStyles();
+            setTableState();
+            syncRefreshHref();
 
             if (serverSide) {
-                $clicksTable.DataTable({
+                clicksDataTable = $clicksTable.DataTable({
                     serverSide: true,
                     processing: true,
                     language: {
@@ -84,38 +369,39 @@
                     lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                     pageLength: 10,
                     ajax: function (data, callback) {
-                        var postData = {
+                        var ajaxData = $.extend({}, data, {
                             action: 'us_handle_request',
                             cmd: 'get_dashboard_clicks_page',
                             security: usParams.security,
-                            draw: data.draw,
-                            start: data.start,
-                            length: data.length,
-                            order: data.order,
-                            search: data.search,
-                        };
+                        });
 
-                        var linkId = $clicksTable.data('link-id');
-                        var linkIds = $clicksTable.data('link-ids');
-                        var days = $clicksTable.data('days');
-
-                        if ( linkId ) {
-                            postData.link_id = linkId;
+                        if ( currentLinkId ) {
+                            ajaxData.link_id = currentLinkId;
                         }
 
-                        if ( linkIds ) {
-                            postData.link_ids = linkIds;
+                        if ( currentLinkIds ) {
+                            ajaxData.link_ids = currentLinkIds;
                         }
 
-                        if ( days ) {
-                            postData.days = days;
+                        if (typeof currentDays !== 'undefined' && currentDays !== null && currentDays !== '') {
+                            ajaxData.days = currentDays;
+                        }
+
+                        if (currentTimeFilter) {
+                            ajaxData.time_filter = currentTimeFilter;
+                        }
+
+                        if (currentTimeFilter === 'custom') {
+                            ajaxData.start_date = currentStartDate;
+                            ajaxData.end_date = currentEndDate;
+                            ajaxData.days = 0;
                         }
 
                         $.ajax({
                             url: usParams.ajaxurl,
                             method: 'POST',
                             dataType: 'json',
-                            data: postData,
+                            data: ajaxData,
                             success: function (response) {
                                 var payload = { draw: data.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
                                 if (response && response.success && response.data) {
@@ -597,6 +883,13 @@
                     document.body.classList.remove('kc-us-dark-active');
                 }
             }
+
+            document.dispatchEvent(new CustomEvent('kc-us-theme-changed', {
+                detail: {
+                    mode: mode,
+                    isDark: isDark
+                }
+            }));
         },
 
         renderCurrent: function (mode) {
@@ -734,6 +1027,93 @@ jQuery(document).on('click', '.us-star-toggle', function() {
     });
 });
 
+function usUpdateLinkStatusToggle($button, status) {
+    var isEnabled = parseInt(status, 10) === 1;
+    var statusLabel = isEnabled ? 'Enabled' : 'Disabled';
+    var statusTip = isEnabled ? 'Click to Disable' : 'Click to Enable';
+    var trackBg = isEnabled
+        ? '#6366f1'
+        : '#64748b';
+    var trackBorder = isEnabled
+        ? 'rgba(99, 102, 241, 0.45)'
+        : 'rgba(71, 85, 105, 0.45)';
+    var thumbBg = isEnabled
+        ? '#ffffff'
+        : '#cbd5e1';
+    var thumbBorder = isEnabled ? 'rgba(255, 255, 255, 0.40)' : 'rgba(148, 163, 184, 0.2)';
+    var thumbTransform = isEnabled ? 'translateX(1.25rem)' : 'translateX(0)';
+    var trackBoxShadow = isEnabled
+        ? 'inset 0 1px 2px rgba(15, 23, 42, 0.10)'
+        : 'inset 0 1px 2px rgba(15, 23, 42, 0.14)';
+    var thumbBoxShadow = isEnabled
+        ? '0 1px 2px rgba(15, 23, 42, 0.18)'
+        : '0 1px 2px rgba(15, 23, 42, 0.16)';
+
+    $button
+        .attr('data-status', isEnabled ? '1' : '0')
+        .attr('aria-checked', isEnabled ? 'true' : 'false')
+        .attr('aria-label', statusLabel + '. ' + statusTip)
+        .attr('title', statusTip)
+        .find('.us-link-status-track')
+        .css({
+            backgroundColor: trackBg,
+            borderColor: trackBorder,
+            boxShadow: trackBoxShadow
+        })
+        .end()
+        .find('.us-link-status-thumb')
+        .css({
+            backgroundColor: thumbBg,
+            borderColor: thumbBorder,
+            boxShadow: thumbBoxShadow,
+            transform: thumbTransform
+        })
+        .end()
+        .find('.us-link-status-label')
+        .text(statusLabel);
+}
+
+jQuery(document).on('click', '.us-link-status-toggle', function (e) {
+    e.preventDefault();
+
+    var $button = jQuery(this);
+
+    if ($button.data('busy')) {
+        return;
+    }
+
+    if (typeof usParams === 'undefined' || !usParams.security) {
+        console.error('URL Shortify: Security nonce is missing. Please check script localization.');
+        return;
+    }
+
+    var ajaxUrl = (typeof usParams !== 'undefined' && usParams.ajaxurl) ? usParams.ajaxurl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
+
+    if (!ajaxUrl) {
+        console.error('URL Shortify: AJAX URL is missing.');
+        return;
+    }
+
+    $button.data('busy', true).addClass('opacity-60 cursor-wait');
+
+    jQuery.post(ajaxUrl, {
+        action: 'us_handle_request',
+        cmd: 'toggle_link_status',
+        link_id: $button.data('link-id'),
+        security: usParams.security,
+    }, function (response) {
+        if (response && response.success && response.data) {
+            usUpdateLinkStatusToggle($button, response.data.status);
+        } else {
+            alert((response && response.data && response.data.message) ? response.data.message : 'Unable to update link status.');
+        }
+    }).fail(function () {
+        alert('Unable to update link status. Please try again.');
+    }).always(function () {
+        $button.data('busy', false).removeClass('opacity-60 cursor-wait');
+    });
+});
+
 jQuery(window).ready(function () {
 });
 
@@ -744,6 +1124,10 @@ window.usHeatmapChart = window.usHeatmapChart || null;
  jQuery(document).ready(function($) {
     'use strict';
 
+    $('.us-link-status-toggle').each(function () {
+        usUpdateLinkStatusToggle($(this), $(this).data('status'));
+    });
+
     if ( typeof us_chart_data === 'undefined' ) {
         return;
     }
@@ -751,6 +1135,10 @@ window.usHeatmapChart = window.usHeatmapChart || null;
     var chartDataAvailable = Array.isArray(us_chart_data.dates) && us_chart_data.dates.length;
     if ( $('#spline-area-chart').length && chartDataAvailable ) {
         var splineContainer = document.querySelector("#spline-area-chart");
+        var isDarkMode = document.documentElement.classList.contains('kc-us-dark') ||
+            document.documentElement.classList.contains('kc-us-dark-active') ||
+            document.body.classList.contains('kc-us-dark-active') ||
+            (document.getElementById('wpbody-content') && document.getElementById('wpbody-content').classList.contains('kc-us-dark'));
         
         // Show skeleton loader
         splineContainer.classList.add('loading');
@@ -774,7 +1162,7 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                 height: 260,
                 type: 'area',
                 toolbar: { show: false },
-                foreColor: '#475569',
+                foreColor: isDarkMode ? '#cbd5e1' : '#475569',
                 background: 'transparent',
                 fontFamily: 'Inter, system-ui, sans-serif',
                 animations: {
@@ -791,16 +1179,19 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                     }
                 }
             },
+            theme: {
+                mode: isDarkMode ? 'dark' : 'light'
+            },
             stroke: { curve: 'smooth', width: 3 },
             dataLabels: { enabled: false },
             fill: {
                 type: 'gradient',
                 gradient: {
-                    shade: 'light',
-                    gradientToColors: ['#a78bfa', '#34d399'],
-                    shadeIntensity: 0.75,
-                    opacityFrom: 0.9,
-                    opacityTo: 0.25,
+                    shade: isDarkMode ? 'dark' : 'light',
+                    gradientToColors: isDarkMode ? ['#818cf8', '#34d399'] : ['#a78bfa', '#34d399'],
+                    shadeIntensity: isDarkMode ? 0.45 : 0.75,
+                    opacityFrom: isDarkMode ? 0.42 : 0.9,
+                    opacityTo: isDarkMode ? 0.08 : 0.25,
                     stops: [0, 60, 100]
                 }
             },
@@ -813,8 +1204,8 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                 type: 'datetime',
                 categories: us_chart_data.dates,
                 labels: { style: { colors: '#94a3b8' } },
-                axisBorder: { show: true, color: 'rgba(148,163,184,0.4)' },
-                axisTicks: { color: 'rgba(148,163,184,0.4)' }
+                axisBorder: { show: true, color: isDarkMode ? 'rgba(71,85,105,0.85)' : 'rgba(148,163,184,0.4)' },
+                axisTicks: { color: isDarkMode ? 'rgba(71,85,105,0.85)' : 'rgba(148,163,184,0.4)' }
             },
             yaxis: {
                 labels: { style: { colors: '#94a3b8' } },
@@ -822,11 +1213,11 @@ window.usHeatmapChart = window.usHeatmapChart || null;
             },
             colors: ['#6366f1', '#34d399'],
             grid: {
-                borderColor: 'rgba(148,163,184,0.25)',
+                borderColor: isDarkMode ? 'rgba(71,85,105,0.65)' : 'rgba(148,163,184,0.25)',
                 strokeDashArray: 4
             },
             tooltip: {
-                theme: 'dark',
+                theme: isDarkMode ? 'dark' : 'light',
                 marker: { show: true },
                 y: {
                     formatter: function (value) {
@@ -849,21 +1240,126 @@ window.usHeatmapChart = window.usHeatmapChart || null;
     var heatmapMonthLabels = Array.isArray(us_chart_data.heatmap_month_labels) ? us_chart_data.heatmap_month_labels : [];
     var dayLabels = Array.isArray(us_chart_data.heatmap_day_labels) ? us_chart_data.heatmap_day_labels : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     var heatmapColorRanges = Array.isArray(us_chart_data.heatmap_color_ranges) ? us_chart_data.heatmap_color_ranges : [];
-    if ( $('#activity-heatmap').length && heatmapSeriesReady && heatmapHasClicksData ) {
-        if ( window.usHeatmapChart instanceof ApexCharts ) {
+    var heatmapDarkPalette = ['#2b3440', '#153b2a', '#14532d', '#166534', '#15803d', '#22c55e', '#7ee787'];
+
+    function usGetIsDarkMode() {
+        return document.documentElement.classList.contains('kc-us-dark') ||
+            document.documentElement.classList.contains('kc-us-dark-active') ||
+            document.body.classList.contains('kc-us-dark-active') ||
+            (document.getElementById('wpbody-content') && document.getElementById('wpbody-content').classList.contains('kc-us-dark'));
+    }
+
+    function usBuildHeatmapRanges(isDarkTheme) {
+        var ranges = heatmapColorRanges.length ? heatmapColorRanges : [
+            { from: 0, to: 0, color: '#f4f7fb', name: '0 clicks' },
+            { from: 1, to: 10, color: '#edf9f1', name: '1-10 clicks' }
+        ];
+
+        if (!isDarkTheme) {
+            return ranges;
+        }
+
+        return ranges.map(function (range, index) {
+            if (index === 0) {
+                return {
+                    from: range.from,
+                    to: range.to,
+                    name: range.name,
+                    color: '#2b3440'
+                };
+            }
+
+            return {
+                from: range.from,
+                to: range.to,
+                name: range.name,
+                color: heatmapDarkPalette[Math.min(index, heatmapDarkPalette.length - 1)]
+            };
+        });
+    }
+
+    function usApplyHeatmapCellTheme(heatmapContainer, isDarkTheme) {
+        if (!heatmapContainer) {
+            return;
+        }
+
+        heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect').forEach(function(rect) {
+            if (rect.classList.contains('kc-us-heatmap-future')) {
+                rect.style.setProperty('filter', 'none', 'important');
+                rect.style.boxShadow = 'none';
+                rect.style.opacity = '0';
+                rect.style.pointerEvents = 'none';
+                rect.style.stroke = 'transparent';
+                return;
+            }
+
+            rect.style.setProperty('filter', 'none', 'important');
+            rect.style.boxShadow = 'none';
+        });
+    }
+
+    function usMarkFutureHeatmapCells(heatmapContainer) {
+        if (!heatmapContainer || !Array.isArray(us_chart_data.heatmap_series)) {
+            return;
+        }
+
+        var heatmapSeriesGroups = heatmapContainer.querySelectorAll('.apexcharts-heatmap-series');
+
+        heatmapSeriesGroups.forEach(function(group) {
+            var seriesIndex = parseInt(group.getAttribute('data:realIndex'), 10);
+            if (Number.isNaN(seriesIndex) || !us_chart_data.heatmap_series[seriesIndex]) {
+                return;
+            }
+
+            var points = Array.isArray(us_chart_data.heatmap_series[seriesIndex].data) ? us_chart_data.heatmap_series[seriesIndex].data : [];
+            var rects = group.querySelectorAll('.apexcharts-heatmap-rect');
+
+            rects.forEach(function(rect, pointIndex) {
+                var point = points[pointIndex];
+
+                if (!rect || !point) {
+                    return;
+                }
+
+                var isFutureCell = !!point.future;
+                rect.classList.toggle('kc-us-heatmap-future', isFutureCell);
+
+                if (isFutureCell) {
+                    rect.style.opacity = '0';
+                    rect.style.pointerEvents = 'none';
+                    rect.style.stroke = 'transparent';
+                } else {
+                    rect.style.opacity = '';
+                    rect.style.pointerEvents = '';
+                    rect.style.stroke = '';
+                }
+            });
+        });
+    }
+
+    function usRenderActivityHeatmap() {
+        var heatmapContainer = document.querySelector('#activity-heatmap');
+        if (!heatmapContainer || !heatmapSeriesReady || !heatmapHasClicksData) {
+            return;
+        }
+
+        var isDarkTheme = usGetIsDarkMode();
+        var heatmapThemeColorRanges = usBuildHeatmapRanges(isDarkTheme);
+
+        if (window.usHeatmapChart instanceof ApexCharts) {
             window.usHeatmapChart.destroy();
         }
+
         var heatmapOptions = {
             series: us_chart_data.heatmap_series,
             chart: {
                 height: 260,
                 type: 'heatmap',
                 toolbar: { show: false },
+                foreColor: isDarkTheme ? '#cbd5e1' : '#475569',
                 background: 'transparent',
                 events: {
-                    // Handle legend hover for better highlighting
-                    legendClick: function(chartContext, seriesIndex) {
-                        // Prevent default toggle behavior
+                    legendClick: function () {
                         return false;
                     }
                 }
@@ -874,6 +1370,9 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                 horizontalAlign: 'center',
                 floating: false,
                 fontSize: 12,
+                labels: {
+                    colors: isDarkTheme ? '#e2e8f0' : '#475569'
+                },
                 markers: {
                     width: 12,
                     height: 12,
@@ -893,19 +1392,16 @@ window.usHeatmapChart = window.usHeatmapChart || null;
             },
             plotOptions: {
                 heatmap: {
-                    shadeIntensity: 0.6,
+                    shadeIntensity: isDarkTheme ? 0.25 : 0.6,
                     radius: 4,
                     distributed: false,
-                    enableShades: true,
+                    enableShades: !isDarkTheme,
                     useFillColorAsStroke: true,
-                    strokeWidth: 3,
-                    strokeColor: '#ffffff',
+                    strokeWidth: 1.5,
+                    strokeColor: isDarkTheme ? 'rgba(71, 85, 105, 0.72)' : 'rgba(226, 232, 240, 0.92)',
                     cellHeight: 18,
                     colorScale: {
-                        ranges: heatmapColorRanges.length > 0 ? heatmapColorRanges : [
-                            { from: 0, to: 0, color: '#f0fdf4', name: '0 clicks' },
-                            { from: 1, to: 10, color: '#d3fcca', name: '1-10 clicks' }
-                        ]
+                        ranges: heatmapThemeColorRanges
                     }
                 }
             },
@@ -919,28 +1415,33 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                         var seriesIndex = opts && opts.seriesIndex ? opts.seriesIndex : 0;
                         var dataPointIndex = opts && opts.dataPointIndex ? opts.dataPointIndex : 0;
                         var metaPoint = us_chart_data.heatmap_series[ seriesIndex ] && us_chart_data.heatmap_series[ seriesIndex ].data[ dataPointIndex ];
+                        if (metaPoint && metaPoint.future) {
+                            return '';
+                        }
                         var dateValue = metaPoint && metaPoint.meta ? metaPoint.meta : value;
                         return dateValue ? new Date(dateValue).toLocaleDateString() : value;
                     }
                 },
                 y: {
                     formatter: function (value) {
+                        if (value === null || typeof value === 'undefined') {
+                            return '';
+                        }
                         return value + ' clicks';
                     }
                 }
             },
             states: {
-                // Enhanced hover effect
                 hover: {
                     filter: {
-                        type: 'darken',
-                        value: 0.25
+                        type: isDarkTheme ? 'none' : 'darken',
+                        value: isDarkTheme ? 0 : 0.25
                     }
                 },
                 active: {
                     filter: {
-                        type: 'darken',
-                        value: 0.15
+                        type: isDarkTheme ? 'none' : 'darken',
+                        value: isDarkTheme ? 0 : 0.15
                     }
                 }
             },
@@ -967,83 +1468,81 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                 categories: dayLabels
             }
         };
-        var heatmapContainer = document.querySelector("#activity-heatmap");
-        if ( heatmapContainer ) {
-            heatmapContainer.innerHTML = '';
-            window.usHeatmapChart = new ApexCharts(heatmapContainer, heatmapOptions);
-            window.usHeatmapChart.render();
 
-            // Add custom legend interaction handling
-            var legendItems = heatmapContainer.querySelectorAll('.apexcharts-legend-series');
-            legendItems.forEach(function(item, index) {
-                item.addEventListener('mouseenter', function() {
-                    // Get the range for this legend item
-                    var range = heatmapColorRanges[index];
-                    if (!range) return;
+        heatmapContainer.innerHTML = '';
+        window.usHeatmapChart = new ApexCharts(heatmapContainer, heatmapOptions);
+        window.usHeatmapChart.render();
+        usMarkFutureHeatmapCells(heatmapContainer);
+        usApplyHeatmapCellTheme(heatmapContainer, isDarkTheme);
 
-                    // Get the color from range
-                    var rangeColor = range.color || '#22c55e';
+        var legendItems = heatmapContainer.querySelectorAll('.apexcharts-legend-series');
+        legendItems.forEach(function(item, index) {
+            item.addEventListener('mouseenter', function() {
+                var range = heatmapThemeColorRanges[index];
+                if (!range) return;
 
-                    // Highlight cells in this range
-                    var allRects = heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect');
-                    allRects.forEach(function(rect) {
-                        var cellValue = parseInt(rect.getAttribute('val')) || 0;
-                        // Check if cell value is in this range
-                        var isInRange = cellValue >= range.from && cellValue <= range.to;
-                        
-                        if (isInRange) {
-                            rect.style.strokeWidth = '4';
-                            rect.style.filter = 'saturate(1.5) brightness(1.1)';
-                            
-                            // Add glow effect using box-shadow with range color
-                            var rgb = hexToRgb(rangeColor);
-                            rect.style.boxShadow = '0 0 6px 2px rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ', 0.6)';
-                            
-                            rect.classList.add('active-highlight');
-                            rect.classList.remove('inactive');
-                        } else {
-                            rect.classList.add('inactive');
-                            rect.classList.remove('active-highlight');
-                            rect.style.boxShadow = 'none';
-                        }
-                    });
+                var rangeColor = range.color || '#22c55e';
+                var allRects = heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect');
+                allRects.forEach(function(rect) {
+                    if (rect.classList.contains('kc-us-heatmap-future')) {
+                        return;
+                    }
 
-                    // Highlight the legend item
-                    item.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
-                    item.style.fontWeight = '600';
-                    item.style.borderLeft = '3px solid ' + rangeColor;
-                    item.style.paddingLeft = '5px';
-                });
+                    var cellValue = parseInt(rect.getAttribute('val')) || 0;
+                    var isInRange = cellValue >= range.from && cellValue <= range.to;
 
-                item.addEventListener('mouseleave', function() {
-                    // Reset all cells
-                    var allRects = heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect');
-                    allRects.forEach(function(rect) {
-                        rect.style.strokeWidth = '3';
-                        rect.style.filter = 'none';
-                        rect.style.boxShadow = 'none';
+                    if (isInRange) {
+                        rect.style.strokeWidth = '4';
+                        rect.style.filter = isDarkTheme ? 'saturate(1.1) brightness(1.03)' : 'saturate(1.5) brightness(1.1)';
+                        var rgb = hexToRgb(rangeColor);
+                        rect.style.boxShadow = '0 0 6px 2px rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ', 0.6)';
+                        rect.classList.add('active-highlight');
                         rect.classList.remove('inactive');
+                    } else {
+                        rect.classList.add('inactive');
                         rect.classList.remove('active-highlight');
-                    });
-
-                    // Reset legend item
-                    item.style.backgroundColor = 'transparent';
-                    item.style.fontWeight = '400';
-                    item.style.borderLeft = 'none';
-                    item.style.paddingLeft = '0px';
+                        rect.style.boxShadow = 'none';
+                    }
                 });
+
+                item.style.backgroundColor = isDarkTheme ? 'rgba(148, 163, 184, 0.12)' : 'rgba(34, 197, 94, 0.1)';
+                item.style.fontWeight = '600';
+                item.style.borderLeft = '3px solid ' + rangeColor;
+                item.style.paddingLeft = '5px';
             });
 
-            // Helper function to convert hex color to RGB
-            function hexToRgb(hex) {
-                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : { r: 34, g: 197, b: 94 };
-            }
+            item.addEventListener('mouseleave', function() {
+                var allRects = heatmapContainer.querySelectorAll('.apexcharts-heatmap-rect');
+                allRects.forEach(function(rect) {
+                    if (rect.classList.contains('kc-us-heatmap-future')) {
+                        return;
+                    }
+
+                    rect.style.strokeWidth = '3';
+                    rect.style.filter = 'none';
+                    rect.style.boxShadow = 'none';
+                    rect.classList.remove('inactive');
+                    rect.classList.remove('active-highlight');
+                });
+
+                usMarkFutureHeatmapCells(heatmapContainer);
+                usApplyHeatmapCellTheme(heatmapContainer, isDarkTheme);
+                item.style.backgroundColor = 'transparent';
+                item.style.fontWeight = '400';
+                item.style.borderLeft = 'none';
+                item.style.paddingLeft = '0px';
+            });
+        });
+
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 34, g: 197, b: 94 };
         }
+
         var heatmapMonthContainer = document.querySelector('#heatmap-month-row');
         if ( heatmapMonthContainer ) {
             if ( heatmapMonthLabels.length ) {
@@ -1059,5 +1558,12 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                 heatmapMonthContainer.innerHTML = '';
             }
         }
+    }
+
+    if ( $('#activity-heatmap').length && heatmapSeriesReady && heatmapHasClicksData ) {
+        usRenderActivityHeatmap();
+        document.addEventListener('kc-us-theme-changed', function () {
+            usRenderActivityHeatmap();
+        });
     }
 });

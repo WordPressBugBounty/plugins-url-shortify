@@ -102,9 +102,11 @@ class Redirect {
 	public function do_redirect( $link_data = [], $params = [] ) {
 		/* Track Click */
 		$track_me = Helper::get_data( $link_data, 'track_me', 0 );
+		$status   = (int) Helper::get_data( $link_data, 'status', 1 );
 
 		$click_data = [];
 		$link_id = 0;
+		$click_id = 0;
 		if ( $track_me ) {
 			$link_id = (int) Helper::get_data( $link_data, 'id', 0 );
 			$slug    = Helper::get_data( $link_data, 'slug', '' );
@@ -115,6 +117,10 @@ class Redirect {
 				$click_data = $click->get_prepared_data();
 
 				$track_me = apply_filters( 'kc_us_can_track_click', $track_me, $click );
+
+				if ( $track_me ) {
+					$click_id = $click->track();
+				}
 			}
 		}
 
@@ -123,18 +129,20 @@ class Redirect {
 		// Get the target URL based on all the considerations. Dynamic Redirection, UTM Params etc.
 		$url = $this->get_the_target_url( $url, $link_data, $click_data );
 
-		if ( $link_id && $track_me ) {
-			$click_id = $click->track();
+		if ( $link_id && $track_me && ! empty( $url ) ) {
+			$click_data = [
+				'click_id' => $click_id,
+				'link_id'  => $link_id,
+				'url'      => $url,
+			];
 
-			if ( ! empty( $url ) ) {
-				$click_data = [
-					'click_id' => $click_id,
-					'link_id'  => $link_id,
-					'url'      => $url,
-				];
+			do_action( 'kc_us_track_click', $click_data, $link_data );
+		}
 
-				do_action( 'kc_us_track_click', $click_data, $link_data );
-			}
+		// If link is in active, redirect to homepage. 
+		if ( 1 !== $status ) {
+			wp_redirect( home_url(), 302 );
+			exit;
 		}
 
 		$redirect_type     = Helper::get_data( $link_data, 'redirect_type', '' );
@@ -217,6 +225,38 @@ class Redirect {
 			}
 
 		}
+	}
+
+	/**
+	 * Show a small notice when a disabled link is visited.
+	 *
+	 * We still record the click, but we do not send the visitor to the target URL.
+	 *
+	 * @param array  $link_data
+	 * @param string $url
+	 *
+	 * @return void
+	 */
+	private function show_disabled_link_message( $link_data = [], $url = '' ) {
+		$slug = Helper::get_data( $link_data, 'slug', '' );
+
+		if ( ! function_exists( 'wp_die' ) ) {
+			require_once ABSPATH . WPINC . '/functions.php';
+		}
+
+		$message = apply_filters(
+			'kc_us_disabled_link_message',
+			sprintf(
+				/* translators: 1: short link slug, 2: target URL */
+				__( 'This short link is currently disabled. We are still tracking visits, but redirection is turned off.<br><br>Short link: %1$s<br>Target URL: %2$s', 'url-shortify' ),
+				esc_html( $slug ),
+				esc_html( $url )
+			),
+			$link_data,
+			$url
+		);
+
+		wp_die( wp_kses_post( $message ), esc_html__( 'Link Disabled', 'url-shortify' ), [ 'response' => 200 ] );
 	}
 
 	/**

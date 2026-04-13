@@ -52,9 +52,51 @@ class GroupStatsController extends StatsController {
 	public function prepare_data( $include_click_history = true ) {
 		$refresh = (int) Helper::get_request_data( 'refresh', 0 );
 
+		$time_filter = sanitize_key( Helper::get_request_data( 'time_filter', '' ) );
+		if ( empty( $time_filter ) ) {
+			$time_filter = US()->is_pro() ? 'all_time' : 'last_7_days';
+		}
+		if ( 'custom' === $time_filter && ! US()->is_pro() ) {
+			$time_filter = 'last_7_days';
+		}
+
+		$start_date = '';
+		$end_date   = '';
+		if ( 'custom' === $time_filter && US()->is_pro() ) {
+			$start_date = sanitize_text_field( Helper::get_request_data( 'start_date', '' ) );
+			$end_date   = sanitize_text_field( Helper::get_request_data( 'end_date', '' ) );
+		}
+
+		$days = 7;
+		switch ( $time_filter ) {
+			case 'today':
+				$days = 1;
+				break;
+			case 'last_7_days':
+				$days = 7;
+				break;
+			case 'last_30_days':
+				$days = 30;
+				break;
+			case 'last_60_days':
+				$days = 60;
+				break;
+			case 'all_time':
+			case 'custom':
+				$days = 0;
+				break;
+		}
+
+		// Build a filter-aware cache key so different time ranges are cached separately.
+		$cache_suffix = $time_filter;
+		if ( 'custom' === $time_filter && $start_date && $end_date ) {
+			$cache_suffix .= '_' . $start_date . '_' . $end_date;
+		}
+		$cache_key = 'group_stats_' . $this->group_id . '_' . $cache_suffix;
+
 		// If we have the data in cache, get it from it.
 		// We store data in cache for 3 hours
-		$data = Cache::get_transient( 'group_stats_' . $this->group_id );
+		$data = Cache::get_transient( $cache_key );
 
 		if ( ! empty( $data ) && ( 1 !== $refresh ) ) {
 			return $data;
@@ -70,14 +112,9 @@ class GroupStatsController extends StatsController {
 
 		$data['links'] = US()->db->links->get_by_ids( $link_ids );
 
-		// Click History for last 7 days
-		$days = apply_filters( 'kc_us_clicks_info_for_days', 7 );
+		$data['reports']['clicks'] = $this->get_clicks_info( $days, $link_ids, $start_date, $end_date );
 
-		$data['reports']['clicks'] = $this->get_clicks_info( $days, $link_ids );
-
-		$days = apply_filters( 'kc_us_clicks_count_for_days', 7 );
-
-		$data['click_data_for_graph'] = $this->get_clicks_count_by_days( $days, $link_ids );
+		$data['click_data_for_graph'] = $this->get_clicks_count_by_days( $days, $link_ids, $start_date, $end_date );
 
 		$data['browser_info'] = $this->get_browser_info_for_graph( $link_ids );
 		$data['device_info']  = $this->get_device_info_for_graph( $link_ids );
@@ -111,7 +148,7 @@ class GroupStatsController extends StatsController {
 		$data['last_updated_on'] = time();
 
 		// Store data in cache for 3 hours
-		Cache::set_transient( 'group_stats_' . $this->group_id, $data, HOUR_IN_SECONDS * 3 );
+		Cache::set_transient( $cache_key, $data, HOUR_IN_SECONDS * 3 );
 
 		return $data;
 	}

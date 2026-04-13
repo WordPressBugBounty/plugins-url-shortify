@@ -211,16 +211,11 @@ class Links_Table extends US_List_Table {
 			'groups'   => __( 'Groups', 'url-shortify' ),
 		];
 
-		if ( US()->is_pro() ) {
-			$columns['tags'] = __( 'Tags', 'url-shortify' );
-		}
-
 		$columns['meta_info']  = __( 'Meta Info', 'url-shortify' );
 		$columns['created_at'] = __( 'Created On', 'url-shortify' );
 		$columns['link']       = __( 'Link', 'url-shortify' );
 
 		return apply_filters( 'kc_us_filter_links_columns', $columns );
-
 	}
 
 	function prepare_groups_dropdown() {
@@ -372,6 +367,46 @@ class Links_Table extends US_List_Table {
 			'url-shortify' ), $short_link );
 
 		return $title . $this->row_actions( $actions, false, 'ml-8' );
+	}
+
+	/**
+	 * Render status column.
+	 *
+	 * @param array $item
+	 *
+	 * @return string
+	 */
+	public function column_status( $item ) {
+		$link_id      = absint( Helper::get_data( $item, 'id', 0 ) );
+		$status       = (int) Helper::get_data( $item, 'status', 1 );
+		$is_enabled   = 1 === $status;
+		$status_label = $is_enabled ? __( 'Enabled', 'url-shortify' ) : __( 'Disabled', 'url-shortify' );
+		$status_tip   = $is_enabled ? __( 'Click to Disable', 'url-shortify' ) : __( 'Click to Enable', 'url-shortify' );
+		$status_text  = esc_html( $status_label . '. ' . $status_tip );
+		$can_toggle   = US()->access->can( 'manage_links' ) || absint( Helper::get_data( $item, 'created_by_id', 0 ) ) === get_current_user_id();
+		$track_classes = $is_enabled ? 'is-enabled' : 'is-disabled';
+		$track_style   = $is_enabled
+			? 'background-color:#6366f1;border-color:rgba(99,102,241,.45);box-shadow:inset 0 1px 2px rgba(15,23,42,.10);'
+			: 'background-color:#64748b;border-color:rgba(71,85,105,.45);box-shadow:inset 0 1px 2px rgba(15,23,42,.14);';
+		$thumb_style   = $is_enabled
+			? 'transform: translateX(1.25rem); background-color:#ffffff; border-color:rgba(255,255,255,.4); box-shadow:0 1px 2px rgba(15,23,42,.18);'
+			: 'transform: translateX(0); background-color:#cbd5e1; border-color:rgba(148,163,184,.2); box-shadow:0 1px 2px rgba(15,23,42,.16);';
+
+		if ( ! $can_toggle ) {
+			return '<span class="inline-flex items-center rounded-full px-0.5 py-0.5 opacity-70" title="' . esc_attr( $status_tip ) . '" aria-label="' . esc_attr( $status_text ) . '">
+					<span class="us-link-status-track relative inline-flex h-6 w-10 items-center rounded-full p-0.5 transition duration-200 ease-out ' . esc_attr( $track_classes ) . '" style="' . esc_attr( $track_style ) . '">
+						<span class="us-link-status-thumb h-4 w-4 rounded-full shadow-sm transition duration-200 ease-out" style="' . esc_attr( $thumb_style ) . '"></span>
+					</span>
+					<span class="screen-reader-text us-link-status-label">' . $status_text . '</span>
+				</span>';
+		}
+
+		return '<button type="button" class="us-link-status-toggle inline-flex items-center rounded-full px-0.5 py-0.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60" data-link-id="' . $link_id . '" data-status="' . ( $is_enabled ? 1 : 0 ) . '" role="switch" aria-checked="' . ( $is_enabled ? 'true' : 'false' ) . '" aria-label="' . esc_attr( $status_text ) . '" title="' . esc_attr( $status_tip ) . '">
+				<span class="us-link-status-track relative inline-flex h-6 w-10 items-center rounded-full p-0.5 transition duration-200 ease-out ' . esc_attr( $track_classes ) . '" style="' . esc_attr( $track_style ) . '">
+					<span class="us-link-status-thumb h-4 w-4 rounded-full shadow-sm transition duration-200 ease-out" style="' . esc_attr( $thumb_style ) . '"></span>
+				</span>
+				<span class="screen-reader-text us-link-status-label">' . $status_text . '</span>
+			</button>';
 	}
 
 	/**

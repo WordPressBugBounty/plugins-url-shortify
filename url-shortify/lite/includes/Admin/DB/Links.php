@@ -389,6 +389,15 @@ class Links extends Base_DB {
 			$password = null;
 		}
 
+		$status = Helper::get_data( $data, 'status', null );
+		if ( null === $status && ! empty( $id ) ) {
+			$existing_link = $this->get_by_id( $id );
+			$status        = Helper::get_data( $existing_link, 'status', 1 );
+		}
+		if ( null === $status ) {
+			$status = 1;
+		}
+
 		$form_data = [
 			'name'              => Helper::get_data( $data, 'name', '', true ),
 			'url'               => Helper::get_data( $data, 'url', '' ),
@@ -399,7 +408,7 @@ class Links extends Base_DB {
 			'params_forwarding' => Helper::get_data( $data, 'params_forwarding', $default_parameter_forwarding ),
 			'sponsored'         => Helper::get_data( $data, 'sponsored', $default_sponsored ),
 			'track_me'          => Helper::get_data( $data, 'track_me', $default_track_me ),
-			'status'            => Helper::get_data( $data, 'status', 1 ),
+			'status'            => $status,
 			'cpt_id'            => Helper::get_data( $data, 'cpt_id', null ),
 			'cpt_type'          => Helper::get_data( $data, 'cpt_type', null ),
 			'expires_at'        => $expires_at,

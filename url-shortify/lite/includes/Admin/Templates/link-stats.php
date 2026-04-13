@@ -19,38 +19,48 @@ if ( empty( $time_filter ) ) {
 	$time_filter = ( US()->is_pro() ) ? 'all_time' : 'last_7_days';
 }
 
+// Custom date filter is PRO-only; fall back gracefully for free users.
+if ( 'custom' === $time_filter && ! US()->is_pro() ) {
+	$time_filter = 'last_7_days';
+}
+
 $buttons = [
 	'today' => [
 		'label' => __( 'Today', 'url-shortify' ),
 		'url'   => $today_url,
 		'class' => 'today' === $time_filter ? 'active' : 'inactive',
+		'filter' => 'today',
 	],
 
 	'last_7_days' => [
-		'label' => __( 'Last 7 Days', 'url-shortify' ),
+		'label' => __( '7 Days', 'url-shortify' ),
 		'url'   => $last_7_days_url,
 		'class' => 'last_7_days' === $time_filter ? 'active' : 'inactive',
+		'filter' => 'last_7_days',
 	],
 ];
 
 if ( US()->is_pro() ) {
 	$pro_buttons = [
 		'last_30_days' => [
-			'label' => __( 'Last 30 Days', 'url-shortify' ),
+			'label' => __( '30 Days', 'url-shortify' ),
 			'url'   => $last_30_days_url,
 			'class' => 'last_30_days' === $time_filter ? 'active' : 'inactive',
+			'filter' => 'last_30_days',
 		],
 
 		'last_60_days' => [
-			'label' => __( 'Last 60 Days', 'url-shortify' ),
+			'label' => __( '2 Months', 'url-shortify' ),
 			'url'   => $last_60_days_url,
 			'class' => 'last_60_days' === $time_filter ? 'active' : 'inactive',
+			'filter' => 'last_60_days',
 		],
 
 		'all_time' => [
 			'label' => __( 'All Time', 'url-shortify' ),
 			'url'   => $all_time_url,
 			'class' => 'all_time' === $time_filter ? 'active' : 'inactive',
+			'filter' => 'all_time',
 		],
 	];
 
@@ -67,6 +77,13 @@ $export_url = Helper::get_link_action_url( $link_id, 'export' );
 $clicks_data = $data['reports']['clicks'];
 
 $click_data_for_graph = $data['click_data_for_graph'];
+$chart_data = Helper::get_data( $data, 'chart_data', [] );
+$has_chart_data = ! empty( $chart_data )
+	&& ! empty( Helper::get_data( $chart_data, 'dates', [] ) )
+	&& array_sum( array_map( 'intval', Helper::get_data( $chart_data, 'total_series', [] ) ) ) > 0;
+$has_heatmap_data = ! empty( $chart_data )
+	&& ! empty( Helper::get_data( $chart_data, 'heatmap_series', [] ) )
+	&& ! empty( Helper::get_data( $chart_data, 'has_clicks_data', false ) );
 
 $last_updated_on = Helper::get_data( $data, 'last_updated_on', time() );
 
@@ -90,6 +107,9 @@ if ( ! empty( $click_data_for_graph ) ) {
 
 	$values = wp_json_encode( $clicks );
 }
+
+$current_start_date = Helper::get_data( $_GET, 'start_date', '' );
+$current_end_date   = Helper::get_data( $_GET, 'end_date', '' );
 
 $days = 7;
 switch ( $time_filter ) {
@@ -153,30 +173,101 @@ $click_history->set_columns( $columns );
         <!-- Click History Report -->
         <div class="mt-5">
             <div class="grid grid-cols-1">
-                <div class="mt-2 flex w-full border-b-2 border-gray-100">
-                    <div class="w-5/12">
-                        <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Clicks History', 'url-shortify' ); ?></span>
-                        <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500 mb-2"><?php echo sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ); ?></p>
-                    </div>
-                    <div class="w-7/12">
-                         <span class="relative z-0 inline-flex shadow-sm rounded-md float-right">
-                             <?php foreach ($buttons as $key => $button) { ?>
-                                    <button type="button" class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-green-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 <?php if ( 'active' === $button['class'] ) { echo "bg-green-100 hover:bg-green-100"; } else { echo "bg-white"; } ?>">
-                                        <a href="<?php echo $button['url']; ?>" id="kc-us-7-days" class="text-black hover:text-black"><?php echo $button['label']; ?></a>
-                                    </button>
-	                         <?php } ?>
-                                  <button type="button" class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-green-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                                      <a href="<?php echo $page_refresh_url; ?>" class="text-white hover:text-white" title="Refresh">
-                                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1.7em" height="1.7em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 20 20"><path
-                                                      d="M10.2 3.28c3.53 0 6.43 2.61 6.92 6h2.08l-3.5 4l-3.5-4h2.32a4.439 4.439 0 0 0-4.32-3.45c-1.45 0-2.73.71-3.54 1.78L4.95 5.66a6.965 6.965 0 0 1 5.25-2.38zm-.4 13.44c-3.52 0-6.43-2.61-6.92-6H.8l3.5-4c1.17 1.33 2.33 2.67 3.5 4H5.48a4.439 4.439 0 0 0 4.32 3.45c1.45 0 2.73-.71 3.54-1.78l1.71 1.95a6.95 6.95 0 0 1-5.25 2.38z" fill="#626262"/></svg>
-                                      </a>
-                                 </button>
-                        </span>
-                    </div>
-                </div>
-                <div class="bg-white mt-2" id="click-chart">
+                <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <h2 class="text-2xl font-semibold leading-tight text-slate-900"><?php _e( 'Total vs Unique Links', 'url-shortify' ); ?></h2>
+                            <p class="mt-1 max-w-2xl text-sm leading-5 text-slate-500 mb-2">
+                                <span id="kc-us-total-clicks"><?php echo esc_html( sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ) ); ?></span>
+                            </p>
+                        </div>
+                        <div id="kc-us-clicks-filter-controls" class="flex flex-wrap items-center gap-2">
 
-                </div>
+                            <!-- Segmented pill filter -->
+                            <div class="inline-flex items-center rounded-xl border border-gray-200 bg-gray-100 p-1 gap-0.5">
+                                <?php foreach ( $buttons as $key => $button ) : ?>
+                                    <button type="button"
+                                            class="kc-us-filter-pill rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 <?php echo 'active' === $button['class'] ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>"
+                                            data-filter="<?php echo esc_attr( $button['filter'] ); ?>">
+                                        <?php echo esc_html( $button['label'] ); ?>
+                                    </button>
+                                <?php endforeach; ?>
+                                <?php if ( US()->is_pro() ) : ?>
+                                <button type="button"
+                                        class="kc-us-filter-pill rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 <?php echo 'custom' === $time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>"
+                                        data-filter="custom">
+                                    <span class="dashicons dashicons-calendar-alt" style="width:14px;height:14px;font-size:14px;vertical-align:middle;margin-right:3px;" aria-hidden="true"></span><?php esc_html_e( 'Custom', 'url-shortify' ); ?>
+                                </button>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Custom date range picker (PRO only, visible when Custom is active) -->
+                            <?php if ( US()->is_pro() ) : ?>
+                            <div id="kc-us-clicks-custom-control" class="<?php echo ( 'custom' === $time_filter ) ? '' : 'hidden'; ?> inline-flex flex-wrap items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 shadow-sm">
+                                <input type="text"
+                                       id="kc-us-start-date"
+                                       class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                       placeholder="<?php esc_attr_e( 'Start date', 'url-shortify' ); ?>"
+                                       value="<?php echo esc_attr( $current_start_date ); ?>" />
+                                <span class="text-xs font-medium text-slate-400"><?php esc_html_e( '→', 'url-shortify' ); ?></span>
+                                <input type="text"
+                                       id="kc-us-end-date"
+                                       class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                       placeholder="<?php esc_attr_e( 'End date', 'url-shortify' ); ?>"
+                                       value="<?php echo esc_attr( $current_end_date ); ?>" />
+                                <button type="button"
+                                        id="kc-us-clicks-custom-apply"
+                                        class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                                        title="<?php esc_attr_e( 'Apply custom date range', 'url-shortify' ); ?>">
+                                    <?php esc_html_e( 'Apply', 'url-shortify' ); ?>
+                                </button>
+                            </div>
+                            <?php endif; // is_pro — custom control ?>
+
+                            <!-- Refresh -->
+                            <a href="<?php echo esc_url( $page_refresh_url ); ?>"
+                               id="kc-us-clicks-refresh"
+                               class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-600 transition-colors duration-150"
+                               title="<?php esc_attr_e( 'Refresh', 'url-shortify' ); ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10.2 3.28c3.53 0 6.43 2.61 6.92 6h2.08l-3.5 4l-3.5-4h2.32a4.439 4.439 0 0 0-4.32-3.45c-1.45 0-2.73.71-3.54 1.78L4.95 5.66a6.965 6.965 0 0 1 5.25-2.38zm-.4 13.44c-3.52 0-6.43-2.61-6.92-6H.8l3.5-4c1.17 1.33 2.33 2.67 3.5 4H5.48a4.439 4.439 0 0 0 4.32 3.45c1.45 0 2.73-.71 3.54-1.78l1.71 1.95a6.95 6.95 0 0 1-5.25 2.38z" fill="currentColor"/></svg>
+                            </a>
+
+                        </div>
+                    </div>
+
+                    <?php if ( $has_chart_data ) { ?>
+                        <div id="spline-area-chart" class="mt-6 h-[220px] w-full"></div>
+                    <?php } else { ?>
+                        <div class="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
+                            <p class="text-base font-medium text-slate-700">
+                                <?php esc_html_e( 'No clicks data available yet.', 'url-shortify' ); ?>
+                            </p>
+                        </div>
+                    <?php } ?>
+                </section>
+
+                <?php if ( US()->is_pro() ) : ?>
+                <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)] mt-6">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <h2 class="text-xl font-semibold text-slate-900"><?php _e( 'Link Activity Intensity', 'url-shortify' ); ?></h2>
+                        </div>
+                    </div>
+
+                    <?php if ( $has_heatmap_data ) { ?>
+                        <div class="kc-us-heatmap-chart-wrapper mt-2 w-full">
+                            <div id="activity-heatmap" class="w-full"></div>
+                            <div id="heatmap-month-row" class="kc-us-heatmap-month-row" aria-hidden="true"></div>
+                        </div>
+                    <?php } else { ?>
+                        <div class="kc-us-heatmap-empty-state mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
+                            <p class="text-base font-medium text-slate-700">
+                                <?php esc_html_e( 'No clicks data available. Once your link is visited, analytics will appear here', 'url-shortify' ); ?>
+                            </p>
+                        </div>
+                    <?php } ?>
+                </section>
+                <?php endif; // is_pro — custom control ?>
             </div>
         </div>
 
@@ -425,7 +516,6 @@ $click_history->set_columns( $columns );
                             ? ( $max_conv_rate > 0 && $conv_rate === $max_conv_rate )
                             : ( $max_clicks > 0 && (int) $variant['total_clicks'] === $max_clicks );
                         $bar_pct         = $max_clicks > 0 ? round( ( $variant['total_clicks'] / $max_clicks ) * 100 ) : 0;
-                        /* translators: %s: Variant letter (A, B, C…) */
                         $variant_label   = sprintf( __( 'Variant %s', 'url-shortify' ), chr( 64 + $variant_num ) ); // A, B, C…
                     ?>
                     <tr class="hover:bg-gray-50">
@@ -513,15 +603,15 @@ $click_history->set_columns( $columns );
                     </div>
                     <div class="min-w-0">
                         <p class="text-sm font-semibold text-green-800">
-                            <?php /* translators: %s: Variant letter (A, B, C…) */ printf( esc_html__( 'Variant %s is winning', 'url-shortify' ), $winner_letter ); ?>
+                            <?php printf( esc_html__( 'Variant %s is winning', 'url-shortify' ), $winner_letter ); ?>
                         </p>
                         <p class="text-xs text-green-700 truncate">
                             <?php if ( $is_split_test && isset( $winner['conversion_rate'] ) ) : ?>
-                                <?php /* translators: 1: Conversion rate percentage (e.g. 30.1), 2: Number of conversions */ printf( esc_html__( '%1$s%% conversion rate · %2$s conversions', 'url-shortify' ),
+                                <?php printf( esc_html__( '%s%% conversion rate · %s conversions', 'url-shortify' ),
                                     number_format( $winner['conversion_rate'], 1 ),
                                     number_format_i18n( $winner['conversions'] ) ); ?>
                             <?php else : ?>
-                                <?php /* translators: %s: Number of total clicks */ printf( esc_html__( '%s total clicks', 'url-shortify' ),
+                                <?php printf( esc_html__( '%s total clicks', 'url-shortify' ),
                                     number_format_i18n( $winner['total_clicks'] ) ); ?>
                             <?php endif; ?>
                         </p>
@@ -572,7 +662,15 @@ $click_history->set_columns( $columns );
         <div class="bg-white flex-grow sm:px-4 mt-4 pt-6 pb-8">
 
             <div>
-                <table id="clicks-data" class="display" data-server-side="true" data-link-id="<?php echo esc_attr( $link_id ); ?>" data-days="<?php echo esc_attr( $days ); ?>" style="width:100%">
+                <table id="clicks-data"
+                       class="display"
+                       data-server-side="true"
+                       data-link-id="<?php echo esc_attr( $link_id ); ?>"
+                       data-time-filter="<?php echo esc_attr( $time_filter ); ?>"
+                       data-start-date="<?php echo esc_attr( $current_start_date ); ?>"
+                       data-end-date="<?php echo esc_attr( $current_end_date ); ?>"
+                       data-days="<?php echo esc_attr( $days ); ?>"
+                       style="width:100%">
                     <thead>
 				<?php $click_history->render_header(); ?>
                     </thead>
@@ -587,85 +685,5 @@ $click_history->set_columns( $columns );
 </div>
 
 <script type="text/javascript">
-(function ($) {
-	$(document).ready(function () {
-		const labels = <?php echo wp_json_encode( $chart_labels ); ?>;
-		const values = <?php echo wp_json_encode( $chart_values ); ?>;
-		const target = document.querySelector('#click-chart');
-
-		if (!target || !Array.isArray(labels) || !labels.length || !Array.isArray(values) || !values.length) {
-			return;
-		}
-
-		if (typeof ApexCharts === 'undefined') {
-			console.error('ApexCharts is not available on this page.');
-			return;
-		}
-
-		const options = {
-			series: [{
-				name: '<?php echo esc_js( __( 'Clicks', 'url-shortify' ) ); ?>',
-				data: values,
-			}],
-			chart: {
-				type: 'area',
-				height: 320,
-				toolbar: { show: false },
-				zoom: { enabled: false },
-				background: 'transparent',
-			},
-			dataLabels: { enabled: false },
-			stroke: { curve: 'smooth', width: 3 },
-			colors: ['#4f46e5', '#10b981'],
-			fill: {
-				type: 'gradient',
-				gradient: {
-					shadeIntensity: 0.35,
-					opacityFrom: 0.85,
-					opacityTo: 0.15,
-					stops: [0, 40, 100],
-				},
-			},
-			markers: { size: 0, hover: { sizeOffset: 4 } },
-			xaxis: {
-				type: 'category',
-				categories: labels,
-				labels: {
-					rotate: -30,
-					hideOverlappingLabels: true,
-					style: { colors: '#475569' }
-				},
-				axisBorder: { color: 'rgba(148,163,184,0.35)' },
-				axisTicks: { color: 'rgba(148,163,184,0.35)' },
-				tickAmount: 8
-			},
-			yaxis: {
-				labels: {
-					formatter: function (val) { return Math.round(val); },
-					style: { colors: '#475569' }
-				},
-				tickAmount: 6,
-				min: 0
-			},
-			tooltip: {
-				shared: true,
-				y: {
-					formatter: function (value) {
-						return value + ' <?php echo esc_js( __( 'clicks', 'url-shortify' ) ); ?>';
-					}
-				}
-			},
-			grid: {
-				borderColor: 'rgba(148,163,184,0.25)',
-				strokeDashArray: 4,
-				padding: { left: 10, right: 10 }
-			},
-		};
-
-		target.innerHTML = '';
-		const chart = new ApexCharts(target, options);
-		chart.render();
-	});
-})(jQuery);
-
+	window.us_chart_data = <?php echo wp_json_encode( $chart_data ); ?>;
 </script>

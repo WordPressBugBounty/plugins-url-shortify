@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -454,7 +454,7 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 3. Link Analysis
 
-4. Link default settings [Free & PRO]
+4. Link Activity Intensity - Dark Mode [PRO]
 
 5. Reports Settings [PRO]
 
@@ -480,14 +480,27 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 16. Favorite Links [PRO]
 
+17. Link default settings [Free & PRO]
+
 == Upgrade Notice ==
 
-= 2.2.1 =
+= 2.2.2 =
 
-* Fix: Fixed the issue of showing incorrect click count in link clicks details page.
-* Fix: Improve UI and fixed datatables.
+* New: Added support to enable/disable short links. **PRO**
+* New: Added Link Activity Intensity report in the link stats page. **PRO**
+* New: Added custom date range filter in the link stats page. **PRO**
+* UX: Improved UI for the dark theme.
+* Translations: Updated .POT file for new translations.
 
 == Changelog ==
+
+= 2.2.2 [2026-04-13] =
+
+* New: Added support to enable/disable short links. **PRO**
+* New: Added Link Activity Intensity report in the link stats page. **PRO**
+* New: Added custom date range filter in the link stats page. **PRO**
+* UX: Improved UI for the dark theme.
+* Translations: Updated .POT file for new translations.
 
 = 2.2.1 [2026-04-01] =
 
