@@ -19,6 +19,9 @@
 	function toggleConditionals(enabled) {
 		if (enabled) {
 			$(CONDITIONAL_CLASS).show();
+			// Re-apply frequency-based day row visibility after showing conditionals.
+			var currentFreq = $('input[name*="email_digest_frequency"]:checked').val() || 'weekly';
+			updateDaySelector(currentFreq);
 		} else {
 			$(CONDITIONAL_CLASS).hide();
 		}
@@ -43,17 +46,18 @@
 	 */
 	function updateDaySelector(frequency) {
 		var $wrapper = $('#kc-us-digest-day-wrapper');
+		var $row     = $wrapper.closest('tr');
 		var $select  = $(DAY_SELECT);
 		var current  = $select.val();
 		var options  = '';
 
-		// Daily frequency does not use a day selector.
+		// Daily frequency does not use a day selector — hide the entire row.
 		if (frequency === 'daily') {
-			$wrapper.hide();
+			$row.hide();
 			return;
 		}
 
-		$wrapper.show();
+		$row.show();
 
 		if (frequency === 'monthly') {
 			for (var d = 1; d <= 28; d++) {
@@ -128,6 +132,11 @@
 		var $enabledSwitch = $(ENABLED_INPUT);
 		// WPSF switch inputs may be checkboxes.
 		var isEnabled = $enabledSwitch.is(':checked') || $enabledSwitch.val() == '1';
+
+		// Initialise day row visibility before showing conditionals so there is no flash.
+		var initialFreq = $('input[name*="email_digest_frequency"]:checked').val() || 'weekly';
+		updateDaySelector(initialFreq);
+
 		toggleConditionals(isEnabled);
 
 		// Toggle on change.

@@ -70,6 +70,23 @@ class Tags extends Base_DB {
 		return $map;
 	}
 
+	/**
+	 * Get tag by name.
+	 *
+	 * @param string $name Tag name.
+	 *
+	 * @return array|object|null
+	 *
+	 * @since 1.14.0
+	 */
+	public function get_by_name( $name = '' ) {
+		if ( empty( $name ) ) {
+			return null;
+		}
+
+		return $this->get_by( 'name', $name );
+	}
+
 	public function get_all_id_object_map() {
 		$results = $this->get_all();
 		$map = [];

@@ -503,6 +503,63 @@ class Clicks extends Base_DB {
 	}
 
 	/**
+	 * Get unique clicks data by day.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string $start_date
+	 * @param string $end_date
+	 * @param array  $link_ids
+	 *
+	 * @return array
+	 */
+	public function get_unique_clicks_count_by_days( $start_date = '', $end_date = '', $link_ids = [] ) {
+		global $wpdb;
+
+		$clicks_table = "{$wpdb->prefix}kc_us_clicks";
+
+		$query = "SELECT DATE(created_at) as date, IF(COUNT(CASE WHEN is_first_click = 1 THEN 1 ELSE NULL END) IS NULL, 0, COUNT(CASE WHEN is_first_click = 1 THEN 1 ELSE NULL END)) as count FROM $clicks_table";
+
+		$where = [];
+		if ( ! empty( $link_ids ) ) {
+			$link_ids_str = $this->prepare_for_in_query( $link_ids );
+			$where[] = "link_id IN ($link_ids_str)";
+		}
+
+		$where[] = $wpdb->prepare( 'DATE(created_at) >= %s AND DATE(created_at) <= %s ', $start_date, $end_date );
+
+		if ( ! empty( $where ) ) {
+			$where = implode( ' AND ', $where );
+			$query .= " WHERE $where";
+		}
+
+		$query .= 'GROUP BY DATE(created_at) ORDER BY DATE(created_at) DESC';
+
+		$results = $wpdb->get_results( $query, ARRAY_A );
+
+		$data = [];
+		if ( Helper::is_forechable( $results ) ) {
+			foreach ( $results as $result ) {
+				$data[ $result['date'] ] = $result['count'];
+			}
+
+			end( $data );
+			$last_date = key( $data );
+			$stop_date = date( 'Y-m-d', strtotime( $last_date . ' -1 day' ) );
+		} else {
+			$stop_date = date( 'Y-m-d', strtotime( 'today -1 day' ) );
+		}
+
+		$final_data = [];
+		for ( $i = 0; $stop_date <= $end_date; $i ++ ) {
+			$final_data[ $stop_date ] = Helper::get_data( $data, $stop_date, 0 );
+			$stop_date = date( 'Y-m-d', strtotime( $stop_date . ' +1 day' ) );
+		}
+
+		return $final_data;
+	}
+
+	/**
 	 * Get browser info
 	 *
 	 * @since 1.2.1
@@ -768,6 +825,50 @@ class Clicks extends Base_DB {
 			foreach ( $results as $result ) {
 				$clicks_data[ $result['group_id'] ]['total_clicks']  = $result['total_clicks'];
 				$clicks_data[ $result['group_id'] ]['unique_clicks'] = $result['unique_clicks'];
+			}
+		}
+
+		return $clicks_data;
+	}
+
+	/**
+	 * Get total clicks and unique clicks by tag ids.
+	 *
+	 * @param $tag_ids
+	 *
+	 * @return array
+	 *
+	 * @since 1.13.1
+	 */
+	public function get_total_clicks_and_unique_clicks_by_tag_ids( $tag_ids ) {
+		global $wpdb;
+
+		if ( empty( $tag_ids ) ) {
+			return [];
+		}
+
+		if ( ! is_array( $tag_ids ) ) {
+			$tag_ids = [ $tag_ids ];
+		}
+
+		$tag_ids_str = $this->prepare_for_in_query( $tag_ids );
+
+		$clicks_table     = $wpdb->prefix . 'kc_us_clicks';
+		$link_tags_table  = $wpdb->prefix . 'kc_us_links_tags';
+
+		$query = "SELECT lt.tag_id, COUNT(c.link_id) AS total_clicks, COUNT(DISTINCT CASE WHEN c.is_first_click = 1 THEN c.id ELSE NULL END) AS unique_clicks
+				FROM {$clicks_table} c
+				JOIN {$link_tags_table} lt ON c.link_id = lt.link_id
+				WHERE lt.tag_id IN ({$tag_ids_str})
+				GROUP BY lt.tag_id";
+
+		$results = $wpdb->get_results( $query, ARRAY_A );
+
+		$clicks_data = [];
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $result ) {
+				$clicks_data[ $result['tag_id'] ]['total_clicks']  = $result['total_clicks'];
+				$clicks_data[ $result['tag_id'] ]['unique_clicks'] = $result['unique_clicks'];
 			}
 		}
 

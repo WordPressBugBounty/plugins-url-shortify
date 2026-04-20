@@ -649,6 +649,34 @@ class Links extends Base_DB {
 		return $this->update_by_condition( $parameter, $value, $where );
 	}
 
+	/**
+	 * Bulk update link status.
+	 *
+	 * @param array $ids
+	 * @param int   $status
+	 *
+	 * @return bool
+	 */
+	public function bulk_update_status( $ids, $status ) {
+		if ( empty( $ids ) ) {
+			return false;
+		}
+
+		$status  = absint( $status );
+		$ids     = array_map( 'absint', (array) $ids );
+		$ids_str = $this->prepare_for_in_query( $ids );
+		$where   = "id IN ($ids_str)";
+		$updated = $this->update_by_condition( 'status', $status, $where );
+
+		if ( $updated ) {
+			foreach ( $ids as $id ) {
+				do_action( 'kc_us_link_updated', $id );
+			}
+		}
+
+		return $updated;
+	}
+
 	public function get_new_links_count_by_time_range($start_date, $end_date) {
 		global $wpdb;
 

@@ -908,6 +908,25 @@ class Helper {
     }
 
     /**
+     * Get Tag action url
+     *
+     * @param  string  $action
+     *
+     * @param  null    $tag_id
+     *
+     * @return string
+     *
+     * @since 1.13.1
+     */
+    public static function get_tag_action_url( $tag_id = null, $action = 'edit' ) {
+        if ( empty( $tag_id ) || empty( $action ) ) {
+            return '#';
+        }
+
+        return self::get_action_url( $tag_id, 'tags', $action );
+    }
+
+    /**
      * Get max upload file size.
      *
      * @return int
@@ -1020,6 +1039,8 @@ class Helper {
             $page = 'us_links';
         } elseif ( 'groups' === $type ) {
             $page = 'us_groups';
+        } elseif ( 'tags' === $type ) {
+            $page = 'us_tags';
         } elseif ( 'domains' === $type ) {
             $page = 'us_domains';
         } elseif ( 'utm_presets' === $type ) {
@@ -2649,6 +2670,16 @@ class Helper {
             $options['redirect_types'] = [
                     'label'  => __( 'Redirect Types', 'url-shortify' ),
                     'values' => $redirect_type_options,
+            ];
+        }
+
+        if ( US()->is_pro() ) {
+            $options['status'] = [
+                    'label'  => __( 'Status', 'url-shortify' ),
+                    'values' => [
+                            'status_1' => __( 'Enabled', 'url-shortify' ),
+                            'status_0' => __( 'Disabled', 'url-shortify' ),
+                    ],
             ];
         }
 

@@ -148,6 +148,102 @@ class ImportController extends BaseController {
 	}
 
 	/**
+	 * Import Tags
+	 *
+	 * Create missing tags before mapping them to links.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @param array $tags
+	 */
+	public function import_tags( $tags = [] ) {
+		if ( ! Helper::is_forechable( $tags ) ) {
+			return;
+		}
+
+		$existing_tags   = US()->db->tags->get_id_name_map();
+		$current_user_id = \get_current_user_id();
+		$tags_to_import  = [];
+		$key             = 0;
+
+		foreach ( $tags as $tag_name => $links ) {
+			if ( ! in_array( $tag_name, $existing_tags, true ) ) {
+				$tags_to_import[ $key ]['name']          = $tag_name;
+				$tags_to_import[ $key ]['created_by_id'] = $current_user_id;
+				$key ++;
+			}
+		}
+
+		if ( Helper::is_forechable( $tags_to_import ) ) {
+			US()->db->tags->bulk_insert( $tags_to_import );
+		}
+	}
+
+	/**
+	 * Add links to tag
+	 *
+	 * @since 1.14.0
+	 *
+	 * @param array $tags
+	 */
+	public function add_links_to_tag( $tags = [] ) {
+		if ( ! Helper::is_forechable( $tags ) ) {
+			return;
+		}
+
+		$created_by_id     = \get_current_user_id();
+		$tags_name_id_map  = US()->db->tags->get_columns_map( 'name', 'id' );
+		$links_slug_id_map = US()->db->links->get_columns_map( 'slug', 'id' );
+		$data_to_insert    = [];
+		$key               = 0;
+
+		foreach ( $tags as $tag => $links ) {
+			$tag_id = Helper::get_data( $tags_name_id_map, $tag, 0 );
+
+			if ( 0 != $tag_id && Helper::is_forechable( $links ) ) {
+				foreach ( $links as $slug ) {
+					$link_id = Helper::get_data( $links_slug_id_map, $slug, 0 );
+
+					if ( 0 != $link_id ) {
+						$data_to_insert[ $key ]['link_id']       = $link_id;
+						$data_to_insert[ $key ]['tag_id']        = $tag_id;
+						$data_to_insert[ $key ]['created_by_id'] = $created_by_id;
+						$key ++;
+					}
+				}
+			}
+		}
+
+		if ( Helper::is_forechable( $data_to_insert ) ) {
+			US()->db->links_tags->bulk_insert( $data_to_insert );
+		}
+	}
+
+	/**
+	 * Parse a CSV field into terms.
+	 *
+	 * Supports pipe-separated or comma-separated values.
+	 *
+	 * @since 1.14.0
+	 *
+	 * @param string $value
+	 *
+	 * @return array
+	 */
+	private function parse_csv_terms( $value = '' ) {
+		$value = trim( (string) $value );
+
+		if ( '' === $value ) {
+			return [];
+		}
+
+		$delimiter = false !== strpos( $value, '|' ) ? '|' : ',';
+		$terms     = array_map( 'trim', explode( $delimiter, $value ) );
+
+		return array_values( array_filter( $terms, 'strlen' ) );
+	}
+
+	/**
 	 * Import link from CSV file.
 	 *
 	 * @since 1.6.0
@@ -241,17 +337,16 @@ class ImportController extends BaseController {
 			$key = 0;
 
 			$groups_to_import = [];
+			$tags_to_import   = [];
 
 			foreach ( $links as $link ) {
 
 				$slug = Helper::get_data( $link, 'Slug', '', true );
 
-				$groups_str = Helper::get_data($link, 'Groups', '', true);
-
-				$groups = [];
-				if ( ! empty( $groups_str ) ) {
-					$groups = explode( '|', $groups_str );
-					$groups = array_map( 'trim', $groups );
+				$groups = $this->parse_csv_terms( Helper::get_data( $link, 'Groups', '', true ) );
+				$tags   = [];
+				if ( US()->is_pro() ) {
+					$tags = $this->parse_csv_terms( Helper::get_data( $link, 'Tags', '', true ) );
 				}
 
 				if ( empty( $slug ) ) {
@@ -263,6 +358,12 @@ class ImportController extends BaseController {
 				if ( ! empty( $groups ) ) {
 					foreach ( $groups as $group ) {
 						$groups_to_import[ $group ][] = $slug;
+					}
+				}
+
+				if ( US()->is_pro() && ! empty( $tags ) ) {
+					foreach ( $tags as $tag ) {
+						$tags_to_import[ $tag ][] = $slug;
 					}
 				}
 
@@ -305,6 +406,12 @@ class ImportController extends BaseController {
 				$this->import_groups( $groups_to_import );
 
 				$this->add_links_to_group( $groups_to_import );
+			}
+
+			if ( US()->is_pro() && ! empty( $tags_to_import ) ) {
+				$this->import_tags( $tags_to_import );
+
+				$this->add_links_to_tag( $tags_to_import );
 			}
 		}
 

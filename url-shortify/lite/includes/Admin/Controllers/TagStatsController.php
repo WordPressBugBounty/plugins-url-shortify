@@ -7,62 +7,57 @@ use KaizenCoders\URL_Shortify\Common\Export;
 use KaizenCoders\URL_Shortify\Common\Utils;
 use KaizenCoders\URL_Shortify\Helper;
 
-class GroupStatsController extends StatsController {
+class TagStatsController extends StatsController {
 	/**
-	 * Group ID
+	 * Tag ID
 	 *
-	 * @since 1.1.3
+	 * @since 1.13.1
 	 * @var null
-	 *
 	 */
-	public $group_id = null;
+	public $tag_id = null;
 
 	/**
-	 * Link_Stats constructor.
+	 * TagStatsController constructor.
 	 *
-	 * @since 1.0.4
-	 *
-	 * @param null $group_id
-	 *
+	 * @param null $tag_id
 	 */
-	public function __construct( $group_id = null ) {
-		$this->group_id = $group_id;
+	public function __construct( $tag_id = null ) {
+		$this->tag_id = $tag_id;
 
 		parent::__construct();
 	}
 
 	/**
-	 * Render Group stats page
+	 * Render Tag stats page.
 	 *
-	 * @since 1.1.7
+	 * @since 1.13.1
 	 */
 	public function render() {
 		$data = $this->prepare_data( false );
 
-		include KC_US_ADMIN_TEMPLATES_DIR . '/group-stats.php';
+		include KC_US_ADMIN_TEMPLATES_DIR . '/tag-stats.php';
 	}
 
 	/**
-	 * Prepare data for report
+	 * Prepare data for report.
 	 *
-	 * @since 1.1.7
+	 * @since 1.13.1
+	 *
+	 * @param bool $include_click_history
+	 *
 	 * @return array|object|void|null
-	 *
 	 */
 	public function prepare_data( $include_click_history = true ) {
 		$refresh = (int) Helper::get_request_data( 'refresh', 0 );
 
 		$time_filter = sanitize_key( Helper::get_request_data( 'time_filter', '' ) );
 		if ( empty( $time_filter ) ) {
-			$time_filter = US()->is_pro() ? 'all_time' : 'last_7_days';
-		}
-		if ( 'custom' === $time_filter && ! US()->is_pro() ) {
-			$time_filter = 'last_7_days';
+			$time_filter = 'all_time';
 		}
 
 		$start_date = '';
 		$end_date   = '';
-		if ( 'custom' === $time_filter && US()->is_pro() ) {
+		if ( 'custom' === $time_filter ) {
 			$start_date = sanitize_text_field( Helper::get_request_data( 'start_date', '' ) );
 			$end_date   = sanitize_text_field( Helper::get_request_data( 'end_date', '' ) );
 		}
@@ -87,37 +82,32 @@ class GroupStatsController extends StatsController {
 				break;
 		}
 
-		// Build a filter-aware cache key so different time ranges are cached separately.
 		$cache_suffix = $time_filter;
 		if ( 'custom' === $time_filter && $start_date && $end_date ) {
 			$cache_suffix .= '_' . $start_date . '_' . $end_date;
 		}
-		$cache_key = 'group_stats_v4_' . $this->group_id . '_' . $cache_suffix;
+		$cache_key = 'tag_stats_v1_' . $this->tag_id . '_' . $cache_suffix;
 
-		// If we have the data in cache, get it from it.
-		// We store data in cache for 3 hours
 		$data = Cache::get_transient( $cache_key );
-
 		if ( ! empty( $data ) && ( 1 !== $refresh ) ) {
 			return $data;
 		}
 
-		$data = US()->db->groups->get_by_id( $this->group_id );
-
-		$link_ids = US()->db->links_groups->get_link_ids_by_group_id( $this->group_id );
+		$data = US()->db->tags->get_by( 'id', $this->tag_id );
+		$link_ids_map = US()->db->links_tags->get_link_ids_by_tag_ids( [ $this->tag_id ] );
+		$link_ids = Helper::get_data( $link_ids_map, $this->tag_id, [] );
 
 		if ( empty( $link_ids ) ) {
 			return $data;
 		}
 
 		$data['links'] = US()->db->links->get_by_ids( $link_ids );
-
 		$data['reports']['clicks'] = $this->get_clicks_info( $days, $link_ids, $start_date, $end_date );
 
-		$total_clicks_by_days  = $this->get_clicks_count_by_days( $days, $link_ids, $start_date, $end_date );
+		$total_clicks_by_days = $this->get_clicks_count_by_days( $days, $link_ids, $start_date, $end_date );
 
 		$unique_start_date = $start_date;
-		$unique_end_date   = $end_date;
+		$unique_end_date    = $end_date;
 		if ( empty( $unique_start_date ) || empty( $unique_end_date ) ) {
 			if ( 0 === (int) $days ) {
 				$unique_start_date = '2000-01-01';
@@ -194,8 +184,7 @@ class GroupStatsController extends StatsController {
 		$data['os_info']      = $this->get_os_info_for_graph( $link_ids );
 
 		$countries_data = $this->get_country_info_for_graph( $link_ids );
-
-		$country_info = [];
+		$country_info   = [];
 
 		if ( Helper::is_forechable( $countries_data ) ) {
 			$total_count = array_sum( array_values( $countries_data ) );
@@ -214,65 +203,48 @@ class GroupStatsController extends StatsController {
 			}
 		}
 
-		$data['country_info'] = $country_info;
-
+		$data['country_info']   = $country_info;
 		$data['referrers_info'] = $this->get_referrers_info_for_graph( $link_ids );
-
 		$data['last_updated_on'] = time();
 
-		// Store data in cache for 3 hours
 		Cache::set_transient( $cache_key, $data, HOUR_IN_SECONDS * 3 );
 
 		return $data;
 	}
 
 	/**
-	 * Export click history of a group.
+	 * Export click history of a tag.
 	 *
-	 * @since 1.6.5
-	 * @return void
-	 *
+	 * @since 1.13.1
 	 */
 	public function export() {
-		$link_ids = US()->db->links_groups->get_link_ids_by_group_id( $this->group_id );
+		$link_ids_map = US()->db->links_tags->get_link_ids_by_tag_ids( [ $this->tag_id ] );
+		$link_ids     = Helper::get_data( $link_ids_map, $this->tag_id, [] );
 
-		// Click History for last 7 days
 		$days = apply_filters( 'kc_us_clicks_info_for_days', 7 );
-
 		$clicks_data = $this->get_all_clicks_info( $days, $link_ids );
 
 		$export = new Export();
-
 		$headers = $export->get_clicks_info_headers();
-
 		$csv_data = $export->generate_csv( $headers, $clicks_data );
 
-		$file_name = 'click-history.csv';
-
-		$export->download_csv( $csv_data, $file_name );
+		$export->download_csv( $csv_data, 'click-history.csv' );
 	}
 
 	/**
-	 * Export click history of a group.
+	 * Export links of a tag.
 	 *
-	 * @since 1.6.5
-	 * @return void
-	 *
+	 * @since 1.13.1
 	 */
 	public function export_links() {
-		$link_ids = US()->db->links_groups->get_link_ids_by_group_id( $this->group_id );
-
-		$links = US()->db->links->get_by_ids( $link_ids );
+		$link_ids_map = US()->db->links_tags->get_link_ids_by_tag_ids( [ $this->tag_id ] );
+		$link_ids     = Helper::get_data( $link_ids_map, $this->tag_id, [] );
+		$links    = US()->db->links->get_by_ids( $link_ids );
 
 		$export = new Export();
-
 		$headers = $export->get_links_headers();
-
 		$csv_data = $export->generate_csv( $headers, $links );
 
-		$file_name = 'links.csv';
-
-		$export->download_csv( $csv_data, $file_name );
+		$export->download_csv( $csv_data, 'links.csv' );
 	}
-
 }

@@ -16,6 +16,20 @@ $elapsed_time = Utils::get_elapsed_time( $last_updated_on );
 $show_kpis            = Helper::get_data( $data, 'show_kpis', false );
 $new_link_url         = Helper::get_data( $data, 'new_link_url', '' );
 $new_group_url        = Helper::get_data( $data, 'new_group_url', '' );
+$dashboard_time_filter = Helper::get_data( $_GET, 'time_filter', '' );
+if ( empty( $dashboard_time_filter ) ) {
+    $dashboard_time_filter = US()->is_pro() ? 'all_time' : '';
+}
+if ( 'custom' === $dashboard_time_filter && ! US()->is_pro() ) {
+    $dashboard_time_filter = '';
+}
+$dashboard_current_start_date = ( 'custom' === $dashboard_time_filter ) ? Helper::get_data( $_GET, 'start_date', '' ) : '';
+$dashboard_current_end_date   = ( 'custom' === $dashboard_time_filter ) ? Helper::get_data( $_GET, 'end_date', '' ) : '';
+$dashboard_today_url          = Utils::get_stats_filter_url( array( 'time_filter' => 'today' ) );
+$dashboard_last_7_days_url    = Utils::get_stats_filter_url( array( 'time_filter' => 'last_7_days' ) );
+$dashboard_last_30_days_url   = Utils::get_stats_filter_url( array( 'time_filter' => 'last_30_days' ) );
+$dashboard_last_60_days_url   = Utils::get_stats_filter_url( array( 'time_filter' => 'last_60_days' ) );
+$dashboard_all_time_url       = Utils::get_stats_filter_url( array( 'time_filter' => 'all_time' ) );
 $click_data_for_graph = Helper::get_data( $data, 'click_data_for_graph', [] );
 $has_clicks_data      = Helper::get_data( $data, 'has_clicks_data', false );
 if ( ! $has_clicks_data && ! empty( $click_data_for_graph ) ) {
@@ -171,6 +185,56 @@ if ( $show_kpis && ! $show_landing_page ) {
                         <h2 class="text-2xl font-semibold leading-tight text-slate-900"><?php
                             _e( 'Total vs Unique Links', 'url-shortify' ); ?></h2>
                     </div>
+                    <?php if ( US()->is_pro() ) : ?>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="inline-flex items-center rounded-xl border border-gray-200 bg-gray-100 p-1 gap-0.5">
+                            <a href="<?php echo esc_url( $dashboard_today_url ); ?>"
+                               class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 no-underline <?php echo 'today' === $dashboard_time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                <?php esc_html_e( 'Today', 'url-shortify' ); ?>
+                            </a>
+                            <a href="<?php echo esc_url( $dashboard_last_7_days_url ); ?>"
+                               class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 no-underline <?php echo 'last_7_days' === $dashboard_time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                <?php esc_html_e( '7 Days', 'url-shortify' ); ?>
+                            </a>
+                            <a href="<?php echo esc_url( $dashboard_last_30_days_url ); ?>"
+                               class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 no-underline <?php echo 'last_30_days' === $dashboard_time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                <?php esc_html_e( '30 Days', 'url-shortify' ); ?>
+                            </a>
+                            <a href="<?php echo esc_url( $dashboard_last_60_days_url ); ?>"
+                               class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 no-underline <?php echo 'last_60_days' === $dashboard_time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                <?php esc_html_e( '2 Months', 'url-shortify' ); ?>
+                            </a>
+                            <a href="<?php echo esc_url( $dashboard_all_time_url ); ?>"
+                               class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 no-underline <?php echo 'all_time' === $dashboard_time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                <?php esc_html_e( 'All Time', 'url-shortify' ); ?>
+                            </a>
+                            <button type="button"
+                                    id="kc-us-dashboard-custom-pill"
+                                    class="rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 <?php echo 'custom' === $dashboard_time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>">
+                                <span class="dashicons dashicons-calendar-alt" style="width:14px;height:14px;font-size:14px;vertical-align:middle;margin-right:3px;" aria-hidden="true"></span><?php esc_html_e( 'Custom', 'url-shortify' ); ?>
+                            </button>
+                        </div>
+                        <div id="kc-us-dashboard-custom-control" class="<?php echo ( 'custom' === $dashboard_time_filter ) ? '' : 'hidden'; ?> inline-flex flex-wrap items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 shadow-sm">
+                            <input type="text"
+                                   id="kc-us-dashboard-start-date"
+                                   class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                   placeholder="<?php esc_attr_e( 'Start date', 'url-shortify' ); ?>"
+                                   value="<?php echo esc_attr( $dashboard_current_start_date ); ?>" />
+                            <span class="text-xs font-medium text-slate-400"><?php esc_html_e( 'â†’', 'url-shortify' ); ?></span>
+                            <input type="text"
+                                   id="kc-us-dashboard-end-date"
+                                   class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                   placeholder="<?php esc_attr_e( 'End date', 'url-shortify' ); ?>"
+                                   value="<?php echo esc_attr( $dashboard_current_end_date ); ?>" />
+                            <button type="button"
+                                    id="kc-us-dashboard-custom-apply"
+                                    class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                                    title="<?php esc_attr_e( 'Apply custom date range', 'url-shortify' ); ?>">
+                                <?php esc_html_e( 'Apply', 'url-shortify' ); ?>
+                            </button>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <div class="kc-us-heatmap-chart-wrapper mt-2 w-full">
                     <div id="spline-area-chart" class="mt-6 h-[220px] w-full"></div>
@@ -304,16 +368,38 @@ if ( $show_kpis && ! $show_landing_page ) {
                             _e( 'Top Devices', 'url-shortify' ); ?></span>
                     </div>
                     <div class="bg-white border-2 h-full px-4 py-3 flex flex-col justify-start">
-                        <?php
-                        $device_info = Helper::get_data( $data, 'device_info', [] );
-                        if ( ! empty( $device_info ) ) {
-                            ?>
-                            <div id="kc-us-device-pie" class="w-full h-64"></div>
+                        <?php if ( US()->is_pro() ) : ?>
                             <?php
-                        } else {
-                            echo '<p class="text-sm text-gray-500 p-4">' . esc_html__( 'Not enough data to show device distribution yet.', 'url-shortify' ) . '</p>';
-                        }
-                        ?>
+                            $device_info = Helper::get_data( $data, 'device_info', [] );
+                            if ( ! empty( $device_info ) ) {
+                                ?>
+                                <div id="kc-us-device-pie" class="w-full h-64"></div>
+                                <?php
+                            } else {
+                                echo '<p class="text-sm text-gray-500 p-4">' . esc_html__( 'Not enough data to show device distribution yet.', 'url-shortify' ) . '</p>';
+                            }
+                            ?>
+                        <?php else : ?>
+                            <div class="w-full h-64 p-10 bg-green-50 rounded-2xl">
+                                <div class="">
+                                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+                                        <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-5">
+                                        <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+                                            <?php echo sprintf( /* translators: %s: URL for the upgrade/pricing page */ __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm leading-5 text-gray-500">
+                                                <?php esc_html_e( 'Want to know which devices were used to access your links?', 'url-shortify' ); ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -324,16 +410,38 @@ if ( $show_kpis && ! $show_landing_page ) {
                             _e( 'Top Browsers', 'url-shortify' ); ?></span>
                     </div>
                     <div class="bg-white border-2 h-full px-4 py-3 flex flex-col justify-start">
-                        <?php
-                        $browser_info = Helper::get_data( $data, 'browser_info', [] );
-                        if ( ! empty( $browser_info ) ) {
-                            ?>
-                            <div id="kc-us-browser-pie" class="w-full h-64"></div>
+                        <?php if ( US()->is_pro() ) : ?>
                             <?php
-                        } else {
-                            echo '<p class="text-sm text-gray-500 p-4">' . esc_html__( 'Not enough data to show browser distribution yet.', 'url-shortify' ) . '</p>';
-                        }
-                        ?>
+                            $browser_info = Helper::get_data( $data, 'browser_info', [] );
+                            if ( ! empty( $browser_info ) ) {
+                                ?>
+                                <div id="kc-us-browser-pie" class="w-full h-64"></div>
+                                <?php
+                            } else {
+                                echo '<p class="text-sm text-gray-500 p-4">' . esc_html__( 'Not enough data to show browser distribution yet.', 'url-shortify' ) . '</p>';
+                            }
+                            ?>
+                        <?php else : ?>
+                            <div class="w-full h-64 p-10 bg-green-50 rounded-2xl">
+                                <div class="">
+                                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+                                        <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-5">
+                                        <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+                                            <?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm leading-5 text-gray-500">
+                                                <?php esc_html_e( 'Get information about browsers.', 'url-shortify' ); ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -345,16 +453,38 @@ if ( $show_kpis && ! $show_landing_page ) {
                             _e( 'Top Platforms', 'url-shortify' ); ?></span>
                     </div>
                     <div class="bg-white border-2 h-full px-4 py-3 flex flex-col justify-start">
-                        <?php
-                        $os_info = Helper::get_data( $data, 'os_info', [] );
-                        if ( ! empty( $os_info ) ) {
-                            ?>
-                            <div id="kc-us-os-pie" class="w-full h-64"></div>
+                        <?php if ( US()->is_pro() ) : ?>
                             <?php
-                        } else {
-                            echo '<p class="text-sm text-gray-500 p-4">' . esc_html__( 'Not enough data to show platform distribution yet.', 'url-shortify' ) . '</p>';
-                        }
-                        ?>
+                            $os_info = Helper::get_data( $data, 'os_info', [] );
+                            if ( ! empty( $os_info ) ) {
+                                ?>
+                                <div id="kc-us-os-pie" class="w-full h-64"></div>
+                                <?php
+                            } else {
+                                echo '<p class="text-sm text-gray-500 p-4">' . esc_html__( 'Not enough data to show platform distribution yet.', 'url-shortify' ) . '</p>';
+                            }
+                            ?>
+                        <?php else : ?>
+                            <div class="w-full h-64 p-10 bg-green-50 rounded-2xl">
+                                <div class="">
+                                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+                                        <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-5">
+                                        <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+                                            <?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm leading-5 text-gray-500">
+                                                <?php esc_html_e( 'Know more about which platforms people used to access your links.', 'url-shortify' ); ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -504,3 +634,47 @@ $os_values      = array_map( 'intval', array_values( $os_info ) );
 	})(jQuery);
 
 </script>
+
+<?php if ( US()->is_pro() ) : ?>
+<script type="text/javascript">
+	(function ($) {
+		var $customPill = $('#kc-us-dashboard-custom-pill');
+		var $customControl = $('#kc-us-dashboard-custom-control');
+		var $customApply = $('#kc-us-dashboard-custom-apply');
+		var $startDate = $('#kc-us-dashboard-start-date');
+		var $endDate = $('#kc-us-dashboard-end-date');
+
+		if ($customPill.length) {
+			$customPill.on('click', function () {
+				$customControl.toggleClass('hidden');
+			});
+		}
+
+		if ($customApply.length) {
+			$customApply.on('click', function () {
+				var start = $startDate.val().trim();
+				var end = $endDate.val().trim();
+
+				if (!start || !end) {
+					alert('<?php echo esc_js( __( 'Please enter both a start date and an end date.', 'url-shortify' ) ); ?>');
+					return;
+				}
+
+				var url = new URL(window.location.href);
+				url.searchParams.set('time_filter', 'custom');
+				url.searchParams.set('start_date', start);
+				url.searchParams.set('end_date', end);
+				url.searchParams.set('refresh', '1');
+				window.location.href = url.toString();
+			});
+
+			$startDate.add($endDate).on('keydown', function (e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					$customApply.trigger('click');
+				}
+			});
+		}
+	})(jQuery);
+</script>
+<?php endif; ?>

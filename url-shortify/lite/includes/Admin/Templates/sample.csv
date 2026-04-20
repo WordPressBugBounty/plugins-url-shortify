@@ -1,4 +1,4 @@
-Slug, Target URL, Title, Description, Groups, Nofollow, Sponsored, Parameter Forwarding, Track
-kzdr,https://kaizencoders.com,KaizenCoders,Continuous Improvement, Sports|Culture|Politics ,1,1,1,1
-gogl,https://google.com,Google,Google Search,Sports|Culture,1,0,0,1
-skol,https://w3schools.com,W3Schools,Online Web Tutorials,Sports|Politics,0,0,0,0
+Slug, Target URL, Title, Description, Groups, Tags, Nofollow, Sponsored, Parameter Forwarding, Track
+kzdr,https://kaizencoders.com,KaizenCoders,Continuous Improvement, Sports|Culture|Politics ,SEO|Marketing,1,1,1,1
+gogl,https://google.com,Google,Google Search,Sports|Culture,Search|Tech,1,0,0,1
+skol,https://w3schools.com,W3Schools,Online Web Tutorials,Sports|Politics,Learning|Docs,0,0,0,0

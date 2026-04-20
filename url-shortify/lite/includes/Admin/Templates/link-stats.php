@@ -271,6 +271,37 @@ $click_history->set_columns( $columns );
             </div>
         </div>
 
+        <?php if ( ! US()->is_pro() ) : ?>
+        <div class="mt-6">
+            <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
+                <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-900"><?php _e( 'Link Activity Intensity', 'url-shortify' ); ?></h2>
+                    </div>
+                </div>
+                <div class="w-full h-64 p-10 bg-green-50 rounded-2xl">
+                    <div class="">
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+                            <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-5">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                                <?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm leading-5 text-gray-500">
+                                    <?php esc_html_e( 'See when your links come alive with activity intensity heatmap.', 'url-shortify' ); ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <?php endif; ?>
+
         <!-- Country & Referrer Info -->
         <div class="mt-6">
             <div class="grid md:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4">

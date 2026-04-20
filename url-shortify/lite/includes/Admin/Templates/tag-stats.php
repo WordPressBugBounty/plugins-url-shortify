@@ -71,9 +71,9 @@ $clicks_data = Helper::get_data( $reports, 'clicks', array() );
 
 $group_id = Helper::get_data( $data, 'id', '' );
 
-$export_url = Helper::get_group_action_url( $group_id, 'export' );
+$export_url = Helper::get_tag_action_url( $group_id, 'export' );
 
-$export_links_url = Helper::get_group_action_url( $group_id, 'export_links' );
+$export_links_url = Helper::get_tag_action_url( $group_id, 'export_links' );
 
 $click_data_for_graph = Helper::get_data( $data, 'click_data_for_graph', array() );
 $chart_data = Helper::get_data( $data, 'chart_data', array() );

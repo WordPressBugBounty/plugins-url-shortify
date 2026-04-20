@@ -330,7 +330,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 	}
 
 	?>
-	<div id="kc-us-digest-day-wrapper" class="kc-us-digest-conditional"<?php echo $day_wrapper_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<div id="kc-us-digest-day-wrapper"<?php echo $day_wrapper_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<select id="kc-us-digest-day" name="kc_us_settings[<?php echo esc_attr( $digest_prefix . 'day' ); ?>]">
 			<?php foreach ( $day_options as $val => $label ) : ?>
 			<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $digest_day, $val ); ?>>
@@ -351,7 +351,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 		: '<span style="color:#6b7280;">' . esc_html__( 'Inactive', 'url-shortify' ) . '</span>';
 	$last_sent_str = $last_sent > 0 ? esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_sent ) ) : esc_html__( 'Never', 'url-shortify' );
 	?>
-	<div class="kc-us-digest-conditional">
+	<div>
 		<div class="kc-us-digest-status-grid">
 			<div class="kc-us-digest-status-item">
 				<span class="kc-us-digest-status-label"><?php esc_html_e( 'Status', 'url-shortify' ); ?></span>

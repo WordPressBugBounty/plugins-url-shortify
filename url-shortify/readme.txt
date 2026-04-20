@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 6.9
-Stable tag: 2.2.2
+Stable tag: 2.3.0
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -484,15 +484,35 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.2.2 =
+= 2.3.0 =
 
-* New: Added support to enable/disable short links. **PRO**
-* New: Added Link Activity Intensity report in the link stats page. **PRO**
-* New: Added custom date range filter in the link stats page. **PRO**
-* UX: Improved UI for the dark theme.
+* New: Added Link Activity Intensity report in the Groups & Tags stats page. **PRO**
+* New: Added Tags stats page. **PRO**
+* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
+* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
+* New: Added support to bulk update links status. **PRO**
+* New: Added support to filter links by status (Enable/Disable). **PRO**
+* New: Added Link Status, Groups and Tags in export. **PRO**
+* New: Added support to import tags. **PRO**
+* Fix: Fixed Email Digest UI issue.
+* Update: UI Improvements.
 * Translations: Updated .POT file for new translations.
 
 == Changelog ==
+
+= 2.3.0 [2026-04-20] =
+
+* New: Added Link Activity Intensity report in the Groups & Tags stats page. **PRO**
+* New: Added Tags stats page. **PRO**
+* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
+* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
+* New: Added support to bulk update links status. **PRO**
+* New: Added support to filter links by status (Enable/Disable). **PRO**
+* New: Added Link Status, Groups and Tags in export. **PRO**
+* New: Added support to import tags. **PRO**
+* Fix: Fixed Email Digest UI issue.
+* Update: UI Improvements.
+* Translations: Updated .POT file for new translations.
 
 = 2.2.2 [2026-04-13] =
 

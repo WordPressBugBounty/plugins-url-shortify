@@ -741,6 +741,15 @@ class Links_Table extends US_List_Table {
 				$redirect_type    = str_replace( 'redirect_type_', '', $filter_by );
 
 				$query[] = $wpdb->prepare( 'redirect_type = %s', $redirect_type );
+			} elseif ( strpos( $filter_by, 'status_' ) !== false ) { // Filter by status.
+				if ( US()->is_pro() ) {
+					$add_where_clause = true;
+					$status           = absint( str_replace( 'status_', '', $filter_by ) );
+
+					if ( 1 === $status || 0 === $status ) {
+						$query[] = $wpdb->prepare( 'status = %d', $status );
+					}
+				}
 			} else {
 				$query = [];
 				$query = apply_filters( 'kc_us_links_filter_by_query', $query, $filter_by );
@@ -1097,6 +1106,78 @@ class Links_Table extends US_List_Table {
 				US()->db->links->bulk_add_expiry( $link_ids, $expiry_date );
 
 				$message = __( 'Expiry date has been added to selected links.', 'url-shortify' );
+				US()->notices->success( $message );
+			}
+		} elseif ( ( 'bulk_enable_links' === $action ) || ( 'bulk_enable_links' === $action2 ) ) {
+			if ( ! US()->is_pro() ) {
+				US()->notices->error( __( 'This feature is available in the PRO version only.', 'url-shortify' ) );
+				return;
+			}
+
+			$nonce  = Helper::get_request_data( '_wpnonce' );
+			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action ) ) {
+				$message = __( 'You do not have permission to enable links.', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
+				}
+
+				if ( empty( $link_ids ) ) {
+					$message = __( 'Please select link(s) to enable.', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				$this->db->bulk_update_status( $link_ids, 1 );
+
+				$message = __( 'Link(s) have been enabled successfully!', 'url-shortify' );
+				US()->notices->success( $message );
+			}
+		} elseif ( ( 'bulk_disable_links' === $action ) || ( 'bulk_disable_links' === $action2 ) ) {
+			if ( ! US()->is_pro() ) {
+				US()->notices->error( __( 'This feature is available in the PRO version only.', 'url-shortify' ) );
+				return;
+			}
+
+			$nonce  = Helper::get_request_data( '_wpnonce' );
+			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action ) ) {
+				$message = __( 'You do not have permission to disable links.', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
+				}
+
+				if ( empty( $link_ids ) ) {
+					$message = __( 'Please select link(s) to disable.', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				$this->db->bulk_update_status( $link_ids, 0 );
+
+				$message = __( 'Link(s) have been disabled successfully!', 'url-shortify' );
 				US()->notices->success( $message );
 			}
 		} elseif ( ( 'bulk_enable_nofollow' === $action ) || ( 'bulk_enable_nofollow' === $action2 ) ) {
@@ -1784,6 +1865,42 @@ class Links_Table extends US_List_Table {
 	 *
 	 */
 	public function save( $data = [], $id = null ) {
+		
+		$tag_names_str = Helper::get_data( $data, 'tags', '' );
+		
+		if ( ! empty( $tag_names_str ) && US()->is_pro() ) {
+			// Split by comma and clean whitespace
+			$tag_names = array_map( 'trim', explode( ',', $tag_names_str ) );
+			$imported_tag_ids = [];
+
+			foreach ( $tag_names as $name ) {
+				if ( empty( $name ) ) {
+					continue;
+				}
+
+				// Check if tag already exists in the database
+				$tag = US()->db->tags->get_by_name( $name );
+
+				if ( $tag ) {
+					$imported_tag_ids[] = $tag->id;
+				} else {
+					// Tag doesn't exist: Create it on the fly
+					$new_tag_id = US()->db->tags->insert( [
+						'name'        => sanitize_text_field( $name ),
+						'description' => '',
+					] );
+					
+					if ( $new_tag_id ) {
+						$imported_tag_ids[] = $new_tag_id;
+					}
+				}
+			}
+
+			// Merge newly created/found IDs with any existing tag_ids in the data array
+			$existing_ids = Helper::get_data( $data, 'tag_ids', [] );
+			$data['tag_ids'] = array_unique( array_merge( (array) $existing_ids, $imported_tag_ids ) );
+		}
+
 		$form_data = $this->db->prepare_form_data( $data, $id );
 
 		$link_id = $this->db->save( $form_data, $id );
@@ -1847,9 +1964,56 @@ class Links_Table extends US_List_Table {
 
 		$links = US()->db->links->get_all();
 
+		if ( ! empty( $links ) ) {
+			$link_ids = wp_list_pluck( $links, 'id' );
+
+			$links_ids_group_ids = US()->db->links_groups->get_group_ids_by_link_ids( $link_ids );
+			$group_id_name_map   = US()->db->groups->get_all_id_name_map();
+
+			$links_ids_tag_ids = [];
+			$tag_id_name_map   = [];
+			if ( US()->is_pro() ) {
+				$links_ids_tag_ids = US()->db->links_tags->get_tag_ids_by_link_ids( $link_ids );
+				$tag_id_name_map   = US()->db->tags->get_id_name_map();
+			}
+
+			foreach ( $links as &$link ) {
+				$link_id = $link['id'];
+
+				// Status
+				$link['status'] = 1 === (int) $link['status'] ? __( 'Enabled', 'url-shortify' ) : __( 'Disabled', 'url-shortify' );
+
+				// Groups
+				$group_ids      = ! empty( $links_ids_group_ids[ $link_id ] ) ? $links_ids_group_ids[ $link_id ] : [];
+				$link['groups'] = Helper::get_group_str_from_ids( $group_ids, $group_id_name_map );
+
+				// Tags
+				if ( US()->is_pro() ) {
+					$tag_ids      = ! empty( $links_ids_tag_ids[ $link_id ] ) ? $links_ids_tag_ids[ $link_id ] : [];
+					$tag_names    = [];
+					if ( ! empty( $tag_ids ) ) {
+						foreach ( $tag_ids as $tag_id ) {
+							if ( isset( $tag_id_name_map[ $tag_id ] ) ) {
+								$tag_names[] = $tag_id_name_map[ $tag_id ];
+							}
+						}
+					}
+					$link['tags'] = implode( ', ', $tag_names );
+				}
+			}
+			unset( $link );
+		}
+
 		$export = new Export();
 
 		$headers = $export->get_links_headers();
+
+		// Add new headers for export
+		$headers['status'] = __( 'Status', 'url-shortify' );
+		$headers['groups'] = __( 'Groups', 'url-shortify' );
+		if ( US()->is_pro() ) {
+			$headers['tags'] = __( 'Tags', 'url-shortify' );
+		}
 
 		$csv_data = $export->generate_csv( $headers, $links );
 

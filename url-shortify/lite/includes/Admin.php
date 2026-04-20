@@ -439,6 +439,10 @@ class Admin {
 			return;
 		}
 
+		$dashboard_time_filter = US()->is_pro() ? sanitize_key( Helper::get_request_data( 'time_filter', 'all_time' ) ) : '';
+		$dashboard_start_date  = US()->is_pro() ? sanitize_text_field( Helper::get_request_data( 'start_date', '' ) ) : '';
+		$dashboard_end_date    = US()->is_pro() ? sanitize_text_field( Helper::get_request_data( 'end_date', '' ) ) : '';
+
 		$spline_data  = US()->db->clicks->get_spline_chart_data();
 		$heatmap_data = US()->db->clicks->get_heatmap_intensity_data();
 
@@ -486,8 +490,91 @@ class Admin {
 		// Generate dynamic heatmap color ranges based on actual data
 		$heatmap_color_ranges = $this->generate_dynamic_heatmap_color_ranges( $heatmap_map );
 
-		// Fill missing dates in spline chart data with 0 values
-		$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data );
+		// Fill missing dates in spline chart data with 0 values.
+		if ( US()->is_pro() ) {
+			$allowed_time_filters = [ 'today', 'last_7_days', 'last_30_days', 'last_60_days', 'all_time', 'custom' ];
+			if ( ! in_array( $dashboard_time_filter, $allowed_time_filters, true ) ) {
+				$dashboard_time_filter = 'all_time';
+			}
+
+			if ( 'custom' === $dashboard_time_filter ) {
+				$start = \DateTimeImmutable::createFromFormat( 'Y-m-d', $dashboard_start_date );
+				$end   = \DateTimeImmutable::createFromFormat( 'Y-m-d', $dashboard_end_date );
+
+				if ( $start && $end ) {
+					if ( $start > $end ) {
+						$swap  = $start;
+						$start = $end;
+						$end   = $swap;
+					}
+
+					$dashboard_start_date = $start->format( 'Y-m-d' );
+					$dashboard_end_date   = $end->format( 'Y-m-d' );
+
+					$total_clicks_by_days  = US()->db->clicks->get_clicks_count_by_days( $dashboard_start_date, $dashboard_end_date );
+					$unique_clicks_by_days = US()->db->clicks->get_unique_clicks_count_by_days( $dashboard_start_date, $dashboard_end_date );
+
+					$spline_data = [];
+					foreach ( $total_clicks_by_days as $date => $count ) {
+						$spline_data[] = [
+							'date'          => $date,
+							'total_clicks'  => (int) $count,
+							'unique_clicks' => 0,
+						];
+					}
+
+					foreach ( $unique_clicks_by_days as $date => $count ) {
+						$found = false;
+						foreach ( $spline_data as &$row ) {
+							if ( $row['date'] === $date ) {
+								$row['unique_clicks'] = (int) $count;
+								$found = true;
+								break;
+							}
+						}
+						unset( $row );
+
+						if ( ! $found ) {
+							$spline_data[] = [
+								'date'          => $date,
+								'total_clicks'  => 0,
+								'unique_clicks' => (int) $count,
+							];
+						}
+					}
+
+					$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data, 0, $dashboard_start_date, $dashboard_end_date );
+				} else {
+					$dashboard_time_filter = 'all_time';
+					$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data );
+				}
+			} else {
+				$dashboard_days = 0;
+				switch ( $dashboard_time_filter ) {
+					case 'today':
+						$dashboard_days = 1;
+						break;
+					case 'last_7_days':
+						$dashboard_days = 7;
+						break;
+					case 'last_30_days':
+						$dashboard_days = 30;
+						break;
+					case 'last_60_days':
+						$dashboard_days = 60;
+						break;
+					case 'all_time':
+					default:
+						$dashboard_days = 0;
+						break;
+				}
+
+				$spline_data = US()->db->clicks->get_spline_chart_data( $dashboard_days );
+				$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data, $dashboard_days );
+			}
+		} else {
+			$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data );
+		}
 
 		$chart_vars = [
 			'dates'               => array_column( $spline_data_filled, 'date' ),
@@ -717,7 +804,7 @@ class Admin {
 	 *
 	 * @return array Complete date range with 0 values for missing dates
 	 */
-	private function fill_missing_dates_in_spline_data( $spline_data = [] ) {
+	private function fill_missing_dates_in_spline_data( $spline_data = [], $days = 0, $start_date = '', $end_date = '' ) {
 		// Create associative map of existing data
 		$data_map = [];
 		foreach ( $spline_data as $row ) {
@@ -730,23 +817,44 @@ class Admin {
 			}
 		}
 
-		// Default range to last 1 year if no data
-		$start_date = ( new \DateTimeImmutable( 'today' ) )->sub( new \DateInterval( 'P1Y' ) )->setTime( 0, 0 );
-		$end_date   = ( new \DateTimeImmutable( 'today' ) )->setTime( 0, 0 );
+		$end_date_obj = null;
+		$start_date_obj = null;
 
-		if ( ! empty( $data_map ) ) {
-			$dates = array_keys( $data_map );
-			sort( $dates );
-			$first_date = new \DateTimeImmutable( $dates[0] );
-			if ( $first_date < $start_date ) {
-				$start_date = $first_date;
+		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+			$start_date_obj = \DateTimeImmutable::createFromFormat( 'Y-m-d', $start_date );
+			$end_date_obj   = \DateTimeImmutable::createFromFormat( 'Y-m-d', $end_date );
+
+			if ( ! $start_date_obj || ! $end_date_obj ) {
+				return [];
+			}
+
+			if ( $start_date_obj > $end_date_obj ) {
+				$swap           = $start_date_obj;
+				$start_date_obj = $end_date_obj;
+				$end_date_obj    = $swap;
+			}
+		} elseif ( absint( $days ) > 0 ) {
+			$end_date_obj   = ( new \DateTimeImmutable( 'today' ) )->setTime( 0, 0 );
+			$start_date_obj = $end_date_obj->sub( new \DateInterval( 'P' . absint( $days ) . 'D' ) );
+		} else {
+			// Default range to last 1 year if no data or filter is all-time.
+			$start_date_obj = ( new \DateTimeImmutable( 'today' ) )->sub( new \DateInterval( 'P1Y' ) )->setTime( 0, 0 );
+			$end_date_obj   = ( new \DateTimeImmutable( 'today' ) )->setTime( 0, 0 );
+
+			if ( ! empty( $data_map ) ) {
+				$dates = array_keys( $data_map );
+				sort( $dates );
+				$first_date = new \DateTimeImmutable( $dates[0] );
+				if ( $first_date < $start_date_obj ) {
+					$start_date_obj = $first_date;
+				}
 			}
 		}
 
 		$filled_data = [];
-		$current_date = $start_date;
+		$current_date = $start_date_obj;
 
-		while ( $current_date <= $end_date ) {
+		while ( $current_date <= $end_date_obj ) {
 			$date_key = $current_date->format( 'Y-m-d' );
 
 			$filled_data[] = [
