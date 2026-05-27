@@ -62,7 +62,7 @@ class Favorites_Links extends Base_DB {
 				[
 					'user_id' => absint( $user_id ),
 					'link_id' => absint( $link_id ),
-				],
+				]
 			);
 		}
 	}

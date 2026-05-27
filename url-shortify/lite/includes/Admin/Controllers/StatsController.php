@@ -80,7 +80,7 @@ class StatsController extends BaseController {
 
 				$heatmap_series[ $day ]['data'][] = [
 					'x'      => $week_start_label,
-					'y'      => $heatmap_map[ $date_key ] ?? 0,
+					'y'      => isset( $heatmap_map[ $date_key ] ) ? $heatmap_map[ $date_key ] : 0,
 					'meta'   => $date_key,
 					'future' => $is_future,
 				];

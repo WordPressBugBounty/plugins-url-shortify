@@ -477,7 +477,7 @@ class Admin {
 				$is_future = $day_date > $end_date;
 				$heatmap_series[ $day ]['data'][] = [
 					'x'      => $week_start_label,
-					'y'      => $heatmap_map[ $date_key ] ?? 0,
+					'y'      => isset( $heatmap_map[ $date_key ] ) ? $heatmap_map[ $date_key ] : 0,
 					'meta'   => $date_key,
 					'future' => $is_future,
 				];
@@ -859,8 +859,8 @@ class Admin {
 
 			$filled_data[] = [
 				'date'           => $date_key,
-				'total_clicks'   => $data_map[ $date_key ]['total_clicks'] ?? 0,
-				'unique_clicks'  => $data_map[ $date_key ]['unique_clicks'] ?? 0,
+				'total_clicks'   => isset( $data_map[ $date_key ]['total_clicks'] ) ? $data_map[ $date_key ]['total_clicks'] : 0,
+				'unique_clicks'  => isset( $data_map[ $date_key ]['unique_clicks'] ) ? $data_map[ $date_key ]['unique_clicks'] : 0,
 			];
 
 			$current_date = $current_date->add( new \DateInterval( 'P1D' ) );

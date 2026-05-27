@@ -349,6 +349,12 @@ class Links_Table extends US_List_Table {
 			/* translators: %s: URL for editing the link */
 			'edit'   => sprintf( __( '<a href="%s" class="text-indigo-600">Edit</a>', 'url-shortify' ),
 				Helper::get_link_action_url( $link_id, 'edit' ) ),
+			'copy'   => sprintf(
+				'<a href="#" class="kc-us-copy-to-clipboard" data-clipboard-text="%s" id="copy-link-%d" onclick="return false;">%s</a>',
+				$short_link,
+				$link_id,
+				esc_html__( 'Copy Short Link', 'url-shortify' )
+			),
 			/* translators: %s: URL for the link statistics page */
 			'stats'  => sprintf( __( '<a href="%s">Statistics</a>', 'url-shortify' ),
 				Helper::get_link_action_url( $link_id, 'statistics' ) ),

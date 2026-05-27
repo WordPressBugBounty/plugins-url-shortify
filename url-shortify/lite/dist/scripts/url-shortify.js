@@ -11,6 +11,33 @@
         return !!pattern.test(str);
     }
 
+    function injectCopyTooltipStyles() {
+        if (document.getElementById('kc-us-copy-tooltip-styles')) {
+            return;
+        }
+        var style = document.createElement('style');
+        style.id = 'kc-us-copy-tooltip-styles';
+        style.textContent =
+            '.kc-us-copy-tooltip{position:absolute;background:#1f2937;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:6px 10px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:100000;box-shadow:0 2px 8px rgba(0,0,0,.18);transform:translate(-50%,-100%);animation:kcUsCopyVibrate .25s ease-out both}' +
+            '.kc-us-copy-tooltip::after{content:"";position:absolute;top:100%;left:50%;margin-left:-4px;border:4px solid transparent;border-top-color:#1f2937}' +
+            '@keyframes kcUsCopyVibrate{0%,100%{transform:translate(-50%,-100%) translateX(0)}33%{transform:translate(-50%,-100%) translateX(-4px)}66%{transform:translate(-50%,-100%) translateX(4px)}}';
+        document.head.appendChild(style);
+    }
+
+    function showCopyTooltip(targetEl, message) {
+        injectCopyTooltipStyles();
+        var rect = targetEl.getBoundingClientRect();
+        var $tooltip = $('<div class="kc-us-copy-tooltip"></div>').text(message);
+        $('body').append($tooltip);
+        $tooltip.css({
+            top: rect.top + window.pageYOffset - 4,
+            left: rect.left + window.pageXOffset + (rect.width / 2)
+        });
+        setTimeout(function () {
+            $tooltip.fadeOut(250, function () { $tooltip.remove(); });
+        }, 1100);
+    }
+
     $(document).ready(function () {
         // Copy Short Link
         var elem = '.kc-us-copy-to-clipboard';
@@ -25,12 +52,8 @@
                     let elem = e.trigger;
 
                     $(elem).find('.kc-us-link').select();
-                    let id = elem.getAttribute('id');
 
-                    let copiedTextID = '#copied-text-' + id;
-
-                    $(copiedTextID).text('Copied').fadeIn();
-                    $(copiedTextID).fadeOut('slow');
+                    showCopyTooltip(elem, 'Copied!');
                 }
             );
         }

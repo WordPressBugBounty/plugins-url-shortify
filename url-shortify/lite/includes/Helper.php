@@ -1256,7 +1256,7 @@ class Helper {
 
         if ( strpos( $range, '/' ) !== false ) {
             // $range is in IP/NETMASK format
-            [ $range, $netmask ] = explode( '/', $range, 2 );
+            list( $range, $netmask ) = explode( '/', $range, 2 );
             if ( strpos( $netmask, '.' ) !== false ) {
                 // $netmask is a 255.255.0.0 format
                 $netmask     = str_replace( '*', '0', $netmask );
@@ -1270,7 +1270,7 @@ class Helper {
                 while ( count( $x ) < 4 ) {
                     $x[] = '0';
                 }
-                [ $a, $b, $c, $d ] = $x;
+                list( $a, $b, $c, $d ) = $x;
                 $range     = sprintf( "%u.%u.%u.%u", empty( $a ) ? '0' : $a, empty( $b ) ? '0' : $b,
                         empty( $c ) ? '0' : $c, empty( $d ) ? '0' : $d );
                 $range_dec = ip2long( $range );
@@ -1295,7 +1295,7 @@ class Helper {
             }
 
             if ( strpos( $range, '-' ) !== false ) { // A-B format
-                [ $lower, $upper ] = explode( '-', $range, 2 );
+                list( $lower, $upper ) = explode( '-', $range, 2 );
                 $lower_dec = (float) sprintf( "%u", ip2long( $lower ) );
                 $upper_dec = (float) sprintf( "%u", ip2long( $upper ) );
                 $ip_dec    = (float) sprintf( "%u", ip2long( $ip ) );
@@ -1349,111 +1349,48 @@ class Helper {
     }
 
     /**
-     * Check Pretty Links Exists
+     * Check whether one-click import is available for a given source plugin.
      *
-     * @return bool|int
+     * Different source plugins require different checks — most are detected by
+     * looking up their database table, but some (e.g. plugins that store data
+     * in options) are detected by their active-plugin file. New source types
+     * can be added by extending the $sources map and the type switch below.
      *
-     * @since 1.3.4
-     */
-    public static function is_pretty_links_table_exists() {
-        global $wpdb;
-
-        $links_table = "{$wpdb->prefix}prli_links";
-
-        return US()->is_table_exists( $links_table );
-    }
-
-    /**
-     * Check MTS Short Links Exists
-     *
-     * @return bool|int
-     *
-     * @since 1.3.4
-     */
-    public static function is_mts_short_links_table_exists() {
-        global $wpdb;
-
-        $links_table = "{$wpdb->prefix}short_links";
-
-        return US()->is_table_exists( $links_table );
-    }
-
-    /**
-     * Check Easy 301 Redirect Plugin Installed
-     *
-     * @return bool|int
-     *
-     * @since 1.3.4
-     */
-    public static function is_301_redirect_table_exists() {
-        global $wpdb;
-
-        $links_table = "{$wpdb->prefix}redirects";
-
-        return US()->is_table_exists( $links_table );
-    }
-
-    /**
-     * Check Simple 301 Redirect plugin installed
+     * @param string $source Source key. One of: pretty_links, mts_links,
+     *                       eps_301_redirects, simple_301_redirects, shorten_url,
+     *                       thirsty_affiliates, redirection.
      *
      * @return bool
      *
-     * @since 1.4.8
+     * @since 2.3.1
      */
-    public static function is_simple_301_redirect_plugin_installed() {
-        $plugins = Tracker::get_active_plugins();
+    public static function is_import_source_available( $source ) {
+        global $wpdb;
 
-        if ( in_array( 'simple-301-redirects/wp-simple-301-redirects.php', $plugins ) ) {
-            return true;
+        $sources = [
+            'pretty_links'         => [ 'type' => 'table',  'value' => 'prli_links' ],
+            'mts_links'            => [ 'type' => 'table',  'value' => 'short_links' ],
+            'eps_301_redirects'    => [ 'type' => 'table',  'value' => 'redirects' ],
+            'simple_301_redirects' => [ 'type' => 'plugin', 'value' => 'simple-301-redirects/wp-simple-301-redirects.php' ],
+            'shorten_url'          => [ 'type' => 'table',  'value' => 'pluginSL_shorturl' ],
+            'thirsty_affiliates'   => [ 'type' => 'plugin', 'value' => 'thirstyaffiliates/thirstyaffiliates.php' ],
+            'redirection'          => [ 'type' => 'table',  'value' => 'redirection_items' ],
+        ];
+
+        if ( ! isset( $sources[ $source ] ) ) {
+            return false;
+        }
+
+        $check = $sources[ $source ];
+
+        switch ( $check['type'] ) {
+            case 'table':
+                return (bool) US()->is_table_exists( $wpdb->prefix . $check['value'] );
+            case 'plugin':
+                return in_array( $check['value'], Tracker::get_active_plugins(), true );
         }
 
         return false;
-    }
-
-    /**
-     * Check Simple 301 Redirect plugin installed
-     *
-     * @return bool
-     *
-     * @since 1.4.8
-     */
-    public static function is_thirstry_affiliates_installed() {
-        $plugins = Tracker::get_active_plugins();
-
-        if ( in_array( 'thirstyaffiliates/thirstyaffiliates.php', $plugins ) ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check Shorten URL Plugin Installed.
-     *
-     * @return bool|int
-     *
-     * @since 1.3.4
-     */
-    public static function is_shorten_url_table_exists() {
-        global $wpdb;
-
-        $links_table = "{$wpdb->prefix}pluginSL_shorturl";
-
-        return US()->is_table_exists( $links_table );
-    }
-
-    /**
-     * Check Redirection Plugin Installed.
-     *
-     * @return bool|int
-     * @since 1.8.6
-     */
-    public static function is_redirection_installed() {
-        global $wpdb;
-
-        $links_table = "{$wpdb->prefix}redirection_items";
-
-        return US()->is_table_exists( $links_table );
     }
 
     /**
@@ -3102,7 +3039,7 @@ class Helper {
                 if ( ! is_wp_error( $api ) ) {
                     $data = [
                             'title'      => $api->name,
-                            'logo'       => $api->icons['2x'] ?? ( $api->icons['1x'] ?? ( $api->icons['default'] ?? '' ) ),
+                            'logo'       => isset( $api->icons['2x'] ) ? $api->icons['2x'] : ( isset( $api->icons['1x'] ) ? $api->icons['1x'] : ( isset( $api->icons['default'] ) ? $api->icons['default'] : '' ) ),
                             'desc'       => $api->short_description,
                             'plugin_url' => "https://wordpress.org/plugins/{$slug}/",
                             'slug'       => $slug,

@@ -66,7 +66,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">Pretty Links</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/prettylinks' ),
 					'action' => 'pretty_links',
-					'show'   => Helper::is_pretty_links_table_exists(),
+					'show'   => Helper::is_import_source_available( 'pretty_links' ),
 				],
 
 				[
@@ -74,7 +74,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">URL Shortener by MyThemeShop</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/mts-url-shortener/' ),
 					'action' => 'mts_links',
-					'show'   => Helper::is_mts_short_links_table_exists(),
+					'show'   => Helper::is_import_source_available( 'mts_links' ),
 				],
 
 				[
@@ -82,7 +82,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">301 Redirect</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/eps-301-redirects/' ),
 					'action' => 'eps_301_redirects',
-					'show'   => Helper::is_301_redirect_table_exists(),
+					'show'   => Helper::is_import_source_available( 'eps_301_redirects' ),
 				],
 
 				[
@@ -90,7 +90,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">Simple 301 Redirect</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/simple-301-redirects/' ),
 					'action' => 'simple_301_redirects',
-					'show'   => Helper::is_simple_301_redirect_plugin_installed(),
+					'show'   => Helper::is_import_source_available( 'simple_301_redirects' ),
 				],
 
 				[
@@ -98,7 +98,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">Short URL</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/shorten-url/' ),
 					'action' => 'shorten_url',
-					'show'   => Helper::is_shorten_url_table_exists(),
+					'show'   => Helper::is_import_source_available( 'shorten_url' ),
 				],
 
 				[
@@ -106,7 +106,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">Thirsty Affiliates</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/simple-301-redirects/' ),
 					'action' => 'thirsty_affiliates',
-					'show'   => Helper::is_thirstry_affiliates_installed(),
+					'show'   => Helper::is_import_source_available( 'thirsty_affiliates' ),
 				],
 
 				[
@@ -114,7 +114,7 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 				'title'  => sprintf( __( 'Import Short Links From <a href="%s" target="_blank">Redirection</a> WordPress Plugin',
 						'url-shortify' ), 'https://wordpress.org/plugins/redirection/' ),
 					'action' => 'redirection',
-					'show'   => Helper::is_redirection_installed(),
+					'show'   => Helper::is_import_source_available( 'redirection' ),
 				],
 
 			];

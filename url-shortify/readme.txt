@@ -3,8 +3,8 @@ Contributors: kaizencoders, mikeatkaizencoders
 Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
-Tested up to: 6.9
-Stable tag: 2.3.0
+Tested up to: 7.0
+Stable tag: 2.3.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -484,21 +484,27 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.3.0 =
+= 2.3.2 =
 
-* New: Added Link Activity Intensity report in the Groups & Tags stats page. **PRO**
-* New: Added Tags stats page. **PRO**
-* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
-* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
-* New: Added support to bulk update links status. **PRO**
-* New: Added support to filter links by status (Enable/Disable). **PRO**
-* New: Added Link Status, Groups and Tags in export. **PRO**
-* New: Added support to import tags. **PRO**
-* Fix: Fixed Email Digest UI issue.
-* Update: UI Improvements.
-* Translations: Updated .POT file for new translations.
+* New: Added "Copy Short Link" action in row actions on the Links page for one-click copying.
+* Update: Compatibility update for WordPress 7.0 and PHP 8.2+, restored PHP 5.6 backward compatibility.
+* Update: Improved One-click import from Pretty Links, ThirstyAffiliates Affiliate Link Manager, URL Shortener by MyThemeShop, 301 Redirect, Simple 301 Redirects & Redirection WordPress plugins.
 
 == Changelog ==
+
+= 2.3.2 [2026-05-27] =
+
+* New: Added "Copy Short Link" action in row actions on the Links page for one-click copying.
+* Update: Compatibility update for WordPress 7.0 and PHP 8.2+, restored PHP 5.6 backward compatibility.
+* Update: Improved One-click import from Pretty Links, ThirstyAffiliates Affiliate Link Manager, URL Shortener by MyThemeShop, 301 Redirect, Simple 301 Redirects & Redirection WordPress plugins.
+* Update: Plugin Assets.
+
+= 2.3.1 [2026-05-27] =
+
+* New: Added "Copy Short Link" action in row actions on the Links page for one-click copying.
+* Update: Compatibility update for WordPress 7.0 and PHP 8.2+, restored PHP 5.6 backward compatibility.
+* Update: Improved One-click import from Pretty Links, ThirstyAffiliates Affiliate Link Manager, URL Shortener by MyThemeShop, 301 Redirect, Simple 301 Redirects & Redirection WordPress plugins.
+* Update: Plugin Assets.
 
 = 2.3.0 [2026-04-20] =
 
