@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.0
-Stable tag: 2.3.2
+Stable tag: 2.3.3
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -484,13 +484,15 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.3.2 =
+= 2.3.3 =
 
-* New: Added "Copy Short Link" action in row actions on the Links page for one-click copying.
-* Update: Compatibility update for WordPress 7.0 and PHP 8.2+, restored PHP 5.6 backward compatibility.
-* Update: Improved One-click import from Pretty Links, ThirstyAffiliates Affiliate Link Manager, URL Shortener by MyThemeShop, 301 Redirect, Simple 301 Redirects & Redirection WordPress plugins.
+* Fix: Deprecated notice in PHP 8.4+.
 
 == Changelog ==
+
+= 2.3.3 [2026-05-29] =
+
+* Fix: Deprecated notice in PHP 8.4+.
 
 = 2.3.2 [2026-05-27] =
 
