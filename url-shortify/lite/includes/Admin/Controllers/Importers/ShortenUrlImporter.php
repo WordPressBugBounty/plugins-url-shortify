@@ -17,6 +17,15 @@ class ShortenUrlImporter extends BaseImporter {
 
 	protected $default_group_name = 'Shorten URL';
 
+	/**
+	 * Memo for resolve_url_and_title() — same record is resolved twice per
+	 * row (once in should_skip, once in map_link); without memoization a
+	 * 10 000-row migration runs 20 000 get_post() lookups.
+	 *
+	 * @var array
+	 */
+	private $resolved_cache = [];
+
 	protected function fetch_links() {
 		global $wpdb;
 
@@ -72,9 +81,16 @@ class ShortenUrlImporter extends BaseImporter {
 	 * @return array{url:string,title:string,post_id:int}
 	 */
 	private function resolve_url_and_title( $record ) {
-		$post_id = (int) Helper::get_data( $record, 'id_post', 0 );
-		$title   = (string) Helper::get_data( $record, 'url_externe', '' );
-		$url     = $title;
+		$post_id   = (int) Helper::get_data( $record, 'id_post', 0 );
+		$source    = (string) Helper::get_data( $record, 'url_externe', '' );
+		$cache_key = $post_id . '|' . $source;
+
+		if ( isset( $this->resolved_cache[ $cache_key ] ) ) {
+			return $this->resolved_cache[ $cache_key ];
+		}
+
+		$title = $source;
+		$url   = $source;
 
 		if ( $post_id > 0 ) {
 			$post = get_post( $post_id );
@@ -84,7 +100,7 @@ class ShortenUrlImporter extends BaseImporter {
 			}
 		}
 
-		return [
+		return $this->resolved_cache[ $cache_key ] = [
 			'url'     => (string) $url,
 			'title'   => (string) $title,
 			'post_id' => $post_id ?: null,

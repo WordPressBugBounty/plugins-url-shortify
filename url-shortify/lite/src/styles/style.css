@@ -259,6 +259,36 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
     color: #a5b4fc !important;
 }
 
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages {
+    color: #cbd5e1 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .current-page {
+    background: #0f172a !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .button.disabled,
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .button:disabled,
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .tablenav-pages-navspan,
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .tablenav-pages-navspan.disabled {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #64748b !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.8 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .button.disabled:hover,
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .button:disabled:hover,
+#wpbody-content.kc-us-dark .wrap .tablenav .tablenav-pages .tablenav-pages-navspan:hover {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #64748b !important;
+}
+
 #wpbody-content.kc-us-dark .wrap .rounded-md.bg-green-50.p-4 {
     background: linear-gradient(135deg, #0f172a 0%, #111827 100%) !important;
     border: 1px solid #334155 !important;

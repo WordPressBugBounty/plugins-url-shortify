@@ -213,6 +213,7 @@ class Links_Table extends US_List_Table {
 
 		$columns['meta_info']  = __( 'Meta Info', 'url-shortify' );
 		$columns['created_at'] = __( 'Created On', 'url-shortify' );
+		$columns['status']     = __( 'Status', 'url-shortify' );
 		$columns['link']       = __( 'Link', 'url-shortify' );
 
 		return apply_filters( 'kc_us_filter_links_columns', $columns );

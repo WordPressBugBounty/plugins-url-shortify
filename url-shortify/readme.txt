@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.0
-Stable tag: 2.3.3
+Stable tag: 2.4.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -122,6 +122,7 @@ We have one click import setup for following WordPress Plugin. If you are using 
 > 👉 301 Redirect
 > 👉 Simple 301 Redirects
 > 👉 Redirection
+> 👉 LinkCentral
 > 👉 [Short URL](https://wordpress.org/plugins/shorten-url/)
 
 === Premium Features ===
@@ -231,7 +232,7 @@ We have one click import setup for following WordPress Plugin. If you are using 
 > 👉 **A/B Testing**
 > Learn how new page components influence users' behavior by doing A/B Testing
 
-> 👉 **Amazon Affiliates** [Coming Soon!]
+> 👉 **Amazon Affiliates**
 > Adds your Amazon Affiliate-Tag to all Amazon URLs before redirection.
 
 Do you want to buy URL Shortify PRO? [Buy Now](http://kaizencoders.com/url-shortify-pricing/)
@@ -484,11 +485,25 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.3.3 =
+= 2.4.1 =
 
-* Fix: Deprecated notice in PHP 8.4+.
+* New version of URL Shortify with new features, improvements and bug fixes. Please update to the latest version to get the best experience. Learn more about the new features and improvements in the [changelog](https://docs.kaizencoders.com/url-shortify/changelog).
 
 == Changelog ==
+
+= 2.4.1 [2026-06-04] =
+
+* Fix: Version mismatch issue in the plugin header.
+
+= 2.4.0 [2026-06-04] =
+
+* New: Auto-create a source-named group when running one-click imports (e.g. "Pretty Links", "Thirsty Affiliates", "Easy 301 Redirect"). Every migrated link is automatically added to this group in addition to any categories carried over from the source plugin, so a full migration is bulk-discoverable in one place.
+* New: Open Graph link preview card on the Links page.
+* New: Automatically adds Amazon Affiliate-Tag to all Amazon URLs before redirection. **PRO**
+* Update: Onclick Migration from Link Central plugin.
+* Update: Performance Improvements.
+* Update: Security Improvements.
+* Translations: Updated .POT file for new translations.
 
 = 2.3.3 [2026-05-29] =
 

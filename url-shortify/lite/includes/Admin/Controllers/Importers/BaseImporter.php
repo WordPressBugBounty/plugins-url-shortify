@@ -76,6 +76,24 @@ abstract class BaseImporter {
 
 		$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
 
+		$this->process_records( $source_records, $existing_links );
+
+		$this->after_import();
+
+		return true;
+	}
+
+	/**
+	 * Run the per-record map → bulk-insert → group mapping loop for the
+	 * given batch of source records. Extracted so batched importers (e.g.
+	 * LinkCentralImporter) can reuse the same logic across paged calls.
+	 *
+	 * @param array $source_records
+	 * @param array $existing_slugs Slug → id (or id → slug) map used for dedupe.
+	 *
+	 * @return int Number of links actually inserted.
+	 */
+	protected function process_records( array $source_records, array $existing_slugs ) {
 		$values = [];
 		$groups = [];
 		$key    = 0;
@@ -83,7 +101,7 @@ abstract class BaseImporter {
 		foreach ( $source_records as $record ) {
 			$slug = $this->extract_slug( $record );
 
-			if ( '' === $slug || in_array( $slug, $existing_links, true ) ) {
+			if ( '' === $slug || in_array( $slug, $existing_slugs, true ) ) {
 				continue;
 			}
 
@@ -115,9 +133,7 @@ abstract class BaseImporter {
 			$this->controller->add_links_to_group( $groups );
 		}
 
-		$this->after_import();
-
-		return true;
+		return $key;
 	}
 
 	/**

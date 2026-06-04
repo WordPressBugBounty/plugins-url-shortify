@@ -36,6 +36,7 @@ class Ajax {
 		add_action( 'wp_ajax_us_handle_request', [ $this, 'handle_request' ] );
 		add_action( 'wp_ajax_nopriv_us_handle_request', [ $this, 'handle_request' ] );
 		add_action( 'wp_ajax_url_shortify_manage_plugin', [ $this, 'handle_plugin_management' ] );
+		add_action( 'wp_ajax_url_shortify_migrate_link_central', [ $this, 'migrate_link_central' ] );
 	}
 
 	/**
@@ -317,5 +318,27 @@ class Ajax {
 		}
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * Batch migrate links from Link Central into URL Shortify.
+	 *
+	 * @since 2.3.0
+	 */
+	public function migrate_link_central() {
+		check_ajax_referer( 'us_migrate_link_central', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ] );
+		}
+
+		$import = new ImportController();
+		$result = $import->import_link_central();
+
+		if ( empty( $result['success'] ) ) {
+			wp_send_json_error( $result );
+		}
+
+		wp_send_json_success( $result );
 	}
 }

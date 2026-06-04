@@ -3116,4 +3116,148 @@ class Helper {
 
         return ! empty( $tags_output ) ? '<div style="display: flex; flex-wrap: wrap; gap: 2;">' . implode( '', $tags_output ) . '</div>' : '-';
     }
+    
+	/**
+	 * Reject outbound URLs that could be used for SSRF — local/private/loopback
+	 * targets, non-http(s) schemes, and hostnames that resolve into reserved
+	 * IP ranges. Used by kc_us_get_og_metadata() before issuing wp_remote_get().
+	 *
+	 * @param string $url
+	 *
+	 * @return bool
+	 * @since 2.3.1
+	 */
+	public static function is_url_safe_for_outbound_fetch( $url ) {
+		$parts = wp_parse_url( $url );
+
+		if ( empty( $parts['host'] ) || empty( $parts['scheme'] ) ) {
+			return false;
+		}
+
+		if ( ! in_array( strtolower( $parts['scheme'] ), [ 'http', 'https' ], true ) ) {
+			return false;
+		}
+
+		$host = strtolower( $parts['host'] );
+
+		// Obvious local hostnames.
+		if ( in_array( $host, [ 'localhost', 'localhost.localdomain', 'broadcasthost', 'ip6-localhost', 'ip6-loopback' ], true ) ) {
+			return false;
+		}
+
+		// Resolve and check every IP the host points at — covers the case of
+		// a public hostname that A-records into RFC1918 / link-local space.
+		$ips = [];
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			$ips[] = $host;
+		} else {
+			$records = @dns_get_record( $host, DNS_A + DNS_AAAA );
+			if ( is_array( $records ) ) {
+				foreach ( $records as $record ) {
+					if ( ! empty( $record['ip'] ) ) {
+						$ips[] = $record['ip'];
+					}
+					if ( ! empty( $record['ipv6'] ) ) {
+						$ips[] = $record['ipv6'];
+					}
+				}
+			}
+		}
+
+		if ( empty( $ips ) ) {
+			// Couldn't resolve — fail closed.
+			return false;
+		}
+
+		foreach ( $ips as $ip ) {
+			if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Fetch and parse Open Graph metadata from a given URL.
+	 *
+	 * @param string $url The destination URL to fetch data from.
+	 *
+	 * @return array
+	 * @since 2.4.0
+	 */
+	public static function kc_us_get_og_metadata( $url ) {
+		$data = [
+			'og_title'       => '',
+			'og_description' => '',
+			'og_image'       => '',
+			'og_site_name'   => '',
+		];
+
+		if ( empty( $url ) || ! self::is_url_safe_for_outbound_fetch( $url ) ) {
+			return $data;
+		}
+
+		$response = wp_remote_get( $url, [
+			'timeout'             => 10,
+			'redirection'         => 0,
+			'limit_response_size' => 262144,
+			'user-agent'          => 'URL-Shortify/' . KC_US_PLUGIN_VERSION . ' (WordPress link preview)',
+		] );
+
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) >= 400 ) {
+			return $data;
+		}
+
+		$html = wp_remote_retrieve_body( $response );
+		if ( empty( $html ) ) {
+			return $data;
+		}
+
+		$doc = new \DOMDocument();
+		$libxml_previous_state = libxml_use_internal_errors( true );
+		
+		if ( function_exists( 'mb_convert_encoding' ) ) {
+			$html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
+		}
+		
+		$doc->loadHTML( $html );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $libxml_previous_state );
+
+		$xpath = new \DOMXPath( $doc );
+
+		$og_title = $xpath->query( "//meta[@property='og:title']/@content" );
+		if ( $og_title && $og_title->length > 0 ) {
+			$data['og_title'] = sanitize_text_field( $og_title->item( 0 )->nodeValue );
+		} else {
+			$title = $xpath->query( "//title" );
+			if ( $title && $title->length > 0 ) {
+				$data['og_title'] = sanitize_text_field( $title->item( 0 )->nodeValue );
+			}
+		}
+
+		$og_desc = $xpath->query( "//meta[@property='og:description']/@content" );
+		if ( $og_desc && $og_desc->length > 0 ) {
+			$data['og_description'] = sanitize_textarea_field( $og_desc->item( 0 )->nodeValue );
+		} else {
+			$meta_desc = $xpath->query( "//meta[@name='description']/@content" );
+			if ( $meta_desc && $meta_desc->length > 0 ) {
+				$data['og_description'] = sanitize_textarea_field( $meta_desc->item( 0 )->nodeValue );
+			}
+		}
+
+		$og_image = $xpath->query( "//meta[@property='og:image']/@content" );
+		if ( $og_image && $og_image->length > 0 ) {
+			$data['og_image'] = esc_url_raw( $og_image->item( 0 )->nodeValue );
+		}
+
+		$og_site = $xpath->query( "//meta[@property='og:site_name']/@content" );
+		if ( $og_site && $og_site->length > 0 ) {
+			$data['og_site_name'] = sanitize_text_field( $og_site->item( 0 )->nodeValue );
+		}
+
+		return $data;
+	}
+    
 }

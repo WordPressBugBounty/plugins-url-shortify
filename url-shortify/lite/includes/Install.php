@@ -120,6 +120,10 @@ class Install {
 			'kc_us_update_220_add_r_index_to_clicks_rotations',
 			'kc_us_update_220_create_linkmeta_table',
 		],
+
+		'2.3.1' => [
+			'kc_us_update_231_alter_links_table',
+		],
 	];
 
 	/**
@@ -660,6 +664,11 @@ class Install {
 				`created_by_id` int(11) DEFAULT NULL,
 				`updated_at` datetime DEFAULT NULL,
 				`updated_by_id` int(11) DEFAULT NULL,
+				`og_title` text DEFAULT NULL,
+				`og_description` text DEFAULT NULL,
+				`og_image` text DEFAULT NULL,
+				`og_site_name` varchar(255) DEFAULT NULL,
+				`og_last_fetched` datetime DEFAULT NULL,
                 PRIMARY KEY  (id),
                 KEY cpt_id (cpt_id),
                 KEY type_id (type_id),
@@ -1109,5 +1118,15 @@ class Install {
 				KEY meta_key (meta_key(191))
 			) $collate;
 		";
+	}
+
+	/**
+	 * Run dbDelta to add new Open Graph columns to kc_us_links table.
+	 *
+	 * @since 2.4.0
+	 */
+	public static function update_240_alter_links_table() {
+		self::create_tables();
+		return true;
 	}
 }

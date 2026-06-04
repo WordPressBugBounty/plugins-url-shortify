@@ -405,6 +405,7 @@ class Plugin {
 			'KaizenCoders\URL_Shortify\Install',
 			'KaizenCoders\URL_Shortify\Cron',
 			'KaizenCoders\URL_Shortify\Ajax',
+			'KaizenCoders\URL_Shortify\Ajax\Link_Preview',
 			//'KaizenCoders\URL_Shortify\Email\Report',
 			'KaizenCoders\URL_Shortify\Promo',
 			'KaizenCoders\URL_Shortify\Frontend\Redirect',

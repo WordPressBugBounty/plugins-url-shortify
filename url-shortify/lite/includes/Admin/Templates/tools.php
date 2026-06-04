@@ -154,6 +154,9 @@ $import_status = Helper::get_request_data( 'import_status', '' );
 			// Generate bookmarklet page from PRO.
 			do_action( 'kc_us_render_bookmarklet_page' );
 
+		} elseif ( 'migration' === $tab ) {
+			include_once KC_US_ADMIN_TEMPLATES_DIR . '/migration.php';
+
 		} elseif ( 'import' === $tab && 'csv' === $action && ( '' === $submitted ) ) { ?>
 
             <div class="flex-row pt-2 pb-2 ml-5 mr-4 text-left item-center">

@@ -18,6 +18,14 @@ class RedirectionImporter extends BaseImporter {
 
 	protected $default_group_name = 'Redirection';
 
+	/**
+	 * Memo for resolve_url_and_title() — same record is resolved twice per
+	 * row (once in should_skip, once in map_link).
+	 *
+	 * @var array
+	 */
+	private $resolved_cache = [];
+
 	protected function fetch_links() {
 		global $wpdb;
 
@@ -71,9 +79,14 @@ class RedirectionImporter extends BaseImporter {
 	 * @return array{url:string,title:string,post_id:int|null}
 	 */
 	private function resolve_url_and_title( $record ) {
-		$post_id = (int) Helper::get_data( $record, 'id_post', 0 );
-		$title   = (string) Helper::get_data( $record, 'title', '' );
-		$url     = (string) Helper::get_data( $record, 'action_data', '' );
+		$post_id   = (int) Helper::get_data( $record, 'id_post', 0 );
+		$title     = (string) Helper::get_data( $record, 'title', '' );
+		$url       = (string) Helper::get_data( $record, 'action_data', '' );
+		$cache_key = $post_id . '|' . $url;
+
+		if ( isset( $this->resolved_cache[ $cache_key ] ) ) {
+			return $this->resolved_cache[ $cache_key ];
+		}
 
 		if ( $post_id > 0 ) {
 			$post = get_post( $post_id );
@@ -83,7 +96,7 @@ class RedirectionImporter extends BaseImporter {
 			}
 		}
 
-		return [
+		return $this->resolved_cache[ $cache_key ] = [
 			'url'     => (string) $url,
 			'title'   => (string) $title,
 			'post_id' => $post_id ?: null,

@@ -477,3 +477,40 @@ function kc_us_update_220_add_r_index_to_clicks_rotations() {
 function kc_us_update_220_create_linkmeta_table() {
 	Install::create_tables( '2.2.0' );
 }
+
+/**************** 2.3.1 *******************/
+
+/**
+ * Add Open Graph columns to the links table.
+ *
+ * @since 2.3.1
+ */
+function kc_us_update_231_alter_links_table() {
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'kc_us_links';
+
+	if ( ! $wpdb->query( "SHOW TABLES LIKE '{$table}'" ) ) {
+		return false;
+	}
+
+	$cols = $wpdb->get_col( "SHOW COLUMNS FROM {$table}" );
+
+	if ( ! in_array( 'og_title', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `og_title` text DEFAULT NULL AFTER `updated_by_id`" );
+	}
+	if ( ! in_array( 'og_description', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `og_description` text DEFAULT NULL AFTER `og_title`" );
+	}
+	if ( ! in_array( 'og_image', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `og_image` text DEFAULT NULL AFTER `og_description`" );
+	}
+	if ( ! in_array( 'og_site_name', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `og_site_name` varchar(255) DEFAULT NULL AFTER `og_image`" );
+	}
+	if ( ! in_array( 'og_last_fetched', $cols, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `og_last_fetched` datetime DEFAULT NULL AFTER `og_site_name`" );
+	}
+
+	return false;
+}

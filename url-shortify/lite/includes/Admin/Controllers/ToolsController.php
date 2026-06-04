@@ -37,6 +37,11 @@ class ToolsController extends BaseController {
 			'link'  => add_query_arg( [ 'tab' => 'import' ], admin_url( 'admin.php?page=us_tools' ) ),
 		];
 
+		$tabs['migration'] = [
+			'title' => __( 'Migration', 'url-shortify' ),
+			'link'  => add_query_arg( [ 'tab' => 'migration' ], admin_url( 'admin.php?page=us_tools' ) ),
+		];
+
 		$tabs['trim_clicks'] = [
 			'title' => __( 'Trim Clicks', 'url-shortify' ),
 			'link'  => add_query_arg( [ 'tab' => 'trim_clicks' ], admin_url( 'admin.php?page=us_tools' ) ),

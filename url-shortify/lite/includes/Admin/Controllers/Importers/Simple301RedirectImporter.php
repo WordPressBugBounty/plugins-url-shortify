@@ -61,7 +61,7 @@ class Simple301RedirectImporter extends BaseImporter {
 			'redirect_type'     => 301,
 			'status'            => 1,
 			'type'              => 'direct',
-			'created_at'        => date( 'Y-m-d H:i:s' ),
+			'created_at'        => Helper::get_current_date_time(),
 			'created_by_id'     => $this->current_user_id,
 		];
 	}
