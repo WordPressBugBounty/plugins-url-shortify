@@ -42,6 +42,7 @@ class Promo {
                 'pre_launch_offer',
                 'helloween_offer',
                 'survey_2025',
+            'july_2026_offer',
         ];
     }
 
@@ -124,10 +125,25 @@ class Promo {
      */
     public function handle_promotions() {
         $current_url = home_url( $_SERVER['REQUEST_URI'] );
-        $external_url = 'https://kaizencoders.com/url-shortify';
+        $external_url = 'https://kaizencoders.com/url-shortify/?utm_source=url-shortify-in-app&utm_medium=banner&utm_campaign=july-2026-offer#pricing';
+        $dismiss_url  = $this->get_dismiss_url( 'july_2026_offer', [], $current_url );
 
-        $dismiss_url  = $this->get_dismiss_url( 'us_2_0_launch', [], $current_url );
-
+        $july_2026_offer = [
+                'title'                         => "<b class='text-red-600 text-xl'>" . __( 'Upgrade URL Shortify PRO at Flat 25% OFF - Limited Time Offer',
+                                'url-shortify' ) . "</b>",
+                'start_date'                    => '2026-07-09',
+                'end_date'                      => '2026-07-16',
+                'total_links'                   => 1,
+                'start_after_installation_days' => 0,
+                'pricing_url'                   => 'https://kaizencoders.com/url-shortify/?utm_source=url-shortify-in-app&utm_medium=banner&utm_campaign=july-2026-offer#pricing',
+                'promotion'                     => 'july_2026_offer',
+                'show_plan'                     => 'free',
+                'dismiss_url'                   => add_query_arg( 'pricing', 'true', US()->get_landing_page_url() ),
+                'message'                       => '<p class="text-xl mt-4">Get cloaked links, full click analytics, auto link keyword, broken link checker and many more at <strong class="text-red-500">Flat 25% OFF</strong> <br><br> Use Coupon Code - <b>SPECIAL25</b> <br><br>  <a href="' . $external_url . '" target="_blank" class="button-primary bg-indigo-600 text-white focus:bg-indigo-800"> 👉 Upgrade Now </a> <a href="' . $dismiss_url . '" target="_blank" class="text-red-500 text-sm hover:text-red-600"> Close </a> </p>',
+                'show_upgrade'                  => false,
+                'show_dismiss_button'           => false,
+                'banner'                        => false,
+        ];
         $us_2_0_launch = [
                 'title'                         => "<b class='text-red-600 text-xl'>" . __( 'URL Shortify 2.0 Launch Offer',
                                 'url-shortify' ) . "</b>",
@@ -251,8 +267,8 @@ class Promo {
         ];
 
         // Promotion.
-        if ( Helper::can_show_promotion( $us_2_0_launch ) ) {
-            $this->show_promotion( 'us_2_0_launch', $us_2_0_launch );
+        if ( Helper::can_show_promotion( $july_2026_offer ) ) {
+            $this->show_promotion( 'july_2026_offer', $july_2026_offer );
         } elseif ( Helper::can_show_promotion( $bfcm_2025_offer ) ) {
             $this->show_promotion( 'bfcm_2025_offer', $bfcm_2025_offer );
         } elseif ( Helper::can_show_promotion( $survey_2025 ) ) {
