@@ -39,10 +39,30 @@ $top_links        = ! empty( $data['top_links'] ) && is_array( $data['top_links'
 $recent_links     = ! empty( $data['recent_links'] ) && is_array( $data['recent_links'] ) ? $data['recent_links'] : [];
 $news_items       = ! empty( $data['news_items'] ) && is_array( $data['news_items'] ) ? $data['news_items'] : [];
 $analytics_url    = admin_url( 'admin.php?page=url_shortify' );
-$upgrade_url      = US()->get_pricing_url();
 $plugin_version   = defined( 'KC_US_PLUGIN_VERSION' ) ? KC_US_PLUGIN_VERSION : '';
-$docs_url         = 'https://docs.kaizencoders.com/url-shortify/';
-$website_url      = 'https://kaizencoders.com';
+
+// Every outbound link in this email is attributed to the digest, with
+// `utm_content` naming the placement it was clicked from.
+$email_utm = [
+	'source'   => 'url-shortify-email',
+	'medium'   => 'email',
+	'campaign' => 'email-digest',
+];
+
+$upgrade_url = US()->get_pricing_url(
+	'annual',
+	array_merge( $email_utm, [ 'content' => 'upgrade-cta' ] )
+);
+
+$docs_url = \KaizenCoders\URL_Shortify\Helper::get_utm_url(
+	'https://docs.kaizencoders.com/url-shortify/',
+	array_merge( $email_utm, [ 'content' => 'footer-docs' ] )
+);
+
+$website_url = \KaizenCoders\URL_Shortify\Helper::get_utm_url(
+	'https://kaizencoders.com',
+	array_merge( $email_utm, [ 'content' => 'footer-brand' ] )
+);
 $is_pro           = US()->is_pro();
 
 // Total clicks for percentage calculations.
@@ -433,6 +453,17 @@ if ( null !== $click_trend ) {
 					$item_url    = ! empty( $item['url'] ) ? $item['url'] : '';
 					$url_label   = ! empty( $item['url_label'] ) ? $item['url_label'] : __( 'Learn more →', 'url-shortify' );
 					if ( empty( $title ) ) { continue; }
+					if ( ! empty( $item_url ) ) {
+						// Attribute the click to this item, so it is possible to tell
+						// which tip or announcement people actually follow.
+						$item_url = \KaizenCoders\URL_Shortify\Helper::get_utm_url(
+							$item_url,
+							array_merge(
+								$email_utm,
+								[ 'content' => 'news-' . sanitize_title( $title ) ]
+							)
+						);
+					}
 					$badge_colors = [
 						'tip'          => 'background-color:#ecfdf5;color:#065f46;',
 						'news'         => 'background-color:#eff6ff;color:#1e40af;',

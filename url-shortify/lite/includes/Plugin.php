@@ -327,12 +327,56 @@ class Plugin {
 	}
 
 	/**
-	 * Get pricing url
+	 * Website url.
+	 *
+	 * @since 2.5.0
+	 */
+	const WEBSITE_URL = 'https://kaizencoders.com/url-shortify/';
+
+	/**
+	 * Get pricing url.
+	 *
+	 * Points at the pricing section on kaizencoders.com rather than the in-app
+	 * checkout, and is tagged so the click can be attributed.
+	 *
+	 * @param  string  $billing_cycle  `annual` or `lifetime`.
+	 * @param  array   $utm            Overrides for the campaign parameters.
+	 *
+	 * @return string
 	 *
 	 * @since 1.1.5
 	 */
-	public function get_pricing_url( $billing_cycle = 'annual' ) {
-		return admin_url( 'admin.php?page=url_shortify-pricing&billing_cycle=' . $billing_cycle );
+	public function get_pricing_url( $billing_cycle = 'annual', $utm = [] ) {
+		$url = self::WEBSITE_URL . '#pricing';
+
+		if ( ! empty( $billing_cycle ) ) {
+			$url = add_query_arg( 'billing_cycle', $billing_cycle, $url );
+		}
+
+		return Helper::get_utm_url(
+			$url,
+			wp_parse_args(
+				$utm,
+				[
+					'medium'   => 'link',
+					'campaign' => 'pricing',
+				]
+			)
+		);
+	}
+
+	/**
+	 * Get website url.
+	 *
+	 * @param  string  $path  Path relative to the plugin's page, e.g. `#pricing`.
+	 * @param  array   $utm   Campaign parameters.
+	 *
+	 * @return string
+	 *
+	 * @since 2.5.0
+	 */
+	public function get_website_url( $path = '', $utm = [] ) {
+		return Helper::get_utm_url( self::WEBSITE_URL . ltrim( $path, '/' ), $utm );
 	}
 
 	/**
@@ -407,7 +451,7 @@ class Plugin {
 			'KaizenCoders\URL_Shortify\Ajax',
 			'KaizenCoders\URL_Shortify\Ajax\Link_Preview',
 			//'KaizenCoders\URL_Shortify\Email\Report',
-			'KaizenCoders\URL_Shortify\Promo',
+			'KaizenCoders\URL_Shortify\Admin\Promotions\PromoBanner',
 			'KaizenCoders\URL_Shortify\Frontend\Redirect',
 			'KaizenCoders\URL_Shortify\Common\Actions',
 			'KaizenCoders\URL_Shortify\Shortcode',

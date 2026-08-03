@@ -634,6 +634,120 @@ class Helper {
     }
 
     /**
+     * Append UTM parameters to a url.
+     *
+     * Keys may be given with or without the `utm_` prefix. Existing query
+     * arguments are preserved and a fragment stays at the end where it belongs,
+     * so a url such as `.../url-shortify/#pricing` keeps working.
+     *
+     * @param  string  $url     Target url.
+     * @param  array   $params  Parameters, e.g. [ 'source' => 'x', 'medium' => 'y' ].
+     *
+     * @return string
+     *
+     * @since 2.5.0
+     */
+    public static function add_utm_params( $url, $params ) {
+        if ( '' === (string) $url || empty( $params ) ) {
+            return (string) $url;
+        }
+
+        $utm = [];
+
+        foreach ( (array) $params as $key => $value ) {
+            $value = (string) $value;
+
+            if ( '' === $value ) {
+                continue;
+            }
+
+            $key = (string) $key;
+
+            if ( 0 !== strpos( $key, 'utm_' ) ) {
+                $key = 'utm_' . $key;
+            }
+
+            $utm[ $key ] = $value;
+        }
+
+        if ( empty( $utm ) ) {
+            return (string) $url;
+        }
+
+        $parts = wp_parse_url( $url );
+
+        $scheme   = isset( $parts['scheme'] ) ? $parts['scheme'] . '://' : '';
+        $user     = isset( $parts['user'] ) ? $parts['user'] . ( isset( $parts['pass'] ) ? ':' . $parts['pass'] : '' ) . '@' : '';
+        $host     = isset( $parts['host'] ) ? $parts['host'] : '';
+        $port     = isset( $parts['port'] ) ? ':' . $parts['port'] : '';
+        $path     = isset( $parts['path'] ) ? $parts['path'] : '';
+        $query    = isset( $parts['query'] ) ? $parts['query'] : '';
+        $fragment = isset( $parts['fragment'] ) ? '#' . $parts['fragment'] : '';
+
+        // `https://example.com` has no path, which would render as
+        // `https://example.com?utm_source=…`. Valid, but the slash belongs there.
+        if ( '' === $path && '' !== $host ) {
+            $path = '/';
+        }
+
+        $existing = [];
+
+        if ( '' !== $query ) {
+            parse_str( $query, $existing );
+        }
+
+        $merged = array_merge( is_array( $existing ) ? $existing : [], $utm );
+
+        $rebuilt_query = http_build_query( $merged );
+
+        return $scheme . $user . $host . $port . $path
+               . ( '' !== $rebuilt_query ? '?' . $rebuilt_query : '' )
+               . $fragment;
+    }
+
+    /**
+     * Tag an outbound url with the plugin's standard campaign parameters.
+     *
+     * Single place where the UTM convention lives, so every link that leaves
+     * the plugin for kaizencoders.com is attributed the same way.
+     *
+     * @param  string  $url   Target url.
+     * @param  array   $args  {
+     *     @type string $source    Defaults to `url-shortify-in-app`.
+     *     @type string $medium    Where the click came from, e.g. `banner`, `email`.
+     *     @type string $campaign  Campaign identifier.
+     *     @type string $content   Optional placement within the medium.
+     * }
+     *
+     * @return string
+     *
+     * @since 2.5.0
+     */
+    public static function get_utm_url( $url, $args = [] ) {
+        $args = wp_parse_args(
+            $args,
+            [
+                'source'   => 'url-shortify-in-app',
+                'medium'   => '',
+                'campaign' => '',
+                'content'  => '',
+            ]
+        );
+
+        /**
+         * Filter the UTM parameters applied to outbound plugin links.
+         *
+         * @param array  $args UTM parameters.
+         * @param string $url  Target url.
+         *
+         * @since 2.5.0
+         */
+        $args = apply_filters( 'kc_us_utm_params', $args, $url );
+
+        return self::add_utm_params( $url, $args );
+    }
+
+    /**
      * Get link prefix.
      *
      * @return array|data|string
@@ -1482,90 +1596,6 @@ class Helper {
     }
 
     /**
-     * Can show promotion message?
-     *
-     * @param  boolean  $force
-     *
-     * @param  array    $meta
-     *
-     * @return bool
-     *
-     * @since 1.4.4
-     *
-     */
-    public static function can_show_promotion( $conditions = [], $force = false ) {
-        if ( ! Helper::is_plugin_admin_screen() ) {
-            return false;
-        }
-
-        if ( $force ) {
-            return true;
-        }
-
-        $disable_promotion = apply_filters( 'kc_us_disable_promotion', false );
-
-        if ( $disable_promotion ) {
-            return false;
-        }
-
-        $conditions = array_merge( [
-                'show_plan'                     => 'pro',
-                'meta'                          => [],
-                'start_after_installation_days' => 7,
-                'end_before_installation_days'  => 999999,
-                'total_links'                   => 2,
-                'start_date'                    => null,
-                'end_date'                      => null,
-                'promotion'                     => null,
-        ], $conditions );
-
-        extract( $conditions );
-
-        if ( 'pro' === $show_plan ) {
-            if ( US()->is_pro() ) {
-                return false;
-            }
-        }
-
-        // Already seen this promotion?
-        if ( ! is_null( $promotion ) && self::is_promotion_dismissed( $promotion ) ) {
-            return false;
-        }
-
-        $today = Helper::get_current_date_time();
-
-        // Don't show if start date is future.
-        if ( ! is_null( $start_date ) && ( $today < $start_date ) ) {
-            return false;
-        }
-
-        // Don't show if end date is past.
-        if ( ! is_null( $end_date ) && ( $today > $end_date ) ) {
-            return false;
-        }
-
-        // Check total links condition if it exists.
-        if ( ! is_null( $total_links ) ) {
-            if ( $total_links > US()->db->links->count() ) {
-                return false;
-            }
-        }
-
-        $installed_on = Option::get( 'installed_on', 0 );
-        if ( 0 === $installed_on ) {
-            Option::set( 'installed_on', time() );
-        }
-
-        $since_installed = ceil( ( time() - $installed_on ) / 86400 );
-
-        if ( ( $since_installed < $start_after_installation_days ) || ( $since_installed > $end_before_installation_days ) ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Prepare Tooltip html
      *
      * @param  string  $tooltip_text
@@ -1763,121 +1793,6 @@ class Helper {
         $links_json_file = self::get_links_json_filename();
 
         return file_put_contents( KC_US_UPLOADS_DIR . "/" . $links_json_file, json_encode( $links_data ) );
-    }
-
-    /**
-     * Get upgrade banner.
-     *
-     * @return void
-     *
-     * @since 1.5.15
-     */
-    public static function get_upgrade_banner( $query_strings = [], $show_coupon = false, $data = [] ) {
-        $message             = Helper::get_data( $data, 'message', '' );
-        $title               = Helper::get_data( $data, 'title', 'Upgrade Now.' );
-        $coupon_message      = Helper::get_data( $data, 'coupon_message', '' );
-        $pricing_url         = Helper::get_data( $data, 'pricing_url', US()->get_landing_page_url() );
-        $dismiss_url         = Helper::get_data( $data, 'dismiss_url', US()->get_landing_page_url() );
-        $show_upgrade        = Helper::get_data( $data, 'show_upgrade', true );
-        $show_dismiss_button = Helper::get_data( $data, 'show_dismiss_button', true );
-        $is_banner           = Helper::get_data( $data, 'banner', false );
-
-
-        if ( $query_strings ) {
-            $pricing_url = add_query_arg( $query_strings, $pricing_url );
-            $dismiss_url = add_query_arg( $query_strings, $dismiss_url );
-        }
-
-        if ( $is_banner ) {
-            $banner_image = KC_US_PLUGIN_ASSETS_DIR_URL . '/images/promo/bfcm_2025_offer.png';
-
-            ?>
-            <div class="rounded-md flex justify-center">
-                <a href="<?php
-                echo $pricing_url; ?>" target="_blank"><img src="<?php
-                    echo $banner_image; ?>"
-                                                            title="BFCM Promotion"></a>
-            </div>
-
-            <?php
-        } else {
-            ?>
-
-
-            <div class="rounded-md bg-green-50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                  clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-green-800"><?php
-                            echo $title; ?></h3>
-                        <div class="mt-2 text-sm">
-                        <span class="text-base">
-                                 <?php
-                                 echo $message; ?>
-
-                            <?php
-                            if ( $show_coupon ) { ?>
-                                <br/>
-                                <?php
-                                echo $coupon_message;
-                            } ?>
-                        </span>
-                        </div>
-                        <div class="mt-4">
-                            <div class="-mx-2 -my-1.5 flex">
-                                <?php
-                                if ( $show_upgrade ) { ?>
-                                    <button type="button"
-                                            class="rounded-md border-2 border-green-800 bg-green-50 px-2 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-green-50">
-                                        <a href="<?php
-                                        echo esc_url( $pricing_url ); ?>"
-                                           class="text-green-800 hover:text-green-800">Upgrade Now</a></button>
-                                    <?php
-                                }
-
-                                if ( $show_dismiss_button ) { ?>
-                                    <button type="button"
-                                            class="ml-3 rounded-md px-2 py-1.5 text-sm font-medium text-red-800 focus:outline-none focus:ring-2">
-                                        <a href="<?php
-                                        echo esc_url( $dismiss_url ); ?>" class="text-red-500">Dismiss</a>
-                                    </button>
-                                    <?php
-                                } ?>
-
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php
-        }
-    }
-
-    /**
-     * Is promotion dismissed?
-     *
-     * @param $promotion
-     *
-     * @return bool
-     *
-     * @since 1.5.15
-     *
-     */
-    public static function is_promotion_dismissed( $promotion ) {
-        if ( empty( $promotion ) ) {
-            return false;
-        }
-
-        $promotion_dismissed_option = 'kc_us_' . trim( $promotion ) . '_dismissed';
-
-        return 'yes' === get_option( $promotion_dismissed_option );
     }
 
     /**
@@ -3009,6 +2924,11 @@ class Helper {
                     ],
 
 
+                    'utility-kit' => [
+                            'name'       => 'utility-kit/utility-kit.php',
+                            'is_premium' => false,
+                    ],
+
                     'social-linkz' => [
                             'name'       => 'social-linkz/social-linkz.php',
                             'is_premium' => false,
@@ -3016,10 +2936,6 @@ class Helper {
 
                     'zapify'    => [
                             'name'       => 'zapify/zapify.php',
-                            'is_premium' => false,
-                    ],
-                    'utilitify' => [
-                            'name'       => 'utilitify/utilitify.php',
                             'is_premium' => false,
                     ],
             ];

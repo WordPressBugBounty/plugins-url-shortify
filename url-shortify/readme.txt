@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.0
-Stable tag: 2.4.3
+Stable tag: 2.5.0
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -237,6 +237,12 @@ We have one click import setup for following WordPress Plugin. If you are using 
 
 > 👉 **REST API to create short links in bulk.**
 > Able to create short links in bulk using WordPress REST API from anywhere.
+
+> 👉 **Duplicate Short Links**
+> Copy any short link in a single click, one at a time or in bulk. The duplicate keeps every setting of the original — target URL, redirect type, link attributes, expiry, password, custom domain, UTM parameters, tracking pixels, groups and tags — and gets a freshly generated slug, so you can build a new link from an existing one without setting it up again.
+
+> 👉 **Export / Import - Move Your Data Between Sites**
+> Move everything URL Shortify stores — links, groups, tags, custom domains, UTM presets, tracking pixels, click history and your plugin settings — from one site to another in a single file. Preview exactly what will be imported before it runs, choose what happens to entries that already exist, and get an automatic backup taken before anything is replaced. Ideal for staging to production workflows and site migrations.
 
 Do you want to buy URL Shortify PRO? [Buy Now](http://kaizencoders.com/url-shortify-pricing/)
 
@@ -488,11 +494,17 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.4.3 =
+= 2.5.0 =
 
-* New version of URL Shortify with new features, improvements and bug fixes. Please update to the latest version to get the best experience. Learn more about the new features and improvements in the [changelog](https://aizencoders.com/docs/url-shortify/changelog).
+* New version of URL Shortify with new features, improvements and bug fixes. Please update to the latest version to get the best experience. Learn more about the new features and improvements in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
+
+= 2.5.0 [2026-08-03] =
+
+* New: Duplicate short links from the links list page, one at a time or in bulk. The copy keeps every parameter of the original link and gets an automatically generated slug. **PRO**
+* New: One-click Export / Import to move all your URL Shortify data and settings between sites, with a dry-run preview, conflict handling and an automatic safety backup before anything is replaced. **PRO**
+* Fix: Dark theme UI issues in the admin.
 
 = 2.4.3 [2026-07-10] =
 

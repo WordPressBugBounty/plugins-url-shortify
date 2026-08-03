@@ -932,6 +932,45 @@ class Links_Table extends US_List_Table {
 				}
 			}
 
+		} elseif ( 'duplicate' === $this->current_action() ) {
+			if ( ! US()->is_pro() ) {
+				US()->notices->error( __( 'This feature is available in the PRO version only.', 'url-shortify' ) );
+
+				return;
+			}
+
+			// In our file that handles the request, verify the nonce.
+			$nonce = Helper::get_request_data( '_wpnonce' );
+
+			if ( ! wp_verify_nonce( $nonce, 'us_action_nonce' ) ) {
+				$message = __( 'You do not have permission to duplicate this link.', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$link_id = absint( Helper::get_request_data( 'id' ) );
+
+				if ( ! empty( $link_id ) ) {
+					$new_link_id = absint( apply_filters( 'kc_us_duplicate_link', 0, $link_id ) );
+
+					if ( ! empty( $new_link_id ) ) {
+						$value = [
+							'status'  => 'success',
+							'message' => __( 'Link has been duplicated successfully!', 'url-shortify' ),
+						];
+					} else {
+						$value = [
+							'status'  => 'error',
+							'message' => __( 'Link could not be duplicated. Please try again.', 'url-shortify' ),
+						];
+					}
+
+					Cache::set_transient( 'notice', $value );
+
+					// Drop the action from the url so that a page refresh doesn't duplicate the link again.
+					wp_safe_redirect( remove_query_arg( [ 'action', 'action2', 'id', '_wpnonce' ] ) );
+					exit();
+				}
+			}
+
 		} elseif ( ( 'bulk_delete' === $action ) || ( 'bulk_delete' === $action2 ) ) {
 			// In our file that handles the request, verify the nonce.
 			$nonce  = Helper::get_request_data( '_wpnonce' );
@@ -1113,6 +1152,59 @@ class Links_Table extends US_List_Table {
 				US()->db->links->bulk_add_expiry( $link_ids, $expiry_date );
 
 				$message = __( 'Expiry date has been added to selected links.', 'url-shortify' );
+				US()->notices->success( $message );
+			}
+		} elseif ( ( 'bulk_duplicate' === $action ) || ( 'bulk_duplicate' === $action2 ) ) {
+			if ( ! US()->is_pro() ) {
+				US()->notices->error( __( 'This feature is available in the PRO version only.', 'url-shortify' ) );
+
+				return;
+			}
+
+			$nonce  = Helper::get_request_data( '_wpnonce' );
+			$action = 'bulk-' . Helper::get_data( $this->_args, 'plural', '' );
+
+			if ( ! wp_verify_nonce( $nonce, $action ) ) {
+				$message = __( 'You do not have permission to duplicate link(s).', 'url-shortify' );
+				US()->notices->error( $message );
+			} else {
+				$select_all = Helper::get_request_data( 'select_all_links', '0' );
+
+				if ( '1' === $select_all && US()->is_pro() ) {
+					$link_ids = $this->get_all_link_ids_for_bulk();
+				} else {
+					$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : Helper::get_request_data( 'link_ids' );
+					if ( empty( $link_ids ) ) {
+						$link_ids = isset( $_POST['link_ids'] ) ? array_map( 'absint', wp_unslash( $_POST['link_ids'] ) ) : [];
+					}
+				}
+
+				if ( empty( $link_ids ) ) {
+					$message = __( 'Please select link(s) to duplicate.', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				$duplicated = 0;
+
+				foreach ( (array) $link_ids as $link_id ) {
+					if ( absint( apply_filters( 'kc_us_duplicate_link', 0, absint( $link_id ) ) ) ) {
+						$duplicated ++;
+					}
+				}
+
+				if ( empty( $duplicated ) ) {
+					$message = __( 'Link(s) could not be duplicated. Please try again.', 'url-shortify' );
+					US()->notices->error( $message );
+
+					return;
+				}
+
+				/* translators: %d: number of links which have been duplicated */
+				$message = sprintf( _n( '%d link has been duplicated successfully!',
+					'%d links have been duplicated successfully!', $duplicated, 'url-shortify' ), $duplicated );
+
 				US()->notices->success( $message );
 			}
 		} elseif ( ( 'bulk_enable_links' === $action ) || ( 'bulk_enable_links' === $action2 ) ) {

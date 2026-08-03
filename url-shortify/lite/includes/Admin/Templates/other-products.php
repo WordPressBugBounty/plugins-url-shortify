@@ -8,7 +8,13 @@ $active_plugins   = Tracker::get_active_plugins();
 $inactive_plugins = Tracker::get_inactive_plugins();
 $all_plugins      = Tracker::get_plugins();
 
-$kaizencoders_url = 'https://kaizencoders.com';
+$kaizencoders_url = \KaizenCoders\URL_Shortify\Helper::get_utm_url(
+	'https://kaizencoders.com',
+	[
+		'medium'   => 'link',
+		'campaign' => 'other-products',
+	]
+);
 
 $plugins = \KaizenCoders\URL_Shortify\Helper::get_kc_plugins_info();
 

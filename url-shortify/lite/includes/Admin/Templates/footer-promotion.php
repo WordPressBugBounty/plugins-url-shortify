@@ -31,7 +31,13 @@
             <p>
                 <?php /* translators: %s: URL for the KaizenCoders website */ ?>
                 <?php echo sprintf( __( "Made with ❤️ by the team <a href='%s' target='_blank'>KaizenCoders</a>",
-                    'url-shortify' ), 'https://kaizencoders.com' ); ?>
+                    'url-shortify' ), esc_url( \KaizenCoders\URL_Shortify\Helper::get_utm_url(
+                        'https://kaizencoders.com',
+                        [
+                            'medium'   => 'link',
+                            'campaign' => 'admin-footer',
+                        ]
+                    ) ) ); ?>
             </p>
         </div>
     </div>

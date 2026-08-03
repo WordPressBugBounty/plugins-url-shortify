@@ -402,7 +402,7 @@ $settings = array(
                                                 <div class="ml-3">
                                                     <h3 class="text-sm leading-5 font-medium text-green-800">
 														<?php /* translators: %s: URL for the upgrade/pricing page */ ?>
-													<?php echo sprintf( __( 'Protect your short link with password using PRO version. <a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_pricing_url() ); ?>
+													<?php echo sprintf( __( 'Protect your short link with password using PRO version. <a href="%s" target="_blank">Upgrade Now</a>', 'url-shortify' ), esc_url( US()->get_pricing_url( 'annual', [ 'content' => 'link-form-password' ] ) ) ); ?>
                                                     </h3>
                                                 </div>
                                             </div>

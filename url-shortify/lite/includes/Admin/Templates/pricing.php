@@ -2,7 +2,7 @@
 
 use KaizenCoders\URL_Shortify\Helper;
 
-$pricing_url = US()->get_pricing_url();
+$pricing_url = US()->get_pricing_url( 'annual', [ 'content' => 'pricing-table' ] );
 
 $pricing = [
     'yearly' => [

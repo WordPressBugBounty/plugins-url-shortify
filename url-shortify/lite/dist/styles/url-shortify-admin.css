@@ -911,7 +911,7 @@ body.kc-us-dark-active .wrap h4,
 #wpbody-content.kc-us-dark .wrap .wp-list-table td,
 #wpbody-content.kc-us-dark .wrap table.widefat th,
 #wpbody-content.kc-us-dark .wrap table.widefat td {
-    background-color: #1e293b;
+    background-color: #0f172a;
     border-bottom-color: #334155;
     color: #e2e8f0;
 }
@@ -924,7 +924,7 @@ body.kc-us-dark-active .wrap h4,
 
 #wpbody-content.kc-us-dark .wrap .wp-list-table tr:hover td,
 #wpbody-content.kc-us-dark .wrap table.widefat tr:hover td {
-    background-color: #273548 !important;
+    background-color: #0f172a !important;
 }
 
 #wpbody-content.kc-us-dark .wrap .wp-list-table .alternate,
@@ -1509,12 +1509,43 @@ body.kc-us-dark-active #wpfooter {
 
 /* Keep checkbox and radio inputs unstyled */
 #wpbody-content.kc-us-dark .wrap input[type="checkbox"],
-#wpbody-content.kc-us-dark .wrap input[type="radio"] {
-    background-color: unset !important;
-    border-color: unset !important;
-    color: unset !important;
-    box-shadow: unset !important;
+#wpbody-content.kc-us-dark .wrap input[type="radio"],
+#wpbody-content.kc-us-dark .wrap .form-table input[type="checkbox"],
+#wpbody-content.kc-us-dark .wrap .form-table input[type="radio"] {
+    -webkit-appearance: revert;
+    appearance: revert;
+    background-color: initial;
+    border-color: initial;
 }
+
+#wpbody-content.kc-us-dark .wrap .kc-us-check-toggle:not(:checked) ~ .kc-us-mail-toggle-line {
+    background-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .us-link-status-toggle[data-status="0"] .us-link-status-track {
+    background-color: #334155 !important;
+}
+
+#wpbody-content.kc-us-dark .wrap .us-link-status-toggle[data-status="0"] .us-link-status-thumb {
+    background-color: #94a3b8 !important;
+    border-color: #475569 !important;
+}
+
+/* Fix for generic informational messages (e.g., "No Group found") in dark mode */
+#wpbody-content.kc-us-dark .wrap p:not([class*="text-"]),
+#wpbody-content.kc-us-dark .wrap div:not([class*="text-"]) {
+    /* Apply dark background if no specific background class is set */
+    background-color: #0f172a !important;
+    /* Ensure text is light for readability */
+    color: #e2e8f0 !important;
+}
+
+/* Ensure links within these messages are also readable */
+#wpbody-content.kc-us-dark .wrap p:not([class*="text-"]) a,
+#wpbody-content.kc-us-dark .wrap div:not([class*="text-"]) a {
+    color: #93c5fd !important; /* Lighter blue for links */
+}
+
 
 /* Submit / button inputs keep their colour */
 #wpbody-content.kc-us-dark .wrap input[type="submit"],

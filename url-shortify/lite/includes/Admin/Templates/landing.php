@@ -225,7 +225,9 @@ $features = [
         include_once 'videos.php';
     }
 
-	if ( \KaizenCoders\URL_Shortify\Helper::can_show_promotion( [ 'total_links' => 1 ] ) ||
+	// Show pricing to anyone we are allowed to promote to (free, and the Disable
+	// Promotion add-on not active), or whenever it was explicitly asked for.
+	if ( US()->can_show_premium_promotion() ||
 	     \KaizenCoders\URL_Shortify\Helper::get_data( $_GET, 'pricing', '' ) == 'true') {
 		include_once 'pricing.php';
 	}

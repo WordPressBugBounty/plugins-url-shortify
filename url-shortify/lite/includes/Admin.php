@@ -17,6 +17,7 @@ use KaizenCoders\URL_Shortify\Admin\Controllers\ResourcesController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\ToolsController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\WidgetsController;
 use KaizenCoders\URL_Shortify\Admin\Groups_Table;
+use KaizenCoders\URL_Shortify\Admin\Promotions\PromoBanner;
 use KaizenCoders\URL_Shortify\Admin\Tags_Table;
 use KaizenCoders\URL_Shortify\Admin\Links_Table;
 
@@ -914,6 +915,13 @@ class Admin {
 
 		if ( ! empty( $get_page ) && 'url_shortify' == $get_page ) {
 			remove_all_actions( 'admin_notices' );
+
+			// The dashboard is deliberately kept clear of third party notices, but
+			// the plugin's own promotional banner still belongs there, so it is
+			// registered again after the sweep.
+			$promo_banner = new PromoBanner();
+
+			add_action( 'admin_notices', [ $promo_banner, PromoBanner::RENDER_CALLBACK ] );
 		} else {
 
 			$allow_display_notices = [
@@ -921,7 +929,7 @@ class Admin {
 				'kc_us_fail_php_version_notice',
 				'kc_us_show_admin_notice',
 				'show_custom_notices',
-				'handle_promotions',
+				PromoBanner::RENDER_CALLBACK,
 				'_admin_notices_hook',
 			];
 
@@ -982,7 +990,13 @@ class Admin {
 		if ( Helper::is_plugin_admin_screen() ) {
 
 			$wordpress_url = 'https://www.wordpress.org';
-			$website_url   = 'https://www.kaizencoders.com';
+			$website_url   = Helper::get_utm_url(
+				'https://kaizencoders.com',
+				[
+					'medium'   => 'link',
+					'campaign' => 'admin-footer',
+				]
+			);
 
 			$url_shortify_plugin_name = ( US()->is_pro() ) ? 'URL Shortify PRO' : 'URL Shortify';
 
@@ -1120,13 +1134,29 @@ class Admin {
 		if ( Helper::is_plugin_admin_screen() ) {
 			$links = [
 				[
-					'url'    => US()->is_pro() ? 'https://kaizencoders.com/contact/' : 'https://wordpress.org/support/plugin/url-shortify/',
+					'url'    => US()->is_pro()
+						? Helper::get_utm_url(
+							'https://kaizencoders.com/contact/',
+							[
+								'medium'   => 'link',
+								'campaign' => 'admin-footer',
+								'content'  => 'support',
+							]
+						)
+						: 'https://wordpress.org/support/plugin/url-shortify/',
 					'text'   => __( 'Support', 'url-shortify' ),
 					'target' => '_blank',
 				],
 				[
-					'url'    => 'https://docs.kaizencoders.com/',
-					'text'   => __( 'Docs', 'pretty-link' ),
+					'url'    => Helper::get_utm_url(
+						'https://docs.kaizencoders.com/',
+						[
+							'medium'   => 'link',
+							'campaign' => 'admin-footer',
+							'content'  => 'docs',
+						]
+					),
+					'text'   => __( 'Docs', 'url-shortify' ),
 					'target' => '_blank',
 				],
 			];
