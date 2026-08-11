@@ -553,6 +553,7 @@ class Install {
 			],
 			'display_options_html'                                  => $html,
 			'display_options_css'                                   => $css,
+			'display_options_restrict_link_to_its_domain'           => 0,
 
 			// Email Digest Settings.
 			'reports_email_digest_enabled'                          => 1,

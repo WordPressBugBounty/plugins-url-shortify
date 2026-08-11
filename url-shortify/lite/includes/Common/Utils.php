@@ -65,16 +65,22 @@ class Utils {
 	 *
 	 * @since 1.0.0
 	 */
-	public static function generate_random_slug( $length = 4 ) {
+	public static function generate_random_slug( $length = null ) {
 
 		$characters = '';
+
+		// An explicit length wins, so a caller retrying after a collision can ask
+		// for a longer slug. Passing null keeps the configured default.
+		$explicit_length = ( null !== $length );
 
 		if ( US()->is_pro() ) {
 
 			$settings = US()->get_settings();
 
-			// $length = (int) Helper::get_data( $settings, 'links_default_link_options_slug_character_count', 4 );
-			$length = (int) Helper::get_data( $settings, 'links_slug_settings_slug_character_count', 4 );
+			if ( ! $explicit_length ) {
+				// $length = (int) Helper::get_data( $settings, 'links_default_link_options_slug_character_count', 4 );
+				$length = (int) Helper::get_data( $settings, 'links_slug_settings_slug_character_count', 4 );
+			}
 
 			$is_lower_case           = (bool) Helper::get_data( $settings, 'links_slug_settings_lower_case', true );
 			$is_upper_case           = (bool) Helper::get_data( $settings, 'links_slug_settings_upper_case', false );
@@ -107,6 +113,14 @@ class Utils {
 			$characters = '0123456789abcdefghijklmnopqrstuvwxyz';
 		}
 
+		// Lite has no configurable length, so fall back to the historical default.
+		// A misconfigured setting must never produce a zero-length slug either.
+		if ( null === $length ) {
+			$length = 4;
+		}
+
+		$length = max( 1, (int) $length );
+
 		$slug = '';
 
 		$index = strlen( $characters ) - 1;
@@ -127,17 +141,37 @@ class Utils {
 	 *
 	 * @sinc 1.0.0
 	 */
-	public static function get_valid_slug( $length = 4 ) {
+	public static function get_valid_slug( $length = null ) {
 
-		$slugs = US()->db->links->get_column_by_condition( 'slug' );
+		$slug = '';
 
-		$slug = self::generate_random_slug( $length );
-
-		while ( in_array( $slug, $slugs ) ) {
+		/*
+		 * Bounded rather than `while ( taken )`. On a site with a lot of links and
+		 * a short configured slug length the old loop could spin until PHP timed
+		 * out; here the slug simply gets longer once the shorter space looks full.
+		 */
+		for ( $attempt = 1; $attempt <= 12; $attempt ++ ) {
 			$slug = self::generate_random_slug( $length );
+
+			/*
+			 * Links are saved with the configured prefix applied, so the lookup has
+			 * to use the prefixed form. Checking the bare slug meant that on any
+			 * site with a prefix set, this never matched an existing row and every
+			 * candidate looked free — the collision check did nothing at all.
+			 * The bare slug is still what gets returned; callers add the prefix.
+			 */
+			if ( ! self::is_slug_exists( Helper::get_slug_with_prefix( $slug ) ) ) {
+				return $slug;
+			}
+
+			// Every fourth failure, widen the search space.
+			if ( 0 === $attempt % 4 ) {
+				$length = strlen( $slug ) + 1;
+			}
 		}
 
-		return $slug;
+		// Effectively certain to be free, and still checked by the caller.
+		return self::generate_random_slug( strlen( $slug ) + 4 );
 	}
 
 	/**
@@ -150,17 +184,7 @@ class Utils {
 	 * @since 1.6.3
 	 */
 	public static function is_slug_exists( $slug ) {
-		$slugs = US()->db->links->get_column_by_condition( 'slug' );
-
-		if ( US()->is_pro() ) {
-			$settings       = US()->get_settings();
-			$case_sensitive = (boolean) Helper::get_data( $settings, 'general_settings_case_sensitive_slug', 0 );
-			if ( $case_sensitive ) {
-				return in_array( $slug, $slugs );
-			}
-		}
-
-		return in_array( strtolower( $slug ), array_map( 'strtolower', $slugs ) );
+		return US()->db->links->slug_exists( $slug );
 	}
 
 	public static function format_html_to_text( $html ) {
@@ -573,12 +597,68 @@ class Utils {
 	/**
 	 * Get Current Page URL
 	 *
+	 * Pass $extra_args instead of running add_query_arg() over the result — see
+	 * build_current_page_url() for why that matters.
+	 *
+	 * @param  array  $extra_args  Optional arguments to add to the query string.
+	 *
 	 * @return string
 	 *
 	 * @since 1.2.4
+	 *
+	 * @modified 2.5.1
 	 */
-	public static function get_current_page_url() {
-		return '//' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	public static function get_current_page_url( $extra_args = array() ) {
+		return self::build_current_page_url( $extra_args );
+	}
+
+	/**
+	 * Build the URL of the current request, optionally with extra query arguments.
+	 *
+	 * The query string is rebuilt with http_build_query() rather than
+	 * add_query_arg(). add_query_arg() runs the query through wp_parse_str(),
+	 * which percent decodes parameter *names*, and then writes them back out
+	 * without re-encoding them. A request carrying an encoded parameter name such
+	 * as `%22%3E%3Csvg onload=...` would therefore come back out as live markup
+	 * and break out of any HTML attribute the URL is printed into.
+	 * http_build_query() encodes names as well as values, so it cannot.
+	 *
+	 * @param  array  $extra_args  Arguments to add to or override in the query string.
+	 *
+	 * @return string
+	 *
+	 * @since 2.5.1
+	 */
+	protected static function build_current_page_url( $extra_args = array() ) {
+		$host = ! empty( $_SERVER['HTTP_HOST'] ) ? wp_unslash( $_SERVER['HTTP_HOST'] ) : '';
+
+		if ( '' === $host && ! empty( $_SERVER['SERVER_NAME'] ) ) {
+			$host = wp_unslash( $_SERVER['SERVER_NAME'] );
+		}
+
+		$request_uri = ! empty( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+
+		$parts = wp_parse_url( $request_uri );
+
+		$path = ! empty( $parts['path'] ) ? $parts['path'] : '';
+
+		$args = array();
+
+		if ( ! empty( $parts['query'] ) ) {
+			wp_parse_str( $parts['query'], $args );
+		}
+
+		if ( ! empty( $extra_args ) ) {
+			$args = array_merge( $args, $extra_args );
+		}
+
+		$url = '//' . $host . $path;
+
+		if ( ! empty( $args ) ) {
+			$url .= '?' . http_build_query( $args );
+		}
+
+		return esc_url_raw( $url );
 	}
 
 	/**
@@ -587,11 +667,11 @@ class Utils {
 	 * @return string
 	 *
 	 * @since 1.2.4
+	 *
+	 * @modified 2.5.1
 	 */
 	public static function get_current_page_refresh_url() {
-		$current_page_url = self::get_current_page_url();
-
-		return add_query_arg( array( 'refresh' => 1 ), $current_page_url );
+		return self::build_current_page_url( array( 'refresh' => 1 ) );
 	}
 
 	/**
@@ -600,14 +680,14 @@ class Utils {
 	 * @param array $args
 	 *
 	 * @since 1.4.7
+	 *
+	 * @modified 2.5.1
 	 */
 	public static function get_stats_filter_url( $args = array() ) {
 
-		$current_page_url = self::get_current_page_url();
-
 		$args['refresh'] = 1;
 
-		return add_query_arg( $args, $current_page_url );
+		return self::build_current_page_url( $args );
 	}
 
 	/**
@@ -803,9 +883,99 @@ class Utils {
 	 * @since 1.3.8
 	 */
 	public static function get_the_clean_domain( $url ) {
-		$url = 'https://' . ltrim( ltrim( $url, 'http://' ), 'https://' );
+		return self::normalize_host( $url );
+	}
 
-		return self::remove_www_and_port( $url );
+	/**
+	 * Normalize a URL or a bare host into a comparable host string.
+	 *
+	 * Lowercased, without scheme, port, trailing dot or a leading `www.`, and
+	 * punycoded where the intl extension is available. Two hosts are the same
+	 * host when their normalized forms are identical.
+	 *
+	 * @param string $url_or_host
+	 *
+	 * @return string Empty string when nothing usable could be parsed.
+	 *
+	 * @since 2.5.1
+	 */
+	public static function normalize_host( $url_or_host ) {
+		$url_or_host = trim( (string) $url_or_host );
+
+		if ( '' === $url_or_host ) {
+			return '';
+		}
+
+		// wp_parse_url() only reports a host when there is a scheme or a leading `//`.
+		if ( ! preg_match( '#^(https?:)?//#i', $url_or_host ) ) {
+			$url_or_host = '//' . ltrim( $url_or_host, '/' );
+		}
+
+		$host = wp_parse_url( $url_or_host, PHP_URL_HOST );
+
+		if ( empty( $host ) ) {
+			return '';
+		}
+
+		// Hosts are case insensitive and may carry the FQDN root dot.
+		$host = rtrim( strtolower( $host ), '.' );
+		$host = preg_replace( '/^www\./', '', $host );
+
+		// So that `münchen.de` and `xn--mnchen-3ya.de` compare equal.
+		if ( function_exists( 'idn_to_ascii' ) && defined( 'INTL_IDNA_VARIANT_UTS46' ) && preg_match( '/[^\x20-\x7f]/', $host ) ) {
+			$ascii = idn_to_ascii( $host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46 );
+
+			if ( ! empty( $ascii ) ) {
+				$host = $ascii;
+			}
+		}
+
+		return $host;
+	}
+
+	/**
+	 * Get the host the current request actually arrived on.
+	 *
+	 * Returns an empty string when the host cannot be determined. Callers that
+	 * gate a redirect on this must treat that as "unknown" and let the redirect
+	 * through, so an exotic server setup can never break working short links.
+	 *
+	 * @return string
+	 *
+	 * @since 2.5.1
+	 */
+	public static function get_request_host() {
+		$host = '';
+
+		/**
+		 * Only for setups where a reverse proxy rewrites the Host header. Off by
+		 * default, because `X-Forwarded-Host` is caller supplied and spoofable.
+		 *
+		 * @param bool $trust
+		 *
+		 * @since 2.5.1
+		 */
+		if ( apply_filters( 'kc_us_trust_forwarded_host', false ) && ! empty( $_SERVER['HTTP_X_FORWARDED_HOST'] ) ) {
+			$forwarded = explode( ',', wp_unslash( $_SERVER['HTTP_X_FORWARDED_HOST'] ) );
+			$host      = trim( $forwarded[0] );
+		}
+
+		if ( '' === $host && ! empty( $_SERVER['HTTP_HOST'] ) ) {
+			$host = wp_unslash( $_SERVER['HTTP_HOST'] );
+		}
+
+		if ( '' === $host && ! empty( $_SERVER['SERVER_NAME'] ) ) {
+			$host = wp_unslash( $_SERVER['SERVER_NAME'] );
+		}
+
+		/**
+		 * Filter the normalized host of the current request.
+		 *
+		 * @param string $host
+		 *
+		 * @since 2.5.1
+		 */
+		return apply_filters( 'kc_us_request_host', self::normalize_host( $host ) );
 	}
 
 	/**

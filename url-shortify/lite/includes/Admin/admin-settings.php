@@ -160,34 +160,8 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 
 	$short_link_position_array = Helper::get_link_display_position_options();
 
-	$password_page_choices = [
-		'0' => __( 'Default password page', 'url-shortify' ),
-	];
-
-	$pages = get_pages(
-		[
-			'post_status' => 'publish',
-			'sort_column' => 'post_title',
-		]
-	);
-
-	if ( ! empty( $pages ) ) {
-		foreach ( $pages as $page ) {
-			$password_page_choices[ (string) $page->ID ] = $page->post_title;
-		}
-	}
-
-	$password_page_choices = apply_filters( 'kc_us_password_page_choices', $password_page_choices );
-
-	$default_display_options[] = [
-		'id'      => 'password_page',
-		'title'   => __( 'Password Page', 'url-shortify' ),
-		'desc'    => __( 'Select a page containing the [url-shortify-password] shortcode for password protected links.', 'url-shortify' ),
-		'type'    => 'select',
-		'default' => '0',
-		'choices' => $password_page_choices,
-		'order'   => 1,
-	];
+	// Password Page (order 1) is registered by PRO\Settings::filter_display_options().
+	// Password protected links are a PRO feature, so the setting is meaningless here.
 
 	$default_display_options[] = [
 		'id'      => 'where_to_display',
@@ -195,6 +169,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 		'type'    => 'checkboxes',
 		'default' => [],
 		'choices' => $short_link_position_array,
+		'order'   => 2,
 	];
 
 	$html = "*<div class='shorten_url'>
@@ -215,6 +190,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 		/* translators: %s: Default short URL template content */
 		'default' => sprintf( __( "<div class='shorten_url'>%s</div>", 'url-shortify' ),
 			"The short URL of the present article is: %short_url%" ),
+		'order'   => 3,
 	];
 
 	$css = ".shorten_url { 
@@ -230,6 +206,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 			'url-shortify' ),
 		'type'    => 'textarea',
 		'default' => $css,
+		'order'   => 4,
 	];
 
 	$default_display_options[] = [
@@ -239,7 +216,7 @@ function wpsf_tabbed_settings( $wpsf_settings ) {
 			'url-shortify' ),
 		'type'    => 'select',
 		'default' => '307',
-		'order'   => 4,
+		'order'   => 5,
 		'choices' => Helper::get_domains_for_select(),
 	];
 

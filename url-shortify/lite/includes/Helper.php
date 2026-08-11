@@ -622,15 +622,29 @@ class Helper {
      * @sicne 1.5.12
      */
     public static function get_slug_with_prefix( $slug = '' ) {
-        if ( empty( $slug ) ) {
+        $slug = ltrim( (string) $slug, '/' );
+
+        if ( '' === $slug ) {
             return '';
         }
 
-        $prefix = self::get_link_prefix();
+        $prefix = trim( (string) self::get_link_prefix(), '/' );
 
-        $slug = ltrim( $slug, $prefix );
+        if ( '' === $prefix ) {
+            return $slug;
+        }
 
-        return ( empty( $prefix ) ? ltrim( $slug, '/' ) : trim( trim( $prefix, '/' ) . '/' . ltrim( $slug, '/' ) ) );
+        /*
+         * Only skip when the slug genuinely already carries the prefix. The old
+         * ltrim( $slug, $prefix ) passed the prefix as a *character list*, so it
+         * ate any leading character that appeared anywhere in it — prefix `go`
+         * turned slug `goose` into `se`, giving `go/se`.
+         */
+        if ( 0 === strpos( $slug, $prefix . '/' ) ) {
+            return $slug;
+        }
+
+        return $prefix . '/' . $slug;
     }
 
     /**
@@ -1587,12 +1601,17 @@ class Helper {
      *
      */
     public static function is_request_from_specific_domain( $domain ) {
-        $current_page_url = Utils::get_current_page_url();
+        $request_host = Utils::get_request_host();
+        $target_host  = Utils::normalize_host( $domain );
 
-        $clean_site_host    = Utils::get_the_clean_domain( $domain );
-        $clean_request_host = Utils::get_the_clean_domain( $current_page_url );
+        // An unknown host on either side is never a match. Callers that gate a
+        // redirect on this must check Utils::get_request_host() separately so an
+        // undeterminable host lets the redirect through instead of blocking it.
+        if ( '' === $request_host || '' === $target_host ) {
+            return false;
+        }
 
-        return $clean_site_host === $clean_request_host;
+        return $request_host === $target_host;
     }
 
     /**
@@ -1782,9 +1801,11 @@ class Helper {
                         'redirect_type'     => $link['redirect_type'],
                         'status'            => $link['status'],
                         'type'              => $link['type'],
-                        'password'          => $link['password'],
                         'expires_at'        => $link['expires_at'],
                         'rules'             => maybe_unserialize( $link['rules'] ),
+                        // Note: link passwords are deliberately not written here.
+                        // This file sits under wp-content/uploads, where the only
+                        // protection is an .htaccess that nginx ignores.
                 ];
             }
 
@@ -2349,13 +2370,17 @@ class Helper {
 
             $slug = Helper::get_data( $data, 'slug', '' );
 
+            // Remember whether a human picked this, so a slug we generated here
+            // still gets the collision check inside create_link().
+            $user_chosen_slug = ! empty( $slug );
+
             if ( empty( $slug ) ) {
                 $slug = Utils::get_valid_slug();
             }
 
             $slug = Helper::get_slug_with_prefix( $slug );
 
-            $link_id = US()->db->links->create_link( $link_data, $slug );
+            $link_id = US()->db->links->create_link( $link_data, $slug, $user_chosen_slug );
         }
 
         if ( $link_id ) {

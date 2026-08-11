@@ -146,9 +146,9 @@ $click_history->set_columns( $columns );
                     <div class="md:flex">
                         <div class="flex inline -mb-px mr-8 w-11/12">
 								<span class="flex">
-									<img class="h-6 w-6 mr-2" src="<?php echo $data['icon_url']; ?>" title="<?php echo esc_attr( $data['url'] ); ?>"/>
+									<img class="h-6 w-6 mr-2" src="<?php echo esc_url( $data['icon_url'] ); ?>" title="<?php echo esc_attr( $data['url'] ); ?>"/>
 									<strong class="text-2xl">
-										<a href="<?php echo $data['url']; ?>" target="_blank">
+										<a href="<?php echo esc_url( $data['url'] ); ?>" target="_blank">
 										 <?php echo stripslashes( $data['name'] ); ?>
 										</a>
 									</strong>

@@ -110,7 +110,7 @@ class Feedback {
 
 				if ( $can_ask_user_for_review ) {
 
-					$current_page_url = "//" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+					$current_page_url = Common\Utils::get_current_page_url();
 
 					$got_feedback = false;
 					/************** Update Review Status ********************/
@@ -206,7 +206,7 @@ class Feedback {
 						<?php
 
 						echo '<div class="notice notice-success kc-us-feedback-notice">';
-						echo '<span class="kc-us-feedback-plugin-icon"> <img src="' . $icon_url . '" alt="Logo"/></span>';
+						echo '<span class="kc-us-feedback-plugin-icon"> <img src="' . esc_url( $icon_url ) . '" alt="Logo"/></span>';
 						echo $message;
 						echo "<ul class='kc-us-feedback-notice-links'>";
 						echo sprintf( '<li><a href="%s" class="button button-primary px-4 py-2 ml-6 mr-2 text-white align-middle cursor-pointer kc-us-primary-button" target="_blank" data-rated="' . esc_attr__( "Thank You :) ",

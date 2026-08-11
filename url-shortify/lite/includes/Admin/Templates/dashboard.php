@@ -88,7 +88,7 @@ if ( $show_kpis && ! $show_landing_page ) {
                                 class="w-full text-white bg-green-500 kc-us-primary-button hover:bg-green-400"
                                 title="<?php echo sprintf( /* translators: %s: Human-readable elapsed time since last update */ __( 'Last Updated On: %s', 'url-shortify' ), $elapsed_time ); ?>">
 							<a href="<?php
-                            echo $page_refresh_url; ?>" class="text-white hover:text-white"><?php
+                            echo esc_url( $page_refresh_url ); ?>" class="text-white hover:text-white"><?php
                                 _e( 'Refresh', 'url-shortify' ); ?></a>
 						</button>
 					</span>

@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.0
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -302,17 +302,19 @@ If you like this plugin then consider checking out our other solutions:
 
 > If you move your WordPress website to a new domain name, you will find that internal links to pages and references to images are not updated. Instead, these links and references will point to your old domain name. Update URLs fixes that problem by helping you change old urls and links in your website.
 
-[Social Linkz](https://wordpress.org/plugins/social-linkz/) - Lightweight and fast social media sharing plugin
-
-> Easily place social share icon on your posts, pages etc..
-
 [Logify](https://wordpress.org/plugins/logify/) - Simple & Easy to use activity log plugin for monitor & record system changes
 
 [Magic Link](https://wordpress.org/plugins/magic-link/) - Simple, Easy and Secure one click login for WordPress
 
-[Utilitify](https://wordpress.org/plugins/utilitify/) - Supercharge Your WordPress Site With Power Pack WordPress Utilities
+[UtilityKit](https://wordpress.org/plugins/utility-kit/)
 
-> It’s a simple & neat plugin which helps you to customize your WordPress setup in a very elegant way.
+> UtilityKit is a powerful and versatile WordPress plugin that provides a collection of essential tools and features to enhance your website's functionality. It includes a variety of utilities such as show/hide admin bar, disable comments, enable/disable WordPress debug log and see logs inside WordPress admin and many more.  All designed to improve user experience and streamline website management.
+
+> It's a simple & neat plugin which helps you to customize your WordPress setup in a very elegant way.
+
+[Social Linkz](https://wordpress.org/plugins/social-linkz/) - Lightweight and fast social media sharing plugin
+
+> Easily place social share icon on your posts, pages etc..
 
 == Installation ==
 
@@ -494,114 +496,27 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.5.0 =
+= 2.5.1 =
 
 * New version of URL Shortify with new features, improvements and bug fixes. Please update to the latest version to get the best experience. Learn more about the new features and improvements in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
 
-= 2.5.0 [2026-08-03] =
+= 2.5.1 [2026-08-11] =
 
-* New: Duplicate short links from the links list page, one at a time or in bulk. The copy keeps every parameter of the original link and gets an automatically generated slug. **PRO**
-* New: One-click Export / Import to move all your URL Shortify data and settings between sites, with a dry-run preview, conflict handling and an automatic safety backup before anything is replaced. **PRO**
-* Fix: Dark theme UI issues in the admin.
-
-= 2.4.3 [2026-07-10] =
-
-* Update: Small code improvements.
-
-= 2.4.2 [2026-07-10] =
-
-* New: Added support to generate short links in bulk using REST API. **PRO**
-
-= 2.4.1 [2026-06-04] =
-
-* Fix: Version mismatch issue in the plugin header.
-
-= 2.4.0 [2026-06-04] =
-
-* New: Auto-create a source-named group when running one-click imports (e.g. "Pretty Links", "Thirsty Affiliates", "Easy 301 Redirect"). Every migrated link is automatically added to this group in addition to any categories carried over from the source plugin, so a full migration is bulk-discoverable in one place.
-* New: Open Graph link preview card on the Links page.
-* New: Automatically adds Amazon Affiliate-Tag to all Amazon URLs before redirection. **PRO**
-* Update: Onclick Migration from Link Central plugin.
-* Update: Performance Improvements.
-* Update: Security Improvements.
+* New: Option to restrict a short link to the domain assigned to it, so a link on a custom domain no longer shadows a page using the same slug on your main site. Enable it under Settings > Display Options. **PRO**
+* New: Setup check for custom domains. A new Setup column on the Domains page tells you whether each domain reaches WordPress as an alias or is redirected to your main site, and the same check is shown on the settings page before the option above. **PRO**
+* Update: The host of an incoming request is now resolved reliably.
+* Fix: Auto-generated slugs could duplicate an existing short link, so the new link silently redirected to the older link's destination. On sites using a link prefix the duplicate check never matched at all, because it compared the slug without the prefix against links stored with it. The check now uses the stored form, a slug that collides is regenerated, and if two links are created at the same instant the newer one moves so the existing link keeps working.
+* Fix: A link prefix could corrupt the slug it was applied to. **PRO**
+* Fix: Slug generation no longer loads every existing slug into memory on each request, and can no longer loop indefinitely when the configured slug length is short and the site has many links.
+* Security: Added a permission check to the short-link creation AJAX command. It could previously be reached by anyone holding the plugin's general AJAX nonce, which is printed publicly whenever the public shortener shortcode is enabled. Creating a link from a post now requires edit rights on that post, and creating one from a URL requires the create-links permission unless the public shortener is switched on.
+* Security: The broken-link checker no longer requests local, loopback or private-network addresses, so a stored link cannot be used to probe internal hosts. Such links are skipped rather than reported as broken. **PRO**
+* Security: Link passwords are no longer written to the cached links JSON file under wp-content/uploads.
+* Fix: Escaped the referring-site link on the Link Stats page.
+* Fix: Searching the links list while a group, tag, redirect-type or status filter was active could return the wrong rows, and a search term containing a percent sign could break the query.
+* Security: Fixed a reflected cross-site scripting issue on the Dashboard. The Refresh link was rebuilt from the current request URL and printed without escaping, so a crafted admin URL could run JavaScript when an administrator opened it. Query strings are now rebuilt with parameter names encoded, and the link is escaped on output. Reported responsibly — thank you.
+* Fix: Custom domain matching failed for any domain starting with the letters h, t, p or s (e.g. `shop.example.com`, `store.example.com`, `t.co`), and ignored letter case, ports and trailing dots.
 * Translations: Updated .POT file for new translations.
-
-= 2.3.3 [2026-05-29] =
-
-* Fix: Deprecated notice in PHP 8.4+.
-
-= 2.3.2 [2026-05-27] =
-
-* New: Added "Copy Short Link" action in row actions on the Links page for one-click copying.
-* Update: Compatibility update for WordPress 7.0 and PHP 8.2+, restored PHP 5.6 backward compatibility.
-* Update: Improved One-click import from Pretty Links, ThirstyAffiliates Affiliate Link Manager, URL Shortener by MyThemeShop, 301 Redirect, Simple 301 Redirects & Redirection WordPress plugins.
-* Update: Plugin Assets.
-
-= 2.3.1 [2026-05-27] =
-
-* New: Added "Copy Short Link" action in row actions on the Links page for one-click copying.
-* Update: Compatibility update for WordPress 7.0 and PHP 8.2+, restored PHP 5.6 backward compatibility.
-* Update: Improved One-click import from Pretty Links, ThirstyAffiliates Affiliate Link Manager, URL Shortener by MyThemeShop, 301 Redirect, Simple 301 Redirects & Redirection WordPress plugins.
-* Update: Plugin Assets.
-
-= 2.3.0 [2026-04-20] =
-
-* New: Added Link Activity Intensity report in the Groups & Tags stats page. **PRO**
-* New: Added Tags stats page. **PRO**
-* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
-* New: Added custom date range filter in the Groups stats page on Dashboard. **PRO**
-* New: Added support to bulk update links status. **PRO**
-* New: Added support to filter links by status (Enable/Disable). **PRO**
-* New: Added Link Status, Groups and Tags in export. **PRO**
-* New: Added support to import tags. **PRO**
-* Fix: Fixed Email Digest UI issue.
-* Update: UI Improvements.
-* Translations: Updated .POT file for new translations.
-
-= 2.2.2 [2026-04-13] =
-
-* New: Added support to enable/disable short links. **PRO**
-* New: Added Link Activity Intensity report in the link stats page. **PRO**
-* New: Added custom date range filter in the link stats page. **PRO**
-* UX: Improved UI for the dark theme.
-* Translations: Updated .POT file for new translations.
-
-= 2.2.1 [2026-04-01] =
-
-* Fix: Fixed the issue of showing incorrect click count in link clicks details page.
-* Fix: Improve UI and fixed datatables.
-
-= 2.2 [2026-03-31] =
-
-* New: Added support for the A/B Testing and show result in link stats page. [Learn More](https://kaizencoders.com/docs/url-shortify/ab-testing) **PRO**
-* New: Update dashboard with the clicks heatmap to visualize clicks by time of day and day of week. **PRO**
-* New: Added support for the Dark mode theme.
-* Fix: Broken Link Checker not showing broken links in the list. **PRO**
-* Update: Compatibility with WordPress 6.9.4
-* Translations: Updated .POT file for new translations
-
-= 2.1 [2026-03-11] =
-
-* Fix: Tags dropdown not showing tags in the links creation form. **PRO**
-* Update: Added recently added links in the Email Digest report.
-* Update: Compatibility with WordPress 6.9.3
-* Translations: Updated .POT file for new translations
-
-= 2.0.1 [2026-03-04] =
-
-* Minor bug fixes and improvements.
-
-= 2.0.0 [2026-03-04] =
-
-* New: Added support to Broken Link Checker. [Learn More](https://kaizencoders.com/docs/url-shortify/broken-link-checker) **PRO**
-* New: Added support to Automatically link keywords in the content to short links. [Learn More](https://kaizencoders.com/docs/url-shortify/how-to-setup-auto-link-keywords) **PRO**
-* New: Added support to splash page. **PRO**
-* New: Added Daily, Weekly and Monthly summary of new links and clicks report via email. [Learn More](https://kaizencoders.com/docs/url-shortify/email-digest)
-* New: Added REST API support for Links, Groups, Tags, Domains, UTM Presets, Tracking Pixels. [Learn More](https://kaizencoders.com/docs/url-shortify/api-reference) **PRO**
-* Fix: Bulk Delete Tags issue. **PRO**
-* Update: UI Improvements.
-* Translations: Updated .POT file for new translations
 
 [See changelog for all versions](https://kaizencoders.com/docs/url-shortify/changelog) file.

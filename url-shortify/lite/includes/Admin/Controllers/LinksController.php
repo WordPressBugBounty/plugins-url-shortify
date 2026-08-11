@@ -64,6 +64,10 @@ class LinksController extends BaseController {
 
 			$slug = Helper::get_data( $data, 'slug', '' );
 
+			// Remember whether a human picked this, so a slug we generated here
+			// still gets the collision check inside create_link().
+			$user_chosen_slug = ! empty( $slug );
+
 			if ( empty( $slug ) ) {
 				$slug = Utils::get_valid_slug();
 			}
@@ -79,7 +83,7 @@ class LinksController extends BaseController {
 				return $response;
 			}
 
-			$link_id = $this->create_link_from_data( $link_data, $slug );
+			$link_id = $this->create_link_from_data( $link_data, $slug, $user_chosen_slug );
 		}
 
 		if ( $link_id ) {
@@ -167,7 +171,7 @@ class LinksController extends BaseController {
 	 * @return bool|int
 	 *
 	 */
-	public function create_link_from_data( $link_data = [], $slug = '' ) {
-		return $this->db->create_link( $link_data, $slug );
+	public function create_link_from_data( $link_data = [], $slug = '', $user_chosen_slug = null ) {
+		return $this->db->create_link( $link_data, $slug, $user_chosen_slug );
 	}
 }

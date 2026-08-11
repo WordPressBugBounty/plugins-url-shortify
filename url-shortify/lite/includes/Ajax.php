@@ -72,10 +72,15 @@ class Ajax {
 
 		check_ajax_referer( KC_US_AJAX_SECURITY, 'security' );
 
-//		if ( ! current_user_can( 'edit_posts' ) ) {
-//			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'url-shortify' ) ) );
-//		}
-
+		/*
+		 * There is deliberately no capability check here. This endpoint is also
+		 * registered for `nopriv` so the public shortener shortcode can reach it,
+		 * and the nonce alone proves nothing about who is calling — it is printed
+		 * on a public page whenever that shortcode is enabled.
+		 *
+		 * Every command below must therefore authorise itself. If you add one,
+		 * give it its own capability check.
+		 */
 		$cmd = Helper::get_data( $params, 'cmd', '' );
 
 		$ajax = US()->is_pro() ? new \KaizenCoders\URL_Shortify\PRO\Ajax() : $this;
@@ -94,6 +99,34 @@ class Ajax {
 	 *
 	 */
 	public function create_short_link( $data = [] ) {
+		$post_id = absint( Helper::get_data( $data, 'post_id', 0 ) );
+
+		if ( $post_id > 0 ) {
+			/*
+			 * Creating a link from a post copies that post's permalink, title and
+			 * excerpt into the links table, so it must never be reachable without
+			 * rights over that specific post. `edit_post` is exactly who is shown
+			 * the button in the posts list, so this does not change the UI.
+			 */
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ], 403 );
+			}
+		} elseif ( ! US()->access->can( 'create_links' ) ) {
+			/*
+			 * Everyone else may only get here through the public shortener, and
+			 * only while it is switched on.
+			 */
+			$settings = US()->get_settings();
+
+			if ( 1 != Helper::get_data( $settings, 'general_settings_enable_public_link', 0 ) ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ], 403 );
+			}
+
+			// The public form only ever submits a target URL. Choosing the slug or
+			// the domain stays with users who hold the capability.
+			unset( $data['slug'], $data['domain'] );
+		}
+
 		$link_controller = new LinksController();
 
 		$response = $link_controller->create( $data );

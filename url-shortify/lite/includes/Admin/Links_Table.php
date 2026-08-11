@@ -696,7 +696,9 @@ class Links_Table extends US_List_Table {
 		$add_where_clause = false;
 
 		if ( ! empty( $search ) ) {
-			$query[] = ' name LIKE %s OR slug LIKE %s OR url LIKE %s OR description LIKE %s';
+			// Parenthesised: these are OR'd together but joined to the other
+			// conditions with AND, which binds tighter without the brackets.
+			$query[] = ' ( name LIKE %s OR slug LIKE %s OR url LIKE %s OR description LIKE %s ) ';
 			$args[]  = '%' . $wpdb->esc_like( $search ) . '%';
 			$args[]  = '%' . $wpdb->esc_like( $search ) . '%';
 			$args[]  = '%' . $wpdb->esc_like( $search ) . '%';
@@ -724,10 +726,10 @@ class Links_Table extends US_List_Table {
 				if ( 'none' == $group_id ) {
 					$query[] = "id NOT IN (SELECT link_id FROM {$links_group_table})";
 				} elseif ( $group_id > 0 ) {
-					$filter_sql = $wpdb->prepare( "SELECT link_id FROM {$links_group_table} WHERE group_id = %d",
-						$group_id );
-
-					$query[] = "id IN ( $filter_sql )";
+					// Placeholder rather than a nested prepare(), so the whole
+					// clause is prepared exactly once at the end.
+					$query[] = "id IN ( SELECT link_id FROM {$links_group_table} WHERE group_id = %d )";
+					$args[]  = $group_id;
 				}
 			} elseif ( strpos( $filter_by, 'tag_id' ) !== false ) { // Filter by tag.
 				$tag_id = str_replace( 'tag_id_', '', $filter_by );
@@ -738,27 +740,30 @@ class Links_Table extends US_List_Table {
 				if ( 'none' == $tag_id ) {
 					$query[] = "id NOT IN (SELECT link_id FROM {$links_tags_table})";
 				} elseif ( $tag_id > 0 ) {
-					$filter_sql = $wpdb->prepare( "SELECT link_id FROM {$links_tags_table} WHERE tag_id = %d",
-						$tag_id );
-
-					$query[] = "id IN ( $filter_sql )";
+					$query[] = "id IN ( SELECT link_id FROM {$links_tags_table} WHERE tag_id = %d )";
+					$args[]  = $tag_id;
 				}
 			} elseif ( strpos( $filter_by, 'redirect_type' ) !== false ) { // Filter by redirect type.
 				$add_where_clause = true;
 				$redirect_type    = str_replace( 'redirect_type_', '', $filter_by );
 
-				$query[] = $wpdb->prepare( 'redirect_type = %s', $redirect_type );
+				$query[] = 'redirect_type = %s';
+				$args[]  = $redirect_type;
 			} elseif ( strpos( $filter_by, 'status_' ) !== false ) { // Filter by status.
 				if ( US()->is_pro() ) {
 					$add_where_clause = true;
 					$status           = absint( str_replace( 'status_', '', $filter_by ) );
 
 					if ( 1 === $status || 0 === $status ) {
-						$query[] = $wpdb->prepare( 'status = %d', $status );
+						$query[] = 'status = %d';
+						$args[]  = $status;
 					}
 				}
 			} else {
+				// This branch discards every condition built above, so the bound
+				// arguments must go with them or the placeholders would desync.
 				$query = [];
+				$args  = [];
 				$query = apply_filters( 'kc_us_links_filter_by_query', $query, $filter_by );
 
 				if ( ! empty( $query ) ) {
@@ -1889,11 +1894,24 @@ class Links_Table extends US_List_Table {
 			$slug          = Helper::get_data( $data, 'slug', '' );
 			$existing_slug = Helper::get_data( $data, 'existing_slug', '' );
 
-			$no_equal_slug = $existing_slug != $slug;
+			/*
+			 * Compare and look up the *stored* form of the slug. Links are saved
+			 * with the link prefix applied, so checking the bare value the form
+			 * submits would never match an existing row: with prefix `go`, a new
+			 * link entered as `goose` looked free while `go/goose` already existed,
+			 * and the duplicate was created anyway.
+			 *
+			 * get_slug_with_prefix() is idempotent, so this is also correct when
+			 * the field already carries the prefix, as it does when editing.
+			 */
+			$prefixed_slug          = Helper::get_slug_with_prefix( $slug );
+			$prefixed_existing_slug = Helper::get_slug_with_prefix( $existing_slug );
+
+			$no_equal_slug = $prefixed_existing_slug != $prefixed_slug;
 			if ( US()->is_pro() ) {
 				$settings       = US()->get_settings();
 				$case_sensitive = (boolean) Helper::get_data( $settings, 'general_settings_case_sensitive_slug', 0 );
-				$no_equal_slug  = $case_sensitive ? $existing_slug != $slug : strtolower( $existing_slug ) != strtolower( $slug );
+				$no_equal_slug  = $case_sensitive ? $prefixed_existing_slug != $prefixed_slug : strtolower( $prefixed_existing_slug ) != strtolower( $prefixed_slug );
 			}
 
 			if ( empty( $title ) ) {
@@ -1907,7 +1925,7 @@ class Links_Table extends US_List_Table {
 			} elseif ( ! Utils::validate_url( $target_url, true ) ) {
 				$messages[] = __( 'Please enter valid Target URL', 'url-shortify' );
 				$error      = true;
-			} elseif ( $no_equal_slug && Utils::is_slug_exists( $slug ) ) {
+			} elseif ( $no_equal_slug && Utils::is_slug_exists( $prefixed_slug ) ) {
 				$messages[] = __( 'Short URL already exists. Please use different Short URL.', 'url-shortify' );
 				$error      = true;
 			}
