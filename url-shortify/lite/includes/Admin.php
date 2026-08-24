@@ -975,40 +975,6 @@ class Admin {
 
 
 	/**
-	 * Update admin footer text
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param $footer_text
-	 *
-	 * @return string
-	 *
-	 */
-	public function update_admin_footer_text( $footer_text ) {
-
-		// Update Footer admin only on URL Shortify pages
-		if ( Helper::is_plugin_admin_screen() ) {
-
-			$wordpress_url = 'https://www.wordpress.org';
-			$website_url   = Helper::get_utm_url(
-				'https://kaizencoders.com',
-				[
-					'medium'   => 'link',
-					'campaign' => 'admin-footer',
-				]
-			);
-
-			$url_shortify_plugin_name = ( US()->is_pro() ) ? 'URL Shortify PRO' : 'URL Shortify';
-
-			/* translators: 1: WordPress link, 2: Plugin name, 3: Plugin version, 4: KaizenCoders link */
-			$footer_text = sprintf( __( '<span id="footer-thankyou">Thank you for creating with <a href="%1$s" target="_blank">WordPress</a> | %2$s <b>%3$s</b>. Made with ❤️ by the team <a href="%4$s" target="_blank">KaizenCoders</a></span>',
-				'url-shortify' ), $wordpress_url, $url_shortify_plugin_name, KC_US_PLUGIN_VERSION, $website_url );
-		}
-
-		return $footer_text;
-	}
-
-	/**
 	 * Redirect after activation
 	 *
 	 * @since 1.0.0

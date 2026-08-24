@@ -10,7 +10,7 @@ namespace KaizenCoders\URL_Shortify\API;
  *
  * @OA\Info(
  *     title="URL Shortify REST API",
- *     version="1.13.1",
+ *     version="2.5.1",
  *     description="Manage short links and groups via the URL Shortify WordPress plugin REST API. Tags, Domains, UTM Presets, Tracking Pixels and Auto Link Keywords require URL Shortify PRO.",
  *     @OA\Contact(
  *         name="Kaizen Coders",

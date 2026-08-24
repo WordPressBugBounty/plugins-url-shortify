@@ -656,7 +656,7 @@ $os_values      = array_map( 'intval', array_values( $os_info ) );
 				var end = $endDate.val().trim();
 
 				if (!start || !end) {
-					alert('<?php echo esc_js( __( 'Please enter both a start date and an end date.', 'url-shortify' ) ); ?>');
+					window.kcUsNotice( '<?php echo esc_js( __( 'Enter both a start date and an end date.', 'url-shortify' ) ); ?>', 'error', $customApply.closest( 'div' ) );
 					return;
 				}
 

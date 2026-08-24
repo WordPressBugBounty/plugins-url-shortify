@@ -61,7 +61,13 @@ class Frontend {
 		 * hooks and the functions defined in this class.
 		 */
 
-		\wp_enqueue_style(
+		/*
+		 * Registered, not enqueued. These assets are only needed by the public
+		 * link shortener form, which most sites never place, so loading them on
+		 * every page put a stylesheet, a script and jQuery in front of visitors
+		 * for nothing. Whatever renders the form enqueues them by handle.
+		 */
+		\wp_register_style(
 			$this->plugin->get_plugin_name(),
 			\plugin_dir_url( dirname( __FILE__ ) ) . 'dist/styles/url-shortify.css',
 			[],
@@ -88,12 +94,20 @@ class Frontend {
 		 * hooks and the functions defined in this class.
 		 */
 
-		\wp_enqueue_script(
+		/*
+		 * Registered, not enqueued - see enqueue_styles(). jQuery stays a real
+		 * dependency because the script uses it; registering rather than
+		 * enqueueing means jQuery is only pulled in when the form is present.
+		 *
+		 * Loaded in the footer: the enqueue now happens while the shortcode
+		 * renders, which is after wp_head has run.
+		 */
+		\wp_register_script(
 			$this->plugin->get_plugin_name(),
 			\plugin_dir_url( dirname( __FILE__ ) ) . 'dist/scripts/url-shortify.js',
 			[ 'jquery' ],
 			$this->plugin->get_version(),
-			false );
+			true );
 
 		wp_localize_script(
 			'url-shortify',

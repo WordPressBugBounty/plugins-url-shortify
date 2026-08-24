@@ -468,10 +468,10 @@ jQuery( function( $ ) {
 			}
 
 			hideModal();
-			window.alert( ( response && response.data && response.data.message ) ? response.data.message : ( i18n.unableToLoad || 'Unable to load the link preview.' ) );
+			window.kcUsNotice( ( response && response.data && response.data.message ) ? response.data.message : ( i18n.unableToLoad || 'Unable to load the link preview.' ) );
 		} ).fail( function() {
 			hideModal();
-			window.alert( i18n.unableToLoad || 'Unable to load the link preview.' );
+			window.kcUsNotice( i18n.unableToLoad || 'Unable to load the link preview.' );
 		} );
 	} );
 

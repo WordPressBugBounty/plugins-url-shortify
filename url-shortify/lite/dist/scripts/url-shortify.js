@@ -108,14 +108,21 @@
             var security = $('#kc-us-security').val();
             var domain = $('#kc-us-domain').val();
 
+            $('#kc-us-error-message').hide();
+            $('#kc-us-success-message').hide();
+
+            // Reported inline, like every other error in this widget. A blocking
+            // browser alert was the odd one out and could not be styled or read
+            // by assistive tech alongside the field it refers to.
             if (!validURL(targetURL)) {
-                alert('Please Enter Valid Target URL');
+                $('#kc-us-error-message')
+                    .text('Enter a full URL, including https://')
+                    .show();
+                $('#kc-us-target-url').trigger('focus');
                 return;
             }
 
             $(this).find('.kc_us_loading').show();
-            $('#kc-us-error-message').hide();
-            $('#kc-us-success-message').hide();
 
             $.ajax({
                 type: "post",
@@ -165,54 +172,141 @@
 
 
         /**
-         * Show public facing url shortener
+         * Public facing url shortener.
          *
          * @since 1.3.10
          */
-        $("#kc-us-submit-btn").click(function (e) {
+        var $shortener = $('.kcus-shortener');
 
+        function kcusMessage($el, text) {
+            if (text) {
+                $el.text(text).prop('hidden', false);
+            } else {
+                $el.text('').prop('hidden', true);
+            }
+        }
+
+        /**
+         * Copy text to the clipboard.
+         *
+         * navigator.clipboard only exists in a secure context, so plain http://
+         * sites fall back to a hidden textarea. If both routes fail the field is
+         * selected so the visitor can copy it themselves.
+         *
+         * @return {Promise<boolean>} resolves true when the text was copied.
+         */
+        function kcusCopy(text, $field) {
+            if (window.navigator && navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text).then(function () {
+                    return true;
+                }).catch(function () {
+                    return kcusLegacyCopy(text, $field);
+                });
+            }
+
+            return $.Deferred().resolve(kcusLegacyCopy(text, $field)).promise();
+        }
+
+        function kcusLegacyCopy(text, $field) {
+            var area = document.createElement('textarea');
+
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.top = '-1000px';
+            document.body.appendChild(area);
+            area.select();
+
+            var copied = false;
+
+            try {
+                copied = document.execCommand('copy');
+            } catch (err) {
+                copied = false;
+            }
+
+            document.body.removeChild(area);
+
+            // Last resort: leave the link selected so it can be copied by hand.
+            if (!copied && $field && $field.length) {
+                $field.trigger('focus').trigger('select');
+            }
+
+            return copied;
+        }
+
+        $shortener.on('submit', '.generate-short-link-form', function (e) {
             e.preventDefault();
 
-            var targetURL = $('#kc-us-target-url').val();
-            var security = $('#kc-us-security').val();
+            var $form = $(this);
+            var $root = $form.closest('.kcus-shortener');
+            var $button = $root.find('#kc-us-submit-btn');
+            var $spinner = $button.find('.kc_us_loading');
+            var $error = $root.find('#kc-us-error-msg');
+            var $result = $root.find('#kc-us-result');
+
+            var targetURL = $.trim($root.find('#kc-us-target-url').val());
+            var security = $root.find('#kc-us-security').val();
+
+            kcusMessage($error, '');
 
             if (!validURL(targetURL)) {
-                alert('Please Enter Valid Long URL');
+                kcusMessage($error, 'Enter a full URL, including https://');
+                $root.find('#kc-us-target-url').trigger('focus');
                 return;
             }
 
-            $(this).parents('.generate-short-link-form').find('.kc_us_loading').show();
+            $button.prop('disabled', true);
+            $spinner.prop('hidden', false);
 
             $.ajax({
-                type: "post",
-                dataType: "json",
-                context: this,
+                type: 'post',
+                dataType: 'json',
                 url: usParams.ajaxurl,
                 data: {
                     action: 'us_handle_request',
-                    cmd: "create_short_link",
+                    cmd: 'create_short_link',
                     url: targetURL,
                     security: security
-                },
-                success: function (response) {
-                    $(this).parents('.generate-short-link-form').find('.kc_us_loading').hide();
+                }
+            }).done(function (response) {
+                if (response && response.status === 'success') {
+                    $root.find('#kc-us-source-url').text(targetURL).attr('title', targetURL);
+                    $root.find('#kc-us-short-url').val(response.link);
+                    kcusMessage($root.find('#kc-us-copied'), '');
+                    $result.prop('hidden', false);
+                    $root.find('#kc-us-copy-btn').trigger('focus');
+                } else {
+                    kcusMessage($error, (response && response.message) || 'That link could not be shortened. Please try again.');
+                }
+            }).fail(function () {
+                kcusMessage($error, 'That link could not be shortened. Please try again.');
+            }).always(function () {
+                $button.prop('disabled', false);
+                $spinner.prop('hidden', true);
+            });
+        });
 
-                    if (response.status === "success") {
-                        var link = response.link;
-                        $('.generated-short-link-form #kc-us-short-url').val(link);
-                        $('.generate-short-link-form').hide();
-                        $('.generated-short-link-form').show();
-                    } else {
-                        var html = 'Something went wrong while creating short link';
-                        $('#kc-us-error-msg').text(html);
-                        $('#kc-us-error-msg').show();
-                    }
-                },
+        $shortener.on('click', '#kc-us-copy-btn', function () {
+            var $button = $(this);
+            var $root = $button.closest('.kcus-shortener');
+            var $field = $root.find('#kc-us-short-url');
+            var $copied = $root.find('#kc-us-copied');
+            var original = $button.data('kcus-label') || $button.text();
 
-                error: function (err) {
-                    var html = 'Something went wrong while creating short link';
-                    $('#kc-us-error-msg').text(html);
-                    $('#kc-us-error-msg').show();
+            $button.data('kcus-label', original);
+
+            $.when(kcusCopy($field.val(), $field)).done(function (ok) {
+                if (ok) {
+                    $button.text('Copied');
+                    kcusMessage($copied, 'Short link copied to your clipboard.');
+
+                    window.setTimeout(function () {
+                        $button.text(original);
+                        kcusMessage($copied, '');
+                    }, 2000);
+                } else {
+                    kcusMessage($copied, 'Press Ctrl+C or Cmd+C to copy the selected link.');
                 }
             });
         });

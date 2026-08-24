@@ -161,7 +161,8 @@ class Plugin {
 		$this->loader->add_filter( 'set-screen-option', $plugin_admin, 'save_screen_options', 20, 3 );
 
 		$this->loader->add_action( 'admin_print_scripts', $plugin_admin, 'remove_admin_notices', 999999999 );
-		$this->loader->add_filter( 'admin_footer_text', $plugin_admin, 'update_admin_footer_text' );
+		// The footer is now Admin\Footer's, which empties core's two lines and
+		// renders one row in their place. See lite/includes/Admin/Footer.php.
 		$this->loader->add_action( 'in_plugin_update_message-url-shortify/url-shortify.php', $plugin_admin, 'in_plugin_update_message', 10, 2 );
 
 		// $this->loader->add_action( 'in_admin_footer', $plugin_admin, 'promote_url_shortify' );
@@ -452,6 +453,7 @@ class Plugin {
 			'KaizenCoders\URL_Shortify\Ajax\Link_Preview',
 			//'KaizenCoders\URL_Shortify\Email\Report',
 			'KaizenCoders\URL_Shortify\Admin\Promotions\PromoBanner',
+			'KaizenCoders\URL_Shortify\Admin\Footer',
 			'KaizenCoders\URL_Shortify\Frontend\Redirect',
 			'KaizenCoders\URL_Shortify\Common\Actions',
 			'KaizenCoders\URL_Shortify\Shortcode',

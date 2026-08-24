@@ -41,33 +41,222 @@
 
 /** Frontend CSS **/
 
-#generate-short-link, #generated-short-link {
-    text-align: center;
+/* ── Public URL shortener form ─────────────────────────────────────────────
+   Scoped to .kcus-shortener so nothing leaks into the host theme. Colours are
+   custom properties: a site owner can retheme the whole card by overriding
+   --kcus-accent. Backgrounds are mixed from currentColor rather than hardcoded,
+   so the card sits correctly on light and dark themes without knowing which.
+   ------------------------------------------------------------------------ */
+
+.kcus-shortener {
+    --kcus-accent: #4662FA;
+    --kcus-accent-contrast: #FFFFFF;
+    --kcus-radius: 12px;
+    --kcus-gap: 14px;
+    --kcus-control-height: 52px;
+    --kcus-border: rgba(128, 128, 128, 0.32);
+    --kcus-surface: rgba(128, 128, 128, 0.06);
+    --kcus-muted: rgba(128, 128, 128, 1);
+    --kcus-danger: #C0392B;
+    --kcus-ok: #1E7A46;
+
+    box-sizing: border-box;
+    max-width: 640px;
+    margin: 1.5em auto;
+    padding: 22px;
+    border: 1px solid var(--kcus-border);
+    border-radius: calc(var(--kcus-radius) + 6px);
+    background: var(--kcus-surface);
+    text-align: left;
+    font: inherit;
 }
 
-#generate-short-link #kc-us-target-url, #generate-short-link #kc-us-short-url {
-    width: 60%;
-    display: inline;
-    border: 1px solid grey;
-    border-radius: 50px 0px 0px 50px;
-    background-color: #FFFFFF;
-    margin: 0px;
-    font-size: 16px;
+/* Adapts the neutral tints to the theme's own text colour where supported. */
+@supports (background: color-mix(in srgb, currentColor 6%, transparent)) {
+    .kcus-shortener {
+        --kcus-border: color-mix(in srgb, currentColor 22%, transparent);
+        --kcus-surface: color-mix(in srgb, currentColor 4%, transparent);
+        --kcus-muted: color-mix(in srgb, currentColor 62%, transparent);
+    }
 }
 
-#generate-short-link #kc-us-submit-btn, #generate-short-link #kc-us-copy-btn {
-    border: 1px solid grey;
-    display: inline;
-    padding: 15px;
-    background-color: #4662FA;
-    color: #FFFFFF;
-    border-radius: 0px 50px 50px 0px;
-    margin: -5px;
-    width: 150px;
-    font-size: 16px;
+.kcus-shortener *,
+.kcus-shortener *::before,
+.kcus-shortener *::after {
+    box-sizing: border-box;
 }
 
+.kcus-shortener__form {
+    margin: 0;
+}
 
+.kcus-shortener__label {
+    display: block;
+    margin: 0 0 10px;
+    font-size: 0.95em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* ── Input + button group ── */
+
+.kcus-field {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.kcus-field__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: var(--kcus-control-height);
+    margin: 0;
+    padding: 0 16px;
+    border: 1px solid var(--kcus-border);
+    border-right: 0;
+    border-radius: var(--kcus-radius) 0 0 var(--kcus-radius);
+    background: #FFFFFF;
+    color: #111111;
+    font: inherit;
+    font-size: 1em;
+    line-height: normal;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.kcus-field__input::placeholder {
+    color: #6B7280;
+    opacity: 1;
+}
+
+.kcus-field__input:focus {
+    outline: 2px solid var(--kcus-accent);
+    outline-offset: -2px;
+    border-color: var(--kcus-accent);
+    z-index: 1;
+}
+
+.kcus-field__button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 124px;
+    height: var(--kcus-control-height);
+    margin: 0;
+    padding: 0 20px;
+    border: 1px solid var(--kcus-accent);
+    border-radius: 0 var(--kcus-radius) var(--kcus-radius) 0;
+    background: var(--kcus-accent);
+    color: var(--kcus-accent-contrast);
+    font: inherit;
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+
+.kcus-field__button:hover:not([disabled]) {
+    filter: brightness(1.08);
+}
+
+.kcus-field__button:focus-visible {
+    outline: 2px solid var(--kcus-accent);
+    outline-offset: 2px;
+}
+
+.kcus-field__button[disabled] {
+    opacity: 0.65;
+    cursor: default;
+}
+
+/* ── Loading spinner inside the button ── */
+
+.kcus-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: kcus-spin 0.7s linear infinite;
+}
+
+@keyframes kcus-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Result: the before / after ── */
+
+.kcus-result {
+    margin-top: 20px;
+}
+
+.kcus-result__eyebrow {
+    margin: 0 0 4px;
+    color: var(--kcus-muted);
+    font-size: 0.7em;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+.kcus-result__source {
+    margin: 0;
+    color: var(--kcus-muted);
+    font-size: 0.85em;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kcus-result__rule {
+    height: 0;
+    margin: 14px 0;
+    border: 0;
+    border-top: 1px solid var(--kcus-border);
+}
+
+.kcus-field--result .kcus-field__input {
+    font-weight: 600;
+}
+
+/* ── Messages ── */
+
+.kcus-message {
+    margin: 10px 0 0;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.kcus-message--error { color: var(--kcus-danger); }
+.kcus-message--ok    { color: var(--kcus-ok); }
+
+/* ── Narrow screens: stack the group ── */
+
+@media (max-width: 480px) {
+    .kcus-field {
+        flex-direction: column;
+    }
+
+    .kcus-field__input {
+        border-right: 1px solid var(--kcus-border);
+        border-radius: var(--kcus-radius) var(--kcus-radius) 0 0;
+    }
+
+    .kcus-field__button {
+        width: 100%;
+        border-radius: 0 0 var(--kcus-radius) var(--kcus-radius);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kcus-spinner { animation: none; }
+    .kcus-field__button { transition: none; }
+}
 
 .kc-us-tooltip {
     position: relative;

@@ -3,8 +3,8 @@ Contributors: kaizencoders, mikeatkaizencoders
 Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
-Tested up to: 7.0
-Stable tag: 2.5.1
+Tested up to: 7.1
+Stable tag: 2.5.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -262,29 +262,11 @@ Do you want us to integrate your WordPress plugin with URL Shortify❓❓❓ [Le
 
 === What users are saying about URL Shortify? ===
 
-👉 **Great customer service**
-> I bought the life time license yesterday and sent Mike a question about whether a bookmarklet feature will be available soon.
->
-> He responded within 24 hours, promising that they will create that feature soon. That’s great customer service.
->
-> - [marcfest](https://wordpress.org/support/users/marcfest/)
-
-👉 **Extremely helpful support & amazing timesaver!**
-> I really can’t say enough good things about this plug-in!
->
-> I had been using one that was last updated 6 years ago (eek!) & it suddenly stopped working (& making an error on my site). I reached out to Mike L & he worked to get my information imported – on Christmas Eve!!!!! So incredibly thankful & I highly recommend 🙂
->
-> [mommy5boys](https://wordpress.org/support/users/mommy5boys/)
-
 👉 **Support & Quality Plugin**
 > The support and help in setting up my plugin were fantastic. Mike walked through the specific use case with me. The plugins easy to use, fast, efficient and does what it says. Excited to see it evolve too and kick the competitors!
 > - [driverasp](https://profiles.wordpress.org/driverasp/)
 
 Go to [URL Shortify plugin review section](https://wordpress.org/support/plugin/url-shortify/reviews/) and read our all reviews.
-
-=== Translations ===
-
-Does URL Shortify speak your language? If not, [translate “URL SHORTIFY” into your language](https://translate.wordpress.org/projects/wp-plugins/url-shortify/).
 
 === DO YOU HAVE ANY QUESTIONS/ FEEDBACK/ FEATURE REQUEST/ BUG REPORT❓===
 
@@ -496,13 +478,25 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.5.1 =
+= 2.5.2 =
 
 * New version of URL Shortify with new features, improvements and bug fixes. Please update to the latest version to get the best experience. Learn more about the new features and improvements in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
 
-= 2.5.1 [2026-08-11] =
+= 2.5.2 - 2026-08-24 =
+
+* Update: Replaced every browser alert in the admin with a standard, dismissible WordPress notice shown next to the control it refers to. This covers the Quick Add widget, custom date ranges on the Dashboard and the Group and Tag stats pages, link rotation weights, favourites, enabling and disabling links, the link preview, and plugin install actions. Confirmation prompts on destructive actions are unchanged.
+* Update: Redesigned the public link Shortener form. It now sits in a self-contained card, shows the original URL above the short link it produced, has a proper field label, an inline error message instead of a browser alert, a loading state on the button, and stacks on narrow screens. Colours can be retuned with the custom property. **PRO**
+* Update: WordPress 7.1 compatibility.
+* Fix: The link rotation weight warning could appear several times for a single edit, because the total was checked inside the loop that added it up. It is now checked once. **PRO**
+* Fix: The Copy button on the public Shortener used the deprecated document.execCommand API. It now uses the Clipboard API where available, falls back for sites served over http, and tells the visitor to press Ctrl+C or Cmd+C if the browser blocks both. **PRO**
+* Fix: The [url-shortify-form] shortcode printed its output instead of returning it, so the public shortener form appeared at the very top of the page rather than where the shortcode was placed. **PRO**
+* Fix: The front-end stylesheet and script were loaded on every public page, pulling in jQuery with them. They are now registered up front and only loaded on pages that actually render the public link shortener form, so most sites no longer load them at all. Reported by a user — thank you.
+* Fix: When importing plugin settings from another site, the default domain used to display links set to "All my domains" kept the source site's domain ID. Short links could then be shown on the wrong custom domain, or on none at all. Both custom domain settings are now repointed at the matching domain on the destination, falling back to your own site's domain when that domain was not part of the import. **PRO**
+* Translations: Updated .POT file for new translations.
+
+= 2.5.1 - 2026-08-11 =
 
 * New: Option to restrict a short link to the domain assigned to it, so a link on a custom domain no longer shadows a page using the same slug on your main site. Enable it under Settings > Display Options. **PRO**
 * New: Setup check for custom domains. A new Setup column on the Domains page tells you whether each domain reaches WordPress as an alias or is redirected to your main site, and the same check is shown on the settings page before the option above. **PRO**

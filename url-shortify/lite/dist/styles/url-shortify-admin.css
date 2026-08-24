@@ -1662,3 +1662,198 @@ body.kc-us-dark-active #wpfooter {
     border-color: #475569 !important;
     color: #e2e8f0 !important;
 }
+
+/* URL Shortify footer - Start
+   Scoped to the `kc-us-screen` body class that Admin\Footer sets, from the same
+   is_plugin_admin_screen() check everything else uses, so it cannot drift from
+   the real screen ids.
+
+   #footer-left and #footer-upgrade are core's two footer lines. Both are
+   emptied by filters as well, so hiding them is belt and braces for anything
+   that hooks in later. */
+body.kc-us-screen #wpfooter {
+    position: static;
+    padding: 0 20px 24px;
+}
+
+body.kc-us-screen #footer-left,
+body.kc-us-screen #footer-upgrade {
+    display: none;
+}
+
+/*
+ * A rule and the admin's own type — no card.
+ *
+ * Three zones on one line: identity, signature, links. A grid of
+ * `1fr auto 1fr` rather than `justify-content: space-between`, because the
+ * middle has to be centred on the row and not merely between its neighbours.
+ * The sides are different widths and they change: a free build carries an extra
+ * "Get PRO", and "URL Shortify PRO" is wider than "URL Shortify", so
+ * space-between would put the signature in a slightly different place on every
+ * build.
+ */
+.kc-us-footer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px 24px;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #dcdcde;
+    color: #50575e;
+    font-size: 13px;
+}
+
+.kc-us-footer__identity,
+.kc-us-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+}
+
+.kc-us-footer__identity {
+    gap: 6px 10px;
+}
+
+/* The right track is a track, so its contents have to be pushed to it. */
+.kc-us-footer__links {
+    justify-content: flex-end;
+}
+
+/* Small, because identity here is a signature and not a banner. */
+.kc-us-footer__mark.dashicons {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+}
+
+.kc-us-footer__name {
+    color: #1d2327;
+    font-weight: 600;
+}
+
+.kc-us-footer__version {
+    color: #646970;
+}
+
+.kc-us-footer__heart {
+    /*
+     * An emoji sits high against 13px text, and its glyph box swallows the
+     * space after it — "Made with ❤️by KaizenCoders" without this.
+     */
+    margin: 0 3px 0 1px;
+    vertical-align: -1px;
+}
+
+/*
+ * The signature. In its own track it is separated by the space either side of
+ * it, so a rule would only add furniture.
+ */
+.kc-us-footer__maker {
+    margin: 0;
+    color: #646970;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.kc-us-footer a {
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.kc-us-footer a:hover,
+.kc-us-footer a:focus {
+    color: #3730a3;
+    text-decoration: underline;
+}
+
+.kc-us-footer__stars {
+    color: #f0a007;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+/*
+ * The one request in a row of signposts, so it is the one thing given any
+ * weight: gold stars and a warm chip, sized so it still sits on the row's
+ * baseline rather than pushing the footer taller.
+ *
+ * Two classes, to beat the plain-link rule above on specificity rather than on
+ * source order.
+ */
+.kc-us-footer .kc-us-footer__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #fff7e3;
+    color: #8a6100;
+    font-weight: 600;
+}
+
+.kc-us-footer .kc-us-footer__rating:hover,
+.kc-us-footer .kc-us-footer__rating:focus {
+    background: #fdeec4;
+    color: #6b4b00;
+    text-decoration: none;
+}
+
+.kc-us-footer .kc-us-footer__rating:hover .kc-us-footer__stars,
+.kc-us-footer .kc-us-footer__rating:focus .kc-us-footer__stars {
+    color: #d98c00;
+}
+
+/*
+ * Go PRO, on free builds only.
+ *
+ * Filled rather than tinted: the rating chip beside it is a favour being asked
+ * and is deliberately soft, while this is the action the page exists to offer.
+ * Two chips of the same weight would compete; a solid one and a warm one read
+ * as primary and secondary without either shouting.
+ *
+ * Two classes, to beat the plain-link rule on specificity rather than on source
+ * order.
+ */
+.kc-us-footer .kc-us-footer__pro {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px;
+    border-radius: 9999px;
+    background: #4f46e5;
+    color: #fff;
+    font-weight: 600;
+}
+
+.kc-us-footer .kc-us-footer__pro:hover,
+.kc-us-footer .kc-us-footer__pro:focus {
+    background: #3730a3;
+    color: #fff;
+    text-decoration: none;
+}
+
+/*
+ * Below about 1100px the three tracks stop fitting and the links start wrapping
+ * under a centre that is no longer in the centre of anything. A centred stack
+ * is the honest shape at that width.
+ */
+@media screen and (max-width: 1100px) {
+    .kc-us-footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px 16px;
+        text-align: center;
+    }
+
+    .kc-us-footer__links {
+        justify-content: center;
+    }
+}
+/* URL Shortify footer - End */

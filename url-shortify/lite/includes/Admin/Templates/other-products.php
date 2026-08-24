@@ -173,10 +173,10 @@ $plugins = \KaizenCoders\URL_Shortify\Helper::get_kc_plugins_info();
 						if (data.success) {
 							window.location.reload();
 						} else {
-							alert(data.data.message || 'Operation failed');
+							window.kcUsNotice((data.data && data.data.message) || '<?php echo esc_js( __( 'That plugin action could not be completed.', 'url-shortify' ) ); ?>');
 						}
 					} catch (error) {
-						alert('An error occurred');
+						window.kcUsNotice('<?php echo esc_js( __( 'That plugin action could not be completed. Please try again.', 'url-shortify' ) ); ?>');
 					} finally {
 						button.classList.remove('button-disabled');
 						spinnerContainer.classList.add('hidden');

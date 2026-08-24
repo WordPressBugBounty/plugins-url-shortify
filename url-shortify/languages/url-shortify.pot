@@ -2,20 +2,21 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 2.5.1\n"
+"Project-Id-Version: URL Shortify 2.5.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-11T15:13:43+00:00\n"
+"POT-Creation-Date: 2026-08-24T05:46:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
 
 #. Plugin Name of the plugin
 #: lite/includes/Admin.php:309
+#: lite/includes/Admin/Footer.php:142
 #: lite/includes/Helper.php:425
 #: lite/language.php:4
 msgid "URL Shortify"
@@ -169,25 +170,21 @@ msgstr ""
 msgid "Sun"
 msgstr ""
 
-#. translators: 1: WordPress link, 2: Plugin name, 3: Plugin version, 4: KaizenCoders link
-#: lite/includes/Admin.php:1004
-msgid "<span id=\"footer-thankyou\">Thank you for creating with <a href=\"%1$s\" target=\"_blank\">WordPress</a> | %2$s <b>%3$s</b>. Made with ❤️ by the team <a href=\"%4$s\" target=\"_blank\">KaizenCoders</a></span>"
-msgstr ""
-
-#: lite/includes/Admin.php:1086
+#: lite/includes/Admin.php:1052
 #: lite/language.php:20
 msgid "URL Shortify Quick Add"
 msgstr ""
 
-#: lite/includes/Admin.php:1147
+#: lite/includes/Admin.php:1113
+#: lite/includes/Admin/Footer.php:190
 msgid "Support"
 msgstr ""
 
-#: lite/includes/Admin.php:1159
+#: lite/includes/Admin.php:1125
 msgid "Docs"
 msgstr ""
 
-#: lite/includes/Admin.php:1164
+#: lite/includes/Admin.php:1130
 msgid "Made with ♥ by the team KaizenCoders"
 msgstr ""
 
@@ -705,6 +702,23 @@ msgstr ""
 #: lite/includes/Admin/DB/Clicks.php:637
 #: lite/language.php:36
 msgid "Direct, Email, SMS"
+msgstr ""
+
+#: lite/includes/Admin/Footer.php:142
+msgid "URL Shortify PRO"
+msgstr ""
+
+#: lite/includes/Admin/Footer.php:182
+msgid "About"
+msgstr ""
+
+#: lite/includes/Admin/Footer.php:186
+#: lite/includes/EmailReports/EmailTemplate.php:552
+msgid "Documentation"
+msgstr ""
+
+#: lite/includes/Admin/Footer.php:203
+msgid "Go PRO"
 msgstr ""
 
 #: lite/includes/Admin/Groups_Table.php:62
@@ -1431,6 +1445,7 @@ msgstr ""
 #: lite/includes/Helper.php:929
 #: lite/includes/Helper.php:932
 #: lite/language.php:148
+#: pro/includes/Shortcode.php:96
 msgid "Copy"
 msgstr ""
 
@@ -1785,12 +1800,29 @@ msgstr ""
 #: lite/includes/Admin/Templates/dashboard.php:659
 #: lite/includes/Admin/Templates/group-stats.php:581
 #: lite/includes/Admin/Templates/tag-stats.php:581
-msgid "Please enter both a start date and an end date."
+msgid "Enter both a start date and an end date."
 msgstr ""
 
 #. translators: %s: URL for the KaizenCoders website
 #: lite/includes/Admin/Templates/footer-promotion.php:33
 msgid "Made with ❤️ by the team <a href='%s' target='_blank'>KaizenCoders</a>"
+msgstr ""
+
+#. translators: 1: a heart, 2: link opening tag, 3: link closing tag
+#: lite/includes/Admin/Templates/footer.php:49
+msgid "Made with %1$s by %2$sKaizenCoders%3$s"
+msgstr ""
+
+#: lite/includes/Admin/Templates/footer.php:57
+msgid "URL Shortify links"
+msgstr ""
+
+#: lite/includes/Admin/Templates/footer.php:89
+msgid "Rate URL Shortify"
+msgstr ""
+
+#: lite/includes/Admin/Templates/footer.php:93
+msgid "on WordPress.org (opens in a new tab)"
 msgstr ""
 
 #: lite/includes/Admin/Templates/group-form.php:19
@@ -1948,7 +1980,7 @@ msgstr ""
 #: lite/includes/Admin/Templates/link-form.php:387
 #: lite/language.php:132
 #: pro/includes/Actions.php:540
-#: pro/includes/Shortcode.php:118
+#: pro/includes/Shortcode.php:137
 #: pro/Templates/password.php:11
 msgid "Password"
 msgstr ""
@@ -2111,6 +2143,14 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/other-products.php:122
 msgid "Deactivate"
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:176
+msgid "That plugin action could not be completed."
+msgstr ""
+
+#: lite/includes/Admin/Templates/other-products.php:179
+msgid "That plugin action could not be completed. Please try again."
 msgstr ""
 
 #: lite/includes/Admin/Templates/tools.php:59
@@ -2419,7 +2459,7 @@ msgid "URL is required."
 msgstr ""
 
 #: lite/includes/API/V1/LinksRestController.php:304
-#: pro/includes/API/V1/BulkLinksRestController.php:338
+#: pro/includes/API/V1/BulkLinksRestController.php:341
 msgid "Failed to create link."
 msgstr ""
 
@@ -2715,10 +2755,6 @@ msgstr ""
 
 #: lite/includes/EmailReports/EmailTemplate.php:540
 msgid "Manage Email Preferences"
-msgstr ""
-
-#: lite/includes/EmailReports/EmailTemplate.php:552
-msgid "Documentation"
 msgstr ""
 
 #: lite/includes/EmailReports/Init.php:171
@@ -3338,13 +3374,13 @@ msgid "Popular Links"
 msgstr ""
 
 #: lite/language.php:221
-#: pro/includes/Shortcode.php:119
+#: pro/includes/Shortcode.php:138
 #: pro/Templates/password.php:28
 msgid "The link you are trying to access is password protected."
 msgstr ""
 
 #: lite/language.php:222
-#: pro/includes/Shortcode.php:120
+#: pro/includes/Shortcode.php:139
 #: pro/Templates/password.php:40
 msgid "Enter"
 msgstr ""
@@ -4335,45 +4371,45 @@ msgstr ""
 msgid "Array of link objects to shorten."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:151
+#: pro/includes/API/V1/BulkLinksRestController.php:154
 msgid "At least one link object is required."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:183
+#: pro/includes/API/V1/BulkLinksRestController.php:186
 msgid "The links payload must be an array."
 msgstr ""
 
 #. translators: %d: maximum number of links allowed in one bulk request
-#: pro/includes/API/V1/BulkLinksRestController.php:196
+#: pro/includes/API/V1/BulkLinksRestController.php:199
 msgid "The bulk request limit is %d links per request."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:209
+#: pro/includes/API/V1/BulkLinksRestController.php:212
 msgid "Invalid link object."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:222
+#: pro/includes/API/V1/BulkLinksRestController.php:225
 msgid "Invalid URL."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:265
-#: pro/includes/API/V1/BulkLinksRestController.php:326
+#: pro/includes/API/V1/BulkLinksRestController.php:268
+#: pro/includes/API/V1/BulkLinksRestController.php:329
 msgid "Slug already exist."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:305
+#: pro/includes/API/V1/BulkLinksRestController.php:308
 msgid "Invalid bulk create payload."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:358
+#: pro/includes/API/V1/BulkLinksRestController.php:361
 msgid "Link was created but could not be loaded."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:405
+#: pro/includes/API/V1/BulkLinksRestController.php:408
 msgid "Unable to generate a unique slug for this link."
 msgstr ""
 
-#: pro/includes/API/V1/BulkLinksRestController.php:455
+#: pro/includes/API/V1/BulkLinksRestController.php:458
 msgid "Bulk API is disabled."
 msgstr ""
 
@@ -4677,16 +4713,16 @@ msgstr ""
 msgid "Plugin settings that point at a specific page or domain (such as the password protection page) refer to ids from the source site and may need to be re-selected after importing."
 msgstr ""
 
-#: pro/includes/Migration/Importer.php:1268
+#: pro/includes/Migration/Importer.php:1287
 msgid "The migration file is no longer available. Please upload it again."
 msgstr ""
 
-#: pro/includes/Migration/Importer.php:1277
+#: pro/includes/Migration/Importer.php:1296
 #: pro/includes/Migration/Package.php:672
 msgid "The migration file could not be opened."
 msgstr ""
 
-#: pro/includes/Migration/Importer.php:1496
+#: pro/includes/Migration/Importer.php:1515
 msgid "The existing data could not be cleared. Nothing further was imported."
 msgstr ""
 
@@ -5061,4 +5097,24 @@ msgstr ""
 
 #: pro/includes/Settings.php:779
 msgid "How to set up a custom domain correctly"
+msgstr ""
+
+#: pro/includes/Shortcode.php:60
+msgid "Shorten a link"
+msgstr ""
+
+#: pro/includes/Shortcode.php:67
+msgid "Paste a long URL"
+msgstr ""
+
+#: pro/includes/Shortcode.php:73
+msgid "Shorten"
+msgstr ""
+
+#: pro/includes/Shortcode.php:85
+msgid "From"
+msgstr ""
+
+#: pro/includes/Shortcode.php:92
+msgid "Your short link"
 msgstr ""
