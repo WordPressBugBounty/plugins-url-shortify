@@ -92,6 +92,23 @@ class GroupStatsController extends StatsController {
 		if ( 'custom' === $time_filter && $start_date && $end_date ) {
 			$cache_suffix .= '_' . $start_date . '_' . $end_date;
 		}
+
+		/*
+		 * Read the comparison request before the cache key is built. The cached
+		 * payload differs with compare mode, so it has to vary the key - without
+		 * this, toggling compare on a page that is already cached returns the
+		 * aggregate-only payload and the toggle looks broken for three hours.
+		 */
+		$compare = sanitize_key( Helper::get_request_data( 'compare', '' ) );
+		$compare = ( ! empty( $compare ) && US()->is_pro() ) ? 'links' : '';
+
+		$compare_metric = sanitize_key( Helper::get_request_data( 'compare_metric', 'total' ) );
+		$compare_metric = in_array( $compare_metric, [ 'total', 'unique' ], true ) ? $compare_metric : 'total';
+
+		if ( ! empty( $compare ) ) {
+			$cache_suffix .= '_cmp_' . $compare . '_' . $compare_metric;
+		}
+
 		$cache_key = 'group_stats_v4_' . $this->group_id . '_' . $cache_suffix;
 
 		// If we have the data in cache, get it from it.
@@ -170,6 +187,23 @@ class GroupStatsController extends StatsController {
 			array_column( $spline_data_filled, 'date' ),
 			array_map( 'intval', array_column( $spline_data_filled, 'total_clicks' ) )
 		) ?: [];
+
+
+		/*
+		 * Comparison mode. Off by default, so the aggregate chart above is
+		 * untouched for everyone who has not asked for this. PRO only, partly
+		 * because it is a PRO feature and partly because free is capped at seven
+		 * days of history, which is too short a window to compare anything over.
+		 */
+		if ( ! empty( $compare ) ) {
+			$data['chart_data']['compare'] = $this->build_compare_chart_data(
+				'link',
+				[],
+				$data['chart_data']['dates'],
+				$compare_metric,
+				$link_ids
+			);
+		}
 
 		$heatmap_data = US()->db->clicks->get_heatmap_intensity_data( 365, $link_ids );
 		$heatmap_map   = [];

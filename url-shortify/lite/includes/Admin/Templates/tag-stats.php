@@ -240,6 +240,44 @@ $links_table_controller->set_columns( $links_columns );
                         </a>
                     </div>
 				</div>
+
+				<?php
+				/*
+				 * Comparison toggle. A link rather than a JS control, so the state
+				 * lives in the URL and can be bookmarked, shared and reloaded. The
+				 * chart itself refreshes over AJAX; this is the entry point into
+				 * that mode, not the mechanism.
+				 */
+				if ( US()->is_pro() ) :
+					$kc_us_comparing   = ! empty( Helper::get_data( $_GET, 'compare', '' ) );
+					$kc_us_compare_url = $kc_us_comparing
+						? remove_query_arg( [ 'compare', 'compare_metric' ] )
+						: add_query_arg( 'compare', 'links' );
+					$kc_us_compare     = Helper::get_data( $chart_data, 'compare', [] );
+					$kc_us_truncated   = Helper::get_data( $kc_us_compare, 'truncated', [] );
+					?>
+					<div class="mt-3 flex flex-wrap items-center gap-3">
+						<a href="<?php echo esc_url( $kc_us_compare_url ); ?>"
+						   class="kc-us-compare-toggle inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors duration-150 <?php echo $kc_us_comparing ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'; ?>"
+						   aria-pressed="<?php echo $kc_us_comparing ? 'true' : 'false'; ?>">
+							<?php echo $kc_us_comparing ? esc_html__( 'Comparing links', 'url-shortify' ) : esc_html__( 'Compare links', 'url-shortify' ); ?>
+						</a>
+
+						<?php if ( $kc_us_comparing && ! empty( $kc_us_truncated['of'] ) && $kc_us_truncated['of'] > $kc_us_truncated['shown'] ) : ?>
+							<span class="text-sm text-slate-500">
+								<?php
+								printf(
+									/* translators: 1: number of links charted, 2: total number of links */
+									esc_html__( 'Showing the top %1$d of %2$d links by clicks.', 'url-shortify' ),
+									(int) $kc_us_truncated['shown'],
+									(int) $kc_us_truncated['of']
+								);
+								?>
+							</span>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
+
 				<?php if ( $has_chart_data ) : ?>
 					<div class="bg-white mt-2" id="spline-area-chart"></div>
 				<?php else : ?>

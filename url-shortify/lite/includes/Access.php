@@ -97,6 +97,7 @@ class Access {
 				'manage_utm_presets',
 				'manage_tracking_pixels',
 				'manage_auto_link_keywords',
+				'manage_reports',
 			];
 		}
 

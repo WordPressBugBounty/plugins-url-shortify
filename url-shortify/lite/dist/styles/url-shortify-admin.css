@@ -1671,9 +1671,23 @@ body.kc-us-dark-active #wpfooter {
    #footer-left and #footer-upgrade are core's two footer lines. Both are
    emptied by filters as well, so hiding them is belt and braces for anything
    that hooks in later. */
-body.kc-us-screen #wpfooter {
-    position: static;
-    padding: 0 20px 24px;
+/*
+ * Leave core's footer where core put it.
+ *
+ * `#wpfooter` is `position: absolute; bottom: 0` inside `#wpwrap`, which
+ * carries `min-height: 100%` — so a page whose content ends halfway down
+ * still puts the footer at the bottom of the screen rather than floating it
+ * in the middle. That is worth keeping.
+ *
+ * The only reason it ever broke is the reserve. Core leaves 65px of padding
+ * at the foot of `#wpbody-content` for its own one-line footer, and this one
+ * is taller, so an absolute footer sat on whatever the page ended with.
+ * Returning it to normal flow fixed the overlap and threw the
+ * bottom-of-screen behaviour away with it; growing the reserve fixes the
+ * overlap and keeps both.
+ */
+body.kc-us-screen #wpbody-content {
+    padding-bottom: 100px;
 }
 
 body.kc-us-screen #footer-left,
@@ -1854,6 +1868,11 @@ body.kc-us-screen #footer-upgrade {
 
     .kc-us-footer__links {
         justify-content: center;
+    }
+
+    /* Wrapped onto two or three lines, it needs more room reserved for it. */
+    body.kc-us-screen #wpbody-content {
+        padding-bottom: 160px;
     }
 }
 /* URL Shortify footer - End */

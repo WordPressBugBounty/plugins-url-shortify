@@ -11,6 +11,41 @@
     }
 }());
 
+/**
+ * Series for the spline chart.
+ *
+ * Comparison mode replaces the two aggregate series with one per link, so
+ * the chart answers "which of these is working" instead of "how did the
+ * whole group do". Without a compare payload the original two are returned
+ * unchanged, which is what every non-PRO and non-compare screen gets.
+ *
+ * @param {Object} chartData
+ * @return {Array}
+ */
+function usChartSeries(chartData) {
+    if (chartData && chartData.compare && Array.isArray(chartData.compare.series) && chartData.compare.series.length) {
+        return chartData.compare.series.map(function (s) {
+            return { name: s.name, data: s.data };
+        });
+    }
+
+    return [
+        { name: 'Total Clicks', data: (chartData && chartData.total_series) || [] },
+        { name: 'Unique Clicks', data: (chartData && chartData.unique_series) || [] }
+    ];
+}
+
+/**
+ * Enough distinct colours for the series cap. Beyond two the gradient fill
+ * used by the aggregate chart turns into mud, so comparison mode draws
+ * plain lines instead - see usChartIsCompare().
+ */
+var US_COMPARE_COLORS = ['#6366f1', '#34d399', '#f59e0b', '#ef4444', '#0ea5e9', '#a855f7', '#14b8a6', '#f472b6'];
+
+function usChartIsCompare(chartData) {
+    return !!(chartData && chartData.compare && Array.isArray(chartData.compare.series) && chartData.compare.series.length);
+}
+
 (function ($) {
     'use strict';
 
@@ -262,10 +297,11 @@
                 }
 
                 if (window.usSplineChart instanceof ApexCharts && chartData && Array.isArray(chartData.dates)) {
-                    window.usSplineChart.updateSeries([
-                        { name: 'Total Clicks', data: chartData.total_series || [] },
-                        { name: 'Unique Clicks', data: chartData.unique_series || [] }
-                    ], true);
+                    window.usSplineChart.updateSeries(usChartSeries(chartData), true);
+                    window.usSplineChart.updateOptions({
+                        colors: usChartIsCompare(chartData) ? US_COMPARE_COLORS : ['#6366f1', '#34d399'],
+                        fill: usChartIsCompare(chartData) ? { type: 'solid', opacity: 0 } : { type: 'gradient' }
+                    }, false, false);
                     window.usSplineChart.updateOptions({
                         xaxis: {
                             categories: chartData.dates || []
@@ -1235,11 +1271,9 @@ window.usHeatmapChart = window.usHeatmapChart || null;
         if ( window.usSplineChart instanceof ApexCharts ) {
             window.usSplineChart.destroy();
         }
+        var splineIsCompare = usChartIsCompare(us_chart_data);
         var splineOptions = {
-            series: [
-                { name: 'Total Clicks', data: us_chart_data.total_series },
-                { name: 'Unique Clicks', data: us_chart_data.unique_series }
-            ],
+            series: usChartSeries(us_chart_data),
             chart: {
                 height: 260,
                 type: 'area',
@@ -1266,7 +1300,7 @@ window.usHeatmapChart = window.usHeatmapChart || null;
             },
             stroke: { curve: 'smooth', width: 3 },
             dataLabels: { enabled: false },
-            fill: {
+            fill: splineIsCompare ? { type: 'solid', opacity: 0 } : {
                 type: 'gradient',
                 gradient: {
                     shade: isDarkMode ? 'dark' : 'light',
@@ -1293,7 +1327,7 @@ window.usHeatmapChart = window.usHeatmapChart || null;
                 labels: { style: { colors: '#94a3b8' } },
                 tickAmount: 4
             },
-            colors: ['#6366f1', '#34d399'],
+            colors: splineIsCompare ? US_COMPARE_COLORS : ['#6366f1', '#34d399'],
             grid: {
                 borderColor: isDarkMode ? 'rgba(71,85,105,0.65)' : 'rgba(148,163,184,0.25)',
                 strokeDashArray: 4

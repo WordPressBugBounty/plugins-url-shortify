@@ -124,6 +124,11 @@ class Install {
 		'2.3.1' => [
 			'kc_us_update_231_alter_links_table',
 		],
+
+		'2.6.0' => [
+			'kc_us_update_260_add_clicks_series_index',
+			'kc_us_update_260_create_saved_reports_table',
+		],
 	];
 
 	/**
@@ -621,6 +626,7 @@ class Install {
 		$tables .= self::get_1122_schema( $collate );
 		$tables .= self::get_1131_schema( $collate );
 		$tables .= self::get_220_schema( $collate );
+		$tables .= self::get_260_schema( $collate );
 
 		return $tables;
 	}
@@ -722,6 +728,7 @@ class Install {
 				`created_at` DATETIME NOT NULL,
 				PRIMARY KEY  (id),
 				KEY link_id (link_id),
+				KEY link_id_created_at (link_id, created_at),
 				KEY ip (ip(191)),
 				KEY browser_type (browser_type(191)),
 				KEY browser_version (browser_version(191)),
@@ -937,6 +944,19 @@ class Install {
 				  KEY created_at (created_at),
 				  KEY updated_at (updated_at)
 				) $collate;
+
+			CREATE TABLE `{$wpdb->prefix}kc_us_saved_reports` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL DEFAULT 0,
+				`name` varchar(191) NOT NULL,
+				`description` text DEFAULT NULL,
+				`config` longtext DEFAULT NULL,
+				`created_at` datetime DEFAULT NULL,
+				`updated_at` datetime DEFAULT NULL,
+				PRIMARY KEY  (id),
+				KEY user_id (user_id),
+				KEY user_name (user_id, name)
+			) $collate;
         ";
 	}
 
@@ -1117,6 +1137,34 @@ class Install {
 				PRIMARY KEY  (meta_id),
 				KEY link_id (link_id),
 				KEY meta_key (meta_key(191))
+			) $collate;
+		";
+	}
+
+	/**
+	 * Saved report definitions for Smart Reports.
+	 *
+	 * Reports belong to the user who saved them, so the same site can carry one
+	 * person's "paid campaigns" view without it showing up for everyone else.
+	 * config holds the filter as JSON - entity, ids, range and metric - rather
+	 * than a column per filter, so adding a filter later needs no migration.
+	 *
+	 * @since 2.6.0
+	 */
+	public static function get_260_schema( $collate = '' ) {
+		global $wpdb;
+		return "
+			CREATE TABLE `{$wpdb->prefix}kc_us_saved_reports` (
+				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` bigint(20) unsigned NOT NULL DEFAULT 0,
+				`name` varchar(191) NOT NULL,
+				`description` text DEFAULT NULL,
+				`config` longtext DEFAULT NULL,
+				`created_at` datetime DEFAULT NULL,
+				`updated_at` datetime DEFAULT NULL,
+				PRIMARY KEY  (id),
+				KEY user_id (user_id),
+				KEY user_name (user_id, name)
 			) $collate;
 		";
 	}

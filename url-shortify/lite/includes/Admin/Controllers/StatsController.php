@@ -44,6 +44,185 @@ class StatsController extends BaseController {
 	}
 
 	/**
+	 * How many series a comparison chart draws before it stops.
+	 *
+	 * Eight is a readable number of lines and about as many colours as anyone
+	 * can tell apart. Groups with more links than this are not truncated
+	 * silently - the payload reports what was left out so the UI can say so.
+	 *
+	 * @since 2.6.0
+	 * @var   int
+	 */
+	const COMPARE_SERIES_LIMIT = 8;
+
+	/**
+	 * Every date in a range, oldest first, with no gaps.
+	 *
+	 * Comparison series are padded against this, so it has to be built from the
+	 * range rather than from whatever dates happen to have clicks - otherwise
+	 * two links with different quiet days would end up on different axes.
+	 *
+	 * @param string $start_date Y-m-d.
+	 * @param string $end_date   Y-m-d.
+	 *
+	 * @return array<int, string>
+	 *
+	 * @since 2.6.0
+	 */
+	protected function build_date_axis( $start_date, $end_date ) {
+		$dates = [];
+
+		$start = strtotime( $start_date );
+		$end   = strtotime( $end_date );
+
+		if ( empty( $start ) || empty( $end ) || $start > $end ) {
+			return $dates;
+		}
+
+		// A very wide range is usually a mistake rather than a request for six
+		// thousand points. Cap it so one bad date cannot stall the page.
+		//
+		// The cap moves the start forward rather than cutting the end off: an
+		// over-long range trimmed from the end would silently hide the most
+		// recent clicks, which is the part anyone actually came to look at.
+		$max_days = (int) apply_filters( 'kc_us_reports_max_axis_days', 1100 );
+
+		if ( $max_days > 0 ) {
+			$earliest = strtotime( '-' . ( $max_days - 1 ) . ' days', $end );
+
+			if ( $start < $earliest ) {
+				$start = $earliest;
+			}
+		}
+
+		for ( $t = $start; $t <= $end; $t = strtotime( '+1 day', $t ) ) {
+			$dates[] = gmdate( 'Y-m-d', $t );
+		}
+
+		return $dates;
+	}
+
+	/**
+	 * Build one chart series per entity, for comparison mode.
+	 *
+	 * The normal chart adds every link in a group together and draws a single
+	 * line. This keeps them apart, so a group can be read as "which of these is
+	 * actually working" rather than just "how did the group do".
+	 *
+	 * Series are ordered by clicks in the range and cut to COMPARE_SERIES_LIMIT,
+	 * because a group with fifty links is fifty unreadable lines. The count that
+	 * was dropped travels with the payload.
+	 *
+	 * @param string $entity     link | group | tag.
+	 * @param array  $ids        Entities to compare. Empty means "whatever the link scope covers".
+	 * @param array  $dates      The date axis already built for the aggregate chart.
+	 * @param string $metric     total | unique.
+	 * @param array  $link_ids   Link scope, e.g. the links belonging to a group.
+	 *
+	 * @return array
+	 *
+	 * @since 2.6.0
+	 */
+	protected function build_compare_chart_data( $entity, $ids, $dates, $metric = 'total', $link_ids = [] ) {
+		$empty = [
+			'mode'      => $entity,
+			'metric'    => $metric,
+			'series'    => [],
+			'truncated' => [ 'shown' => 0, 'of' => 0 ],
+		];
+
+		if ( empty( $dates ) ) {
+			return $empty;
+		}
+
+		$start_date = reset( $dates );
+		$end_date   = end( $dates );
+
+		$raw = US()->db->clicks->get_series_by_entity( $entity, $ids, $start_date, $end_date, $metric, $link_ids );
+
+		if ( empty( $raw ) ) {
+			return $empty;
+		}
+
+		// Rank before naming, so the labels lookup only runs for what survives.
+		$totals = [];
+		foreach ( $raw as $entity_id => $by_date ) {
+			$totals[ $entity_id ] = array_sum( $by_date );
+		}
+
+		arsort( $totals );
+
+		$total_count = count( $totals );
+		$keep        = array_slice( $totals, 0, self::COMPARE_SERIES_LIMIT, true );
+
+		$labels = $this->get_compare_entity_labels( $entity, array_keys( $keep ) );
+
+		$series = [];
+
+		foreach ( $keep as $entity_id => $entity_total ) {
+			$by_date = $raw[ $entity_id ];
+
+			// Every series has to span the same axis, or ApexCharts lines up the
+			// wrong points against the wrong dates.
+			$data = [];
+			foreach ( $dates as $date ) {
+				$data[] = isset( $by_date[ $date ] ) ? (int) $by_date[ $date ] : 0;
+			}
+
+			$series[] = [
+				'id'    => (int) $entity_id,
+				'name'  => isset( $labels[ $entity_id ] ) ? $labels[ $entity_id ] : sprintf( '#%d', $entity_id ),
+				'data'  => $data,
+				'total' => (int) $entity_total,
+			];
+		}
+
+		return [
+			'mode'      => $entity,
+			'metric'    => $metric,
+			'series'    => $series,
+			'truncated' => [
+				'shown' => count( $series ),
+				'of'    => $total_count,
+			],
+		];
+	}
+
+	/**
+	 * Readable names for the entities being compared.
+	 *
+	 * @param string $entity link | group | tag.
+	 * @param array  $ids    Entity ids.
+	 *
+	 * @return array<int, string>
+	 *
+	 * @since 2.6.0
+	 */
+	protected function get_compare_entity_labels( $entity, $ids ) {
+		$labels = [];
+
+		if ( empty( $ids ) ) {
+			return $labels;
+		}
+
+		if ( 'group' === $entity ) {
+			$map = US()->db->groups->get_all_id_name_map();
+		} elseif ( 'tag' === $entity ) {
+			$map = US()->db->tags->get_all_id_name_map();
+		} else {
+			$map = US()->db->links->get_id_label_map( $ids );
+		}
+
+		foreach ( $ids as $id ) {
+			if ( ! empty( $map[ $id ] ) ) {
+				$labels[ $id ] = $map[ $id ];
+			}
+		}
+
+		return $labels;
+	}
+
+	/**
 	 * Build the heatmap payload expected by the shared admin chart script.
 	 *
 	 * @param array $heatmap_map

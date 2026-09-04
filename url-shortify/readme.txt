@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.1
-Stable tag: 2.5.2
+Stable tag: 2.6.0
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -478,11 +478,26 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.5.2 =
+= 2.6.0 =
 
-* New version of URL Shortify with new features, improvements and bug fixes. Please update to the latest version to get the best experience. Learn more about the new features and improvements in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
+* Adds Smart Reports: compare links, groups or tags side by side, set a goal link to measure conversions, and save reports to reopen later. Please update to the latest version to get the best experience. Learn more in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
+
+= 2.6.0 - 2026-09-04 =
+
+* New: Smart Reports. A new screen under URL Shortify for comparing links, groups or tags against each other over a date range. Reports are listed like the rest of the plugin's screens, with View report, Edit and Delete actions. Building a report and reading one are separate steps: you give it a name and description, choose what to measure, and the report opens once it is saved. **PRO**
+* New: Every report shows clicks over time with a line per item, the activity heatmap for the links it covers, a per-link table of total clicks, unique clicks, conversions, conversion rate and the most common device, browser and platform, and the full click log underneath. The per-link table sorts on any of its figures. **PRO**
+* New: Goal links. Choose a goal link and each link in the report shows how many visitors went on to reach that goal, and what share of its clicks that represents. A visitor is counted once, and only when the goal click came after the link click, so the same person reloading a page does not read as ten conversions. **PRO**
+* New: Saved reports. Save the settings behind a report under a name and description, then reopen it whenever you like. A saved report stores the filter rather than the numbers, so it always shows current data. Reports are private to the person who saved them. **PRO**
+* New: Compare mode on the Group and Tag statistics pages. The chart normally adds every link in the group together and draws one line; switching on Compare draws a line per link instead, so you can see which links are actually carrying the group. The top 8 links by clicks are charted and the page says how many were left out. **PRO**
+* New: Links can be sent straight to Smart Reports. Select links on the Links screen and choose "Compare in Smart Reports" from the bulk actions, or follow "Compare with other links" on any single link's statistics page. **PRO**
+* New: The UTM Presets list now shows the ID, source, medium, campaign, term and content of each preset, along with its description, instead of only the name and the date it was created. **PRO**
+* Update: Links are listed with their short slug wherever a report asks you to pick one, so two links with similar names can be told apart. **PRO**
+* Update: Added an index on the clicks table covering link and date together, so the per-link charts stay fast on sites with a large click history.
+* Fix: Sorting the UTM Presets list did nothing. Every column fell back to the creation date, because the list checked the sort column against a list of columns belonging to another screen. **PRO**
+* Fix: Searching the UTM Presets list sent you to the Groups screen. The search now stays on the page and matches the description and every UTM field as well as the name. **PRO**
+* Translations: Updated .POT file for new translations.
 
 = 2.5.2 - 2026-08-24 =
 

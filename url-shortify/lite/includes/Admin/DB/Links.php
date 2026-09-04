@@ -150,16 +150,6 @@ class Links extends Base_DB {
 	}
 
 	/**
-	 * Get link by slug
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param  null  $slug
-	 *
-	 * @return array|object|void|null
-	 *
-	 */
-	/**
 	 * Is a slug already taken?
 	 *
 	 * Asks the database directly instead of pulling every slug into memory, so
@@ -174,6 +164,145 @@ class Links extends Base_DB {
 	 */
 	public function slug_exists( $slug, $exclude_id = 0 ) {
 		return $this->get_conflicting_slug_id( $slug, $exclude_id ) > 0;
+	}
+
+	/**
+	 * Map link ids to "Name (/slug)" for pickers.
+	 *
+	 * Separate from get_id_label_map(): a chart legend wants the shortest label
+	 * that is still unambiguous, but someone choosing a link from a list is
+	 * often looking for the slug itself, so it is always shown here.
+	 *
+	 * @param array $ids
+	 *
+	 * @return array<int, string>
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_id_picker_label_map( $ids = [] ) {
+		global $wpdb;
+
+		if ( empty( $ids ) ) {
+			return [];
+		}
+
+		$ids_str = $this->prepare_for_in_query( $ids );
+
+		if ( '' === $ids_str ) {
+			return [];
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- ids are absint'd by prepare_for_in_query().
+		$rows = $wpdb->get_results( "SELECT id, name, slug FROM {$this->table_name} WHERE id IN ({$ids_str})", ARRAY_A );
+
+		if ( ! Helper::is_forechable( $rows ) ) {
+			return [];
+		}
+
+		$map = [];
+
+		foreach ( $rows as $row ) {
+			$slug = trim( (string) Helper::get_data( $row, 'slug', '' ) );
+			$name = trim( (string) Helper::get_data( $row, 'name', '' ) );
+			$name = ( '' !== $name ) ? stripslashes( $name ) : $slug;
+
+			$map[ (int) $row['id'] ] = ( '' !== $slug )
+				? sprintf( '%s  (/%s)', $name, $slug )
+				: $name;
+		}
+
+		return $map;
+	}
+
+	/**
+	 * Ids of the most recently created links.
+	 *
+	 * Used to populate report pickers. Deliberately not driven by click counts:
+	 * a link created this morning has none yet, and that is exactly the link
+	 * someone wants to put on a chart.
+	 *
+	 * @param int $limit
+	 *
+	 * @return array<int, int>
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_recent_ids( $limit = 500 ) {
+		global $wpdb;
+
+		$limit = absint( $limit );
+
+		if ( empty( $limit ) ) {
+			return [];
+		}
+
+		$ids = $wpdb->get_col(
+			$wpdb->prepare( "SELECT id FROM {$this->table_name} ORDER BY id DESC LIMIT %d", $limit )
+		);
+
+		return array_map( 'absint', (array) $ids );
+	}
+
+	/**
+	 * Map link ids to a readable label for charts and pickers.
+	 *
+	 * Falls back to the slug when a link has no name, so a series is never
+	 * labelled with an empty string. Where two of the requested links share a
+	 * name, both get their slug appended - an unqualified duplicate label in a
+	 * chart legend is indistinguishable from its twin.
+	 *
+	 * Deliberately not named get_id_name_map(): that is inherited from Base_DB
+	 * with a WHERE-clause signature and existing callers rely on it.
+	 *
+	 * @param array $ids Link ids. Required - this is never used unbounded.
+	 *
+	 * @return array<int, string>
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_id_label_map( $ids = [] ) {
+		global $wpdb;
+
+		if ( empty( $ids ) ) {
+			return [];
+		}
+
+		$ids_str = $this->prepare_for_in_query( $ids );
+
+		if ( '' === $ids_str ) {
+			return [];
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- ids are absint'd by prepare_for_in_query().
+		$rows = $wpdb->get_results( "SELECT id, name, slug FROM {$this->table_name} WHERE id IN ({$ids_str})", ARRAY_A );
+
+		if ( ! Helper::is_forechable( $rows ) ) {
+			return [];
+		}
+
+		$map    = [];
+		$slugs  = [];
+		$counts = [];
+
+		foreach ( $rows as $row ) {
+			$id   = (int) $row['id'];
+			$slug = (string) Helper::get_data( $row, 'slug', '' );
+			$name = trim( (string) Helper::get_data( $row, 'name', '' ) );
+			$name = ( '' !== $name ) ? stripslashes( $name ) : $slug;
+
+			$map[ $id ]   = $name;
+			$slugs[ $id ] = $slug;
+
+			$counts[ $name ] = isset( $counts[ $name ] ) ? $counts[ $name ] + 1 : 1;
+		}
+
+		foreach ( $map as $id => $name ) {
+			if ( $counts[ $name ] > 1 && '' !== $slugs[ $id ] ) {
+				$map[ $id ] = sprintf( '%s (%s)', $name, $slugs[ $id ] );
+			}
+		}
+
+		return $map;
 	}
 
 	/**
@@ -231,6 +360,16 @@ class Links extends Base_DB {
 		return (int) $wpdb->get_var( $sql );
 	}
 
+	/**
+	 * Get link by slug
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param  null  $slug
+	 *
+	 * @return array|object|void|null
+	 *
+	 */
 	public function get_by_slug( $slug = null ) {
 		if ( empty( $slug ) ) {
 			return [];

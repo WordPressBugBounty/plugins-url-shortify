@@ -514,3 +514,46 @@ function kc_us_update_231_alter_links_table() {
 
 	return false;
 }
+
+/**************** 2.6.0 *******************/
+
+/**
+ * Index the clicks table for per-entity time series.
+ *
+ * Comparison reports run `WHERE link_id IN (...) AND created_at BETWEEN ...`
+ * and then group by both. The existing single-column `link_id` key narrows to
+ * the links but still scans every one of their clicks to apply the date range;
+ * a composite key covers both halves. On a busy site that is the difference
+ * between a chart that draws and one that times out.
+ *
+ * @since 2.6.0
+ */
+function kc_us_update_260_add_clicks_series_index() {
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'kc_us_clicks';
+
+	if ( ! $wpdb->query( "SHOW TABLES LIKE '{$table}'" ) ) {
+		return false;
+	}
+
+	$indexes = $wpdb->get_col( "SHOW INDEX FROM {$table}", 2 );
+
+	if ( ! in_array( 'link_id_created_at', (array) $indexes, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD INDEX `link_id_created_at` (`link_id`, `created_at`)" );
+	}
+
+	return false;
+}
+
+/**
+ * Create the saved reports table for Smart Reports.
+ *
+ * @since 2.6.0
+ * @return bool
+ */
+function kc_us_update_260_create_saved_reports_table() {
+	\KaizenCoders\URL_Shortify\Install::create_tables( '2.6.0' );
+
+	return false;
+}

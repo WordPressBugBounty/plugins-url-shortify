@@ -96,6 +96,13 @@ class DB {
 	public $auto_link_keywords;
 
 	/**
+	 * @since 2.6.0
+	 * @var Object|Saved_Reports
+	 *
+	 */
+	public $saved_reports;
+
+	/**
 	 * constructor.
 	 *
 	 * @since 1.0.0
@@ -139,5 +146,8 @@ class DB {
 
 		/* @var Object|Auto_Link_Keywords $this */
 		$this->auto_link_keywords = new Auto_Link_Keywords();
+
+		/* @var Object|Saved_Reports $this */
+		$this->saved_reports = new Saved_Reports();
 	}
 }

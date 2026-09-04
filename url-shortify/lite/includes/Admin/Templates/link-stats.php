@@ -180,6 +180,29 @@ $click_history->set_columns( $columns );
                             <p class="mt-1 max-w-2xl text-sm leading-5 text-slate-500 mb-2">
                                 <span id="kc-us-total-clicks"><?php echo esc_html( sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ) ); ?></span>
                             </p>
+
+                            <?php
+                            /*
+                             * One link on its own has nothing to compare against, so this hands
+                             * the link to Smart Reports with it already selected rather than
+                             * repeating the comparison chart here.
+                             */
+                            ?>
+                            <?php if ( US()->is_pro() && ! empty( $link_id ) && US()->access->can( 'manage_reports' ) ) : ?>
+                                <p class="mt-1 mb-2 text-sm">
+                                    <a class="text-indigo-600 hover:text-indigo-700"
+                                       href="<?php echo esc_url( add_query_arg( [
+                                           'page'   => 'us_smart_reports',
+                                           'view'   => 'new',
+                                           'entity' => 'link',
+                                           'range'  => 'last_30_days',
+                                           'metric' => 'total',
+                                           'ids'    => [ absint( $link_id ) ],
+                                       ], admin_url( 'admin.php' ) ) ); ?>">
+                                        <?php esc_html_e( 'Compare with other links', 'url-shortify' ); ?>
+                                    </a>
+                                </p>
+                            <?php endif; ?>
                         </div>
                         <div id="kc-us-clicks-filter-controls" class="flex flex-wrap items-center gap-2">
 

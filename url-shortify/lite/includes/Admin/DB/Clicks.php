@@ -436,6 +436,328 @@ class Clicks extends Base_DB {
 	}
 
 	/**
+	 * Half-open date bounds for a day range.
+	 *
+	 * Ends at midnight of the following day rather than 23:59:59, so the whole
+	 * of the last day is covered without wrapping created_at in DATE(), which
+	 * would stop the index being used.
+	 *
+	 * @param string $start_date Y-m-d.
+	 * @param string $end_date   Y-m-d.
+	 *
+	 * @return array [ from, to ]
+	 *
+	 * @since 2.6.0
+	 */
+	protected function get_range_bounds( $start_date, $end_date ) {
+		return [
+			$start_date . ' 00:00:00',
+			gmdate( 'Y-m-d', strtotime( $end_date . ' +1 day' ) ) . ' 00:00:00',
+		];
+	}
+
+	/**
+	 * Total and unique clicks per link over a range.
+	 *
+	 * @param array  $link_ids
+	 * @param string $start_date Y-m-d.
+	 * @param string $end_date   Y-m-d.
+	 *
+	 * @return array [ link_id => [ 'total' => int, 'unique' => int ] ]
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_totals_by_links( $link_ids = [], $start_date = '', $end_date = '' ) {
+		global $wpdb;
+
+		$ids_str = $this->prepare_for_in_query( $link_ids );
+
+		if ( '' === $ids_str ) {
+			return [];
+		}
+
+		list( $from, $to ) = $this->get_range_bounds( $start_date, $end_date );
+
+		$query = $wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ids are absint'd by prepare_for_in_query().
+			"SELECT link_id,
+				COUNT(*) AS total_clicks,
+				COUNT( CASE WHEN is_first_click = 1 THEN 1 ELSE NULL END ) AS unique_clicks
+			 FROM {$this->table_name}
+			 WHERE link_id IN ({$ids_str})
+			   AND created_at >= %s AND created_at < %s
+			 GROUP BY link_id",
+			$from,
+			$to
+		);
+
+		$rows = $wpdb->get_results( $query, ARRAY_A );
+
+		$totals = [];
+
+		if ( Helper::is_forechable( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$totals[ (int) $row['link_id'] ] = [
+					'total'  => (int) $row['total_clicks'],
+					'unique' => (int) $row['unique_clicks'],
+				];
+			}
+		}
+
+		return $totals;
+	}
+
+	/**
+	 * Conversions per link against a goal link.
+	 *
+	 * A conversion is one visitor who clicked the link and then went on to click
+	 * the goal link afterwards, both within the range. Counting distinct
+	 * visitors rather than clicks keeps a single person reloading a page from
+	 * reading as ten conversions.
+	 *
+	 * Order matters: only a goal click that happened *after* the link click
+	 * counts, so a visitor who hit the goal first and the link later is not
+	 * credited to the link.
+	 *
+	 * @param array  $link_ids
+	 * @param int    $goal_link_id
+	 * @param string $start_date Y-m-d.
+	 * @param string $end_date   Y-m-d.
+	 *
+	 * @return array [ link_id => conversions ]
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_conversions_by_links( $link_ids = [], $goal_link_id = 0, $start_date = '', $end_date = '' ) {
+		global $wpdb;
+
+		$goal_link_id = absint( $goal_link_id );
+		$ids_str      = $this->prepare_for_in_query( $link_ids );
+
+		if ( '' === $ids_str || empty( $goal_link_id ) ) {
+			return [];
+		}
+
+		list( $from, $to ) = $this->get_range_bounds( $start_date, $end_date );
+
+		// A click with no visitor id cannot be tied to a later goal click, so it
+		// can never be part of a conversion and is left out of the count.
+		$query = $wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ids are absint'd by prepare_for_in_query().
+			"SELECT c.link_id, COUNT( DISTINCT c.visitor_id ) AS conversions
+			 FROM {$this->table_name} AS c
+			 WHERE c.link_id IN ({$ids_str})
+			   AND c.visitor_id IS NOT NULL AND c.visitor_id <> ''
+			   AND c.created_at >= %s AND c.created_at < %s
+			   AND EXISTS (
+				   SELECT 1 FROM {$this->table_name} AS g
+				   WHERE g.link_id = %d
+					 AND g.visitor_id = c.visitor_id
+					 AND g.created_at > c.created_at
+					 AND g.created_at >= %s AND g.created_at < %s
+			   )
+			 GROUP BY c.link_id",
+			$from,
+			$to,
+			$goal_link_id,
+			$from,
+			$to
+		);
+
+		$rows = $wpdb->get_results( $query, ARRAY_A );
+
+		$conversions = [];
+
+		if ( Helper::is_forechable( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$conversions[ (int) $row['link_id'] ] = (int) $row['conversions'];
+			}
+		}
+
+		return $conversions;
+	}
+
+	/**
+	 * Most common value of one click attribute, per link.
+	 *
+	 * Used for the device, browser and platform columns of the report, where a
+	 * full breakdown per link would be more numbers than anyone reads.
+	 *
+	 * @param array  $link_ids
+	 * @param string $column     device | browser_type | os.
+	 * @param string $start_date Y-m-d.
+	 * @param string $end_date   Y-m-d.
+	 *
+	 * @return array [ link_id => [ 'value' => string, 'clicks' => int, 'share' => float ] ]
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_top_attribute_by_links( $link_ids = [], $column = 'device', $start_date = '', $end_date = '' ) {
+		global $wpdb;
+
+		// Whitelisted rather than escaped: this goes into the query as an
+		// identifier, where escaping would not make an arbitrary value safe.
+		$allowed = [ 'device', 'browser_type', 'os' ];
+
+		if ( ! in_array( $column, $allowed, true ) ) {
+			return [];
+		}
+
+		$ids_str = $this->prepare_for_in_query( $link_ids );
+
+		if ( '' === $ids_str ) {
+			return [];
+		}
+
+		list( $from, $to ) = $this->get_range_bounds( $start_date, $end_date );
+
+		$query = $wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ids are absint'd and the column is whitelisted above.
+			"SELECT link_id, {$column} AS value, COUNT(*) AS clicks
+			 FROM {$this->table_name}
+			 WHERE link_id IN ({$ids_str})
+			   AND {$column} IS NOT NULL AND {$column} <> ''
+			   AND created_at >= %s AND created_at < %s
+			 GROUP BY link_id, {$column}
+			 ORDER BY link_id ASC, clicks DESC",
+			$from,
+			$to
+		);
+
+		$rows = $wpdb->get_results( $query, ARRAY_A );
+
+		$top     = [];
+		$totals  = [];
+
+		if ( Helper::is_forechable( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$link_id = (int) $row['link_id'];
+				$clicks  = (int) $row['clicks'];
+
+				$totals[ $link_id ] = isset( $totals[ $link_id ] ) ? $totals[ $link_id ] + $clicks : $clicks;
+
+				// Rows arrive ordered by clicks descending, so the first one seen
+				// for a link is its most common value.
+				if ( ! isset( $top[ $link_id ] ) ) {
+					$top[ $link_id ] = [
+						'value'  => (string) $row['value'],
+						'clicks' => $clicks,
+						'share'  => 0.0,
+					];
+				}
+			}
+		}
+
+		foreach ( $top as $link_id => $info ) {
+			$top[ $link_id ]['share'] = ( $totals[ $link_id ] > 0 )
+				? round( $info['clicks'] / $totals[ $link_id ] * 100, 1 )
+				: 0.0;
+		}
+
+		return $top;
+	}
+
+	/**
+	 * Daily click counts, split by the entity each click belongs to.
+	 *
+	 * The existing get_clicks_count_by_days() collapses every link into a single
+	 * series, which is why a group's chart could only ever draw one line. This
+	 * keeps the entity in the GROUP BY, so each link, group or tag comes back as
+	 * its own series ready to plot.
+	 *
+	 * `created_at` is compared as a raw range rather than through DATE(), so the
+	 * (link_id, created_at) index can actually be used. Wrapping the column in a
+	 * function makes it unusable, which matters here: this scans a lot more rows
+	 * than the single-series query it sits beside.
+	 *
+	 * @param string $entity     link | group | tag.
+	 * @param array  $ids        Entity ids to include. Empty means every entity.
+	 * @param string $start_date Y-m-d, inclusive.
+	 * @param string $end_date   Y-m-d, inclusive.
+	 * @param string $metric     total | unique.
+	 * @param array  $link_ids   Optional link scope, e.g. only links in a group.
+	 *
+	 * @return array<int, array<string, int>> [ entity_id => [ Y-m-d => count ] ]
+	 *
+	 * @since 2.6.0
+	 */
+	public function get_series_by_entity( $entity = 'link', $ids = [], $start_date = '', $end_date = '', $metric = 'total', $link_ids = [] ) {
+		global $wpdb;
+
+		$clicks_table = "{$wpdb->prefix}kc_us_clicks";
+
+		// Deleting a link leaves its clicks behind, so join the links table to keep
+		// orphaned rows out. Without this they rank as unlabelable series and push
+		// real links out of the top N.
+		$joins    = " INNER JOIN {$wpdb->prefix}kc_us_links AS l ON l.id = c.link_id";
+		$group_by = 'c.link_id';
+
+		if ( 'group' === $entity ) {
+			$joins   .= " INNER JOIN {$wpdb->prefix}kc_us_links_groups AS r ON r.link_id = c.link_id";
+			$group_by = 'r.group_id';
+		} elseif ( 'tag' === $entity ) {
+			$joins   .= " INNER JOIN {$wpdb->prefix}kc_us_links_tags AS r ON r.link_id = c.link_id";
+			$group_by = 'r.tag_id';
+		}
+
+		// COUNT(*) counts every click; is_first_click marks the first visit by a
+		// given visitor, which is what the reports call a unique click.
+		$count_expr = ( 'unique' === $metric )
+			? 'COUNT( CASE WHEN c.is_first_click = 1 THEN 1 ELSE NULL END )'
+			: 'COUNT(*)';
+
+		$where = [];
+
+		if ( ! empty( $ids ) ) {
+			$ids_str = $this->prepare_for_in_query( $ids );
+
+			if ( '' !== $ids_str ) {
+				$where[] = "{$group_by} IN ({$ids_str})";
+			}
+		}
+
+		if ( ! empty( $link_ids ) ) {
+			$link_ids_str = $this->prepare_for_in_query( $link_ids );
+
+			if ( '' !== $link_ids_str ) {
+				$where[] = "c.link_id IN ({$link_ids_str})";
+			}
+		}
+
+		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+			// End is exclusive at midnight of the following day, so the whole of
+			// the last day is included without calling DATE() on the column.
+			$where[] = $wpdb->prepare(
+				'c.created_at >= %s AND c.created_at < %s',
+				$start_date . ' 00:00:00',
+				gmdate( 'Y-m-d', strtotime( $end_date . ' +1 day' ) ) . ' 00:00:00'
+			);
+		}
+
+		$query = "SELECT {$group_by} AS entity_id, DATE(c.created_at) AS date, {$count_expr} AS count"
+		         . " FROM {$clicks_table} AS c{$joins}";
+
+		if ( ! empty( $where ) ) {
+			$query .= ' WHERE ' . implode( ' AND ', $where );
+		}
+
+		$query .= " GROUP BY {$group_by}, DATE(c.created_at)";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- ids are absint'd and dates are prepared above.
+		$results = $wpdb->get_results( $query, ARRAY_A );
+
+		$series = [];
+
+		if ( Helper::is_forechable( $results ) ) {
+			foreach ( $results as $row ) {
+				$series[ (int) $row['entity_id'] ][ $row['date'] ] = (int) $row['count'];
+			}
+		}
+
+		return $series;
+	}
+
+	/**
 	 * Get clicks data
 	 *
 	 * @since 1.1.6

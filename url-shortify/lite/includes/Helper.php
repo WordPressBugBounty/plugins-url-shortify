@@ -439,6 +439,7 @@ class Helper {
                 "{$prefix}_page_url_shortify-account",
                 "{$prefix}_page_us_auto_link_keywords",
                 "{$prefix}_page_us_broken_links",
+                "{$prefix}_page_us_smart_reports",
         ];
 
         $screens = apply_filters( 'kc_us_admin_screens', $screens );

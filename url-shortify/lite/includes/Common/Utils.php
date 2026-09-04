@@ -595,6 +595,49 @@ class Utils {
 	}
 
 	/**
+	 * Get platform (operating system) icon url.
+	 *
+	 * Reuses the browser icon set, which already carries the vendor marks the
+	 * platforms need. Matching is done on a lowercased prefix so the variants
+	 * the click tracker records - "OS X", "Mac OS X", "Windows NT" - all land on
+	 * the right icon without a row per spelling.
+	 *
+	 * @param string $platform
+	 *
+	 * @return string
+	 *
+	 * @since 2.6.0
+	 */
+	public static function get_platform_icon_url( $platform = '' ) {
+		$platform = strtolower( trim( (string) $platform ) );
+
+		$icon = 'default.svg';
+
+		$map = [
+			'windows'   => 'windows.svg',
+			'os x'      => 'apple.svg',
+			'mac'       => 'apple.svg',
+			'ios'       => 'apple.svg',
+			'iphone'    => 'apple.svg',
+			'ipad'      => 'apple.svg',
+			'android'   => 'android.svg',
+			'chrome os' => 'chrome.svg',
+			'linux'     => 'linux.svg',
+			'ubuntu'    => 'linux.svg',
+			'debian'    => 'linux.svg',
+		];
+
+		foreach ( $map as $needle => $file ) {
+			if ( 0 === strpos( $platform, $needle ) ) {
+				$icon = $file;
+				break;
+			}
+		}
+
+		return KC_US_PLUGIN_ASSETS_DIR_URL . "/images/browsers/{$icon}";
+	}
+
+	/**
 	 * Get Current Page URL
 	 *
 	 * Pass $extra_args instead of running add_query_arg() over the result — see
