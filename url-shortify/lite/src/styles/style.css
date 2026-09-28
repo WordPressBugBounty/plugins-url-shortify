@@ -89,8 +89,10 @@ li.menu-top div.wp-menu-image img {
     @apply text-sm rounded-md border leading-5 font-medium bg-indigo-600 text-white transition ease-in-out duration-150 content-center;
 }
 
+/* Primary buttons darken on hover -- indigo-500 was lighter than the resting
+   indigo-600 and only reached 4.47:1 against white text. */
 .wp-core-ui .button-primary:hover, .wp-core-ui .button:hover {
-    @apply border-indigo-600 text-white bg-indigo-500;
+    @apply border-indigo-700 text-white bg-indigo-700;
 }
 
 .wp-heading-inline .page-title-action {
@@ -172,16 +174,12 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
     background-color: #667eea !important; /*bg-indigo-500*/
 }
 
-.wp-core-ui .button, .wp-core-ui .button-secondary {
-    @apply text-sm rounded-md border text-indigo-500 leading-5 font-medium text-indigo-600;
-}
-
-.wp-core-ui .button-primary {
-    @apply text-sm rounded-md border leading-5 font-medium text-indigo-500 text-white transition ease-in-out duration-150;
-}
-
-.wp-core-ui .button:hover {
-    @apply border-gray-600 text-gray-500;
+/* Secondary buttons fill with a light indigo tint on hover. Scoped away from
+   .button-primary so it keeps the white-on-indigo hover defined further up --
+   an unscoped .button:hover here used to grey the label of every primary
+   button and made it unreadable against the indigo background. */
+.wp-core-ui .button:not(.button-primary):hover {
+    @apply border-indigo-600 text-indigo-700 bg-indigo-50;
 }
 
 .wp-core-ui select, .wp-core-ui .search-box input[name="s"]{
@@ -197,11 +195,11 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
 }
 
 
-.wp-core-ui #search-submit:hover, .wp-core-ui #doaction:hover, .wp-core-ui #doaction2:hover .wp-core-ui #post-query-submit:hover {
+.wp-core-ui #search-submit:hover, .wp-core-ui #doaction:hover, .wp-core-ui #doaction2:hover, .wp-core-ui #post-query-submit:hover {
     @apply bg-gray-100 border-gray-500;
 }
 
-.wp-core-ui #search-submit:focus, .wp-core-ui #doaction:focus, .wp-core-ui #doaction2:focus .wp-core-ui #post-query-submit:focus {
+.wp-core-ui #search-submit:focus, .wp-core-ui #doaction:focus, .wp-core-ui #doaction2:focus, .wp-core-ui #post-query-submit:focus {
     @apply outline-none;
 }
 

@@ -47,11 +47,56 @@ class LinkCentralImporter extends BaseImporter {
 	}
 
 	/**
-	 * One-shot fetch — used by BaseImporter::run() when called outside the
-	 * paged AJAX flow. For large sites prefer run_batch().
+	 * One-shot fetch — kept for the BaseImporter contract. run() below drives
+	 * the paged path instead, so this is not used by the Tools > Import entry.
 	 */
 	protected function fetch_links() {
 		return $this->fetch_batch( 0, PHP_INT_MAX );
+	}
+
+	/**
+	 * Import every Link Central link, a batch at a time.
+	 *
+	 * BaseImporter::run() would pull the whole custom post type into memory in
+	 * one go. Link Central sites are often large affiliate libraries, which is
+	 * why the migration was batched in the first place - so the Tools > Import
+	 * entry walks the same batches rather than giving up that protection.
+	 *
+	 * @return bool
+	 *
+	 * @since 2.6.1
+	 */
+	public function run() {
+		if ( ! $this->is_available() ) {
+			return true;
+		}
+
+		$this->bump_time_limit();
+
+		$offset = 0;
+
+		// Bounded so a batch that somehow stops advancing cannot spin forever.
+		$max_batches = 2000;
+
+		for ( $i = 0; $i < $max_batches; $i ++ ) {
+			$result = $this->run_batch( $offset );
+
+			if ( empty( $result['success'] ) || ! empty( $result['completed'] ) ) {
+				break;
+			}
+
+			$next = isset( $result['offset'] ) ? (int) $result['offset'] : $offset;
+
+			if ( $next <= $offset ) {
+				break;
+			}
+
+			$offset = $next;
+		}
+
+		$this->after_import();
+
+		return true;
 	}
 
 	protected function extract_slug( $record ) {

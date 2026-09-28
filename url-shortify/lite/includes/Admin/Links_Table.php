@@ -597,7 +597,16 @@ class Links_Table extends US_List_Table {
 
 		$redirect_types = Helper::get_redirection_types();
 
-		return Helper::get_data( $redirect_types, $type, '' );
+		/*
+		 * Look the type up directly rather than through Helper::get_data():
+		 * asked for an empty key it returns the whole array, which printed as
+		 * the literal word "Array" for any link stored without a redirect type.
+		 */
+		if ( '' === $type || ! isset( $redirect_types[ $type ] ) ) {
+			return '&mdash;';
+		}
+
+		return $redirect_types[ $type ];
 	}
 
 	function column_groups( $item ) {
@@ -2081,56 +2090,14 @@ class Links_Table extends US_List_Table {
 
 		$links = US()->db->links->get_all();
 
-		if ( ! empty( $links ) ) {
-			$link_ids = wp_list_pluck( $links, 'id' );
-
-			$links_ids_group_ids = US()->db->links_groups->get_group_ids_by_link_ids( $link_ids );
-			$group_id_name_map   = US()->db->groups->get_all_id_name_map();
-
-			$links_ids_tag_ids = [];
-			$tag_id_name_map   = [];
-			if ( US()->is_pro() ) {
-				$links_ids_tag_ids = US()->db->links_tags->get_tag_ids_by_link_ids( $link_ids );
-				$tag_id_name_map   = US()->db->tags->get_id_name_map();
-			}
-
-			foreach ( $links as &$link ) {
-				$link_id = $link['id'];
-
-				// Status
-				$link['status'] = 1 === (int) $link['status'] ? __( 'Enabled', 'url-shortify' ) : __( 'Disabled', 'url-shortify' );
-
-				// Groups
-				$group_ids      = ! empty( $links_ids_group_ids[ $link_id ] ) ? $links_ids_group_ids[ $link_id ] : [];
-				$link['groups'] = Helper::get_group_str_from_ids( $group_ids, $group_id_name_map );
-
-				// Tags
-				if ( US()->is_pro() ) {
-					$tag_ids      = ! empty( $links_ids_tag_ids[ $link_id ] ) ? $links_ids_tag_ids[ $link_id ] : [];
-					$tag_names    = [];
-					if ( ! empty( $tag_ids ) ) {
-						foreach ( $tag_ids as $tag_id ) {
-							if ( isset( $tag_id_name_map[ $tag_id ] ) ) {
-								$tag_names[] = $tag_id_name_map[ $tag_id ];
-							}
-						}
-					}
-					$link['tags'] = implode( ', ', $tag_names );
-				}
-			}
-			unset( $link );
-		}
-
 		$export = new Export();
 
-		$headers = $export->get_links_headers();
+		// Status, groups and tags are added by the shared decorator so every
+		// links export - here and on the group and tag statistics screens -
+		// produces the same columns.
+		$links = $export->decorate_links( $links );
 
-		// Add new headers for export
-		$headers['status'] = __( 'Status', 'url-shortify' );
-		$headers['groups'] = __( 'Groups', 'url-shortify' );
-		if ( US()->is_pro() ) {
-			$headers['tags'] = __( 'Tags', 'url-shortify' );
-		}
+		$headers = $export->get_links_headers();
 
 		$csv_data = $export->generate_csv( $headers, $links );
 

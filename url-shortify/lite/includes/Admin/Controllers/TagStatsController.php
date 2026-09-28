@@ -275,8 +275,9 @@ class TagStatsController extends StatsController {
 		$link_ids     = Helper::get_data( $link_ids_map, $this->tag_id, [] );
 		$links    = US()->db->links->get_by_ids( $link_ids );
 
-		$export = new Export();
-		$headers = $export->get_links_headers();
+		$export   = new Export();
+		$links    = $export->decorate_links( $links );
+		$headers  = $export->get_links_headers();
 		$csv_data = $export->generate_csv( $headers, $links );
 
 		$export->download_csv( $csv_data, 'links.csv' );

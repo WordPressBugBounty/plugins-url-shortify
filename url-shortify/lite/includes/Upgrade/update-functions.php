@@ -557,3 +557,43 @@ function kc_us_update_260_create_saved_reports_table() {
 
 	return false;
 }
+
+/**************** 2.6.1 *******************/
+
+/**
+ * Remove duplicate link-to-group and link-to-tag rows.
+ *
+ * Importing a CSV used to add a fresh relation row every time it ran, so a
+ * link that was imported twice listed the same group and tag repeatedly. The
+ * importer no longer does that; this clears up what earlier runs left behind.
+ *
+ * The lowest id of each pair is kept so the original mapping date survives.
+ *
+ * @since 2.6.1
+ * @return bool
+ */
+function kc_us_update_261_dedupe_link_relations() {
+	global $wpdb;
+
+	$tables = [
+		"{$wpdb->prefix}kc_us_links_groups" => 'group_id',
+		"{$wpdb->prefix}kc_us_links_tags"   => 'tag_id',
+	];
+
+	foreach ( $tables as $table => $column ) {
+		if ( ! $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+			continue;
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table and column are built above, not user input.
+		$wpdb->query(
+			"DELETE older FROM {$table} AS older
+			 INNER JOIN {$table} AS keeper
+			     ON keeper.link_id = older.link_id
+			    AND keeper.{$column} = older.{$column}
+			    AND keeper.id < older.id"
+		);
+	}
+
+	return false;
+}

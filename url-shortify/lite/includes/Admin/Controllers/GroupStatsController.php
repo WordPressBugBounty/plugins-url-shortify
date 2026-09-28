@@ -300,6 +300,8 @@ class GroupStatsController extends StatsController {
 
 		$export = new Export();
 
+		$links = $export->decorate_links( $links );
+
 		$headers = $export->get_links_headers();
 
 		$csv_data = $export->generate_csv( $headers, $links );

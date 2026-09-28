@@ -1,15 +1,15 @@
 # Copyright (C) 2026 KaizenCoders
-# This file is distributed under the GPL-3.0+.
+# This file is distributed under the GPLv3 or later
 msgid ""
 msgstr ""
-"Project-Id-Version: URL Shortify 2.5.2\n"
+"Project-Id-Version: URL Shortify 2.6.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/url-shortify\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: KaizenCoders <hello@kaizencoders.com>\n"
+"Language-Team: KaizenCoders <hello@kaizencoders.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-24T05:46:04+00:00\n"
+"POT-Creation-Date: 2026-09-27T06:11:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: url-shortify\n"
@@ -103,7 +103,12 @@ msgstr ""
 #: lite/includes/Admin/Links_Table.php:78
 #: lite/includes/Admin/Links_Table.php:184
 #: lite/language.php:14
+#: pro/includes/Actions.php:2934
+#: pro/includes/Admin/Tables/SavedReportsTable.php:145
 #: pro/includes/Admin/Tags_Table.php:166
+#: pro/includes/Admin/Templates/smart-report-form.php:44
+#: pro/includes/Admin/Templates/smart-report-view.php:47
+#: pro/includes/Admin/Templates/smart-report-view.php:217
 #: pro/includes/Admin/Widgets/PopularLinksWidget.php:36
 #: pro/includes/Migration/Package.php:140
 msgid "Links"
@@ -114,10 +119,13 @@ msgstr ""
 #: lite/includes/Admin/Groups_Table.php:63
 #: lite/includes/Admin/Groups_Table.php:164
 #: lite/includes/Admin/Links_Table.php:211
-#: lite/includes/Admin/Links_Table.php:2130
 #: lite/includes/Admin/Templates/link-form.php:208
-#: lite/includes/Helper.php:2534
+#: lite/includes/Common/Export.php:133
+#: lite/includes/Helper.php:2542
 #: lite/language.php:15
+#: pro/includes/Admin/Tables/SavedReportsTable.php:146
+#: pro/includes/Admin/Templates/smart-report-form.php:45
+#: pro/includes/Admin/Templates/smart-report-view.php:48
 #: pro/includes/Migration/Package.php:74
 msgid "Groups"
 msgstr ""
@@ -136,37 +144,37 @@ msgid "Resources"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Mon"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Tue"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Wed"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Thu"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Fri"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Sat"
 msgstr ""
 
 #: lite/includes/Admin.php:463
-#: lite/includes/Admin/Controllers/StatsController.php:58
+#: lite/includes/Admin/Controllers/StatsController.php:237
 msgid "Sun"
 msgstr ""
 
@@ -218,7 +226,7 @@ msgid "The prefix that comes before your short link's slug. <br>eg. %s/<strong>g
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:97
-#: lite/includes/Common/Export.php:119
+#: lite/includes/Common/Export.php:126
 #: lite/language.php:23
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:194
 msgid "Nofollow"
@@ -226,14 +234,14 @@ msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:105
 #: lite/includes/Admin/Templates/link-form.php:33
-#: lite/includes/Common/Export.php:121
+#: lite/includes/Common/Export.php:128
 #: lite/language.php:24
 msgid "Sponsored"
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:113
 #: lite/includes/Admin/Templates/link-form.php:37
-#: lite/includes/Common/Export.php:122
+#: lite/includes/Common/Export.php:129
 #: lite/language.php:25
 msgid "Parameter Forwarding"
 msgstr ""
@@ -396,10 +404,10 @@ msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:334
 #: lite/includes/Admin/Links_Table.php:216
-#: lite/includes/Admin/Links_Table.php:2129
 #: lite/includes/Admin/Templates/other-products.php:68
-#: lite/includes/Helper.php:2555
-#: pro/includes/Actions.php:1462
+#: lite/includes/Common/Export.php:132
+#: lite/includes/Helper.php:2563
+#: pro/includes/Actions.php:1473
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:80
 #: pro/includes/Admin/Tables/BrokenLinksTable.php:49
 #: pro/includes/Admin/Templates/auto-link-keyword-form.php:188
@@ -441,7 +449,7 @@ msgid "Send Test"
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:377
-#: lite/includes/Helper.php:2862
+#: lite/includes/Helper.php:2870
 #: lite/language.php:205
 #: pro/includes/Settings.php:462
 #: pro/includes/Settings.php:676
@@ -449,7 +457,7 @@ msgid "Posts"
 msgstr ""
 
 #: lite/includes/Admin/admin-settings.php:378
-#: lite/includes/Helper.php:2863
+#: lite/includes/Helper.php:2871
 #: lite/language.php:206
 #: pro/includes/Settings.php:463
 #: pro/includes/Settings.php:677
@@ -568,6 +576,7 @@ msgstr ""
 #: lite/includes/Admin/Templates/tag-stats.php:157
 #: lite/includes/EmailReports/EmailTemplate.php:317
 #: lite/language.php:59
+#: pro/includes/Admin/Templates/smart-report-view.php:299
 msgid "Link"
 msgstr ""
 
@@ -586,7 +595,7 @@ msgstr ""
 #: lite/includes/Admin/Templates/group-stats.php:143
 #: lite/includes/Admin/Templates/tag-stats.php:143
 #: lite/language.php:88
-#: pro/includes/Actions.php:849
+#: pro/includes/Actions.php:860
 msgid "Referrer"
 msgstr ""
 
@@ -624,58 +633,70 @@ msgid "Total Groups"
 msgstr ""
 
 #: lite/includes/Admin/Controllers/DashboardController.php:80
-#: lite/includes/Admin/Templates/link-stats.php:524
-#: lite/includes/Admin/Templates/link-stats.php:655
+#: lite/includes/Admin/Templates/link-stats.php:547
+#: lite/includes/Admin/Templates/link-stats.php:678
 #: lite/includes/EmailReports/EmailTemplate.php:224
 #: lite/language.php:32
+#: pro/includes/Admin/Templates/smart-report-view.php:221
+#: pro/includes/Admin/Templates/smart-report-view.php:300
 msgid "Total Clicks"
 msgstr ""
 
 #: lite/includes/Admin/Controllers/DashboardController.php:87
 #: lite/language.php:33
+#: pro/includes/Admin/Templates/smart-report-view.php:225
+#: pro/includes/Admin/Templates/smart-report-view.php:301
 msgid "Unique Clicks"
 msgstr ""
 
 #: lite/includes/Admin/Controllers/DashboardController.php:120
-#: lite/includes/Admin/Controllers/GroupStatsController.php:205
+#: lite/includes/Admin/Controllers/GroupStatsController.php:239
 #: lite/includes/Admin/Controllers/LinkStatsController.php:135
-#: lite/includes/Admin/Controllers/TagStatsController.php:194
+#: lite/includes/Admin/Controllers/TagStatsController.php:228
 #: lite/language.php:34
 msgid "Others"
 msgstr ""
 
-#: lite/includes/Admin/Controllers/ImportController.php:265
-#: lite/includes/Admin/Controllers/ImportController.php:269
+#: lite/includes/Admin/Controllers/ImportController.php:362
+#: lite/includes/Admin/Controllers/ImportController.php:366
 msgid "You do not have permission to import CSV."
 msgstr ""
 
-#: lite/includes/Admin/Controllers/ImportController.php:274
+#: lite/includes/Admin/Controllers/ImportController.php:371
 msgid "Please select a CSV file to import."
 msgstr ""
 
-#: lite/includes/Admin/Controllers/ImportController.php:284
+#: lite/includes/Admin/Controllers/ImportController.php:381
 msgid "Invalid file format. Please upload a CSV file."
 msgstr ""
 
-#: lite/includes/Admin/Controllers/ImportController.php:290
+#: lite/includes/Admin/Controllers/ImportController.php:387
 msgid "Invalid file type."
 msgstr ""
 
-#: lite/includes/Admin/Controllers/Importers/LinkCentralImporter.php:98
+#: lite/includes/Admin/Controllers/ImportController.php:411
+msgid "The CSV file appears to be empty."
+msgstr ""
+
+#: lite/includes/Admin/Controllers/ImportController.php:427
+msgid "Invalid columns in CSV file. Please make sure Target URL column is available in CSV file."
+msgstr ""
+
+#: lite/includes/Admin/Controllers/Importers/LinkCentralImporter.php:143
 msgid "No Link Central links were found to migrate."
 msgstr ""
 
-#: lite/includes/Admin/Controllers/Importers/LinkCentralImporter.php:111
+#: lite/includes/Admin/Controllers/Importers/LinkCentralImporter.php:156
 msgid "Migration complete."
 msgstr ""
 
 #. translators: %d number of imported links
-#: lite/includes/Admin/Controllers/Importers/LinkCentralImporter.php:129
+#: lite/includes/Admin/Controllers/Importers/LinkCentralImporter.php:174
 msgid "%d Link Central links migrated."
 msgstr ""
 
 #: lite/includes/Admin/Controllers/ToolsController.php:36
-#: lite/includes/Admin/Templates/tools.php:145
+#: lite/includes/Admin/Templates/tools.php:264
 #: lite/includes/Admin/tools-settings.php:39
 #: lite/language.php:35
 #: pro/includes/Admin/Templates/export-import.php:102
@@ -683,23 +704,18 @@ msgid "Import"
 msgstr ""
 
 #: lite/includes/Admin/Controllers/ToolsController.php:41
-#: lite/includes/Admin/Templates/migration.php:5
-msgid "Migration"
-msgstr ""
-
-#: lite/includes/Admin/Controllers/ToolsController.php:46
 msgid "Trim Clicks"
 msgstr ""
 
-#: lite/includes/Admin/Controllers/ToolsController.php:54
+#: lite/includes/Admin/Controllers/ToolsController.php:49
 msgid "REST API"
 msgstr ""
 
-#: lite/includes/Admin/Controllers/ToolsController.php:59
+#: lite/includes/Admin/Controllers/ToolsController.php:54
 msgid "Other Awesome Products"
 msgstr ""
 
-#: lite/includes/Admin/DB/Clicks.php:637
+#: lite/includes/Admin/DB/Clicks.php:959
 #: lite/language.php:36
 msgid "Direct, Email, SMS"
 msgstr ""
@@ -772,7 +788,7 @@ msgstr ""
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:81
 #: pro/includes/Admin/Domains_Table.php:98
 #: pro/includes/Admin/Tags_Table.php:168
-#: pro/includes/Admin/UTM_Presets_Table.php:96
+#: pro/includes/Admin/UTM_Presets_Table.php:102
 msgid "Created On"
 msgstr ""
 
@@ -785,7 +801,7 @@ msgstr ""
 #: pro/includes/Admin/Domains_Table.php:140
 #: pro/includes/Admin/Tags_Table.php:190
 #: pro/includes/Admin/Tracking_Pixels_Table.php:145
-#: pro/includes/Admin/UTM_Presets_Table.php:132
+#: pro/includes/Admin/UTM_Presets_Table.php:161
 msgid "<a href=\"%s\" class=\"text-indigo-600\">Edit</a>"
 msgstr ""
 
@@ -804,7 +820,7 @@ msgstr ""
 #: lite/language.php:44
 #: pro/includes/Admin/Domains_Table.php:142
 #: pro/includes/Admin/Tracking_Pixels_Table.php:147
-#: pro/includes/Admin/UTM_Presets_Table.php:134
+#: pro/includes/Admin/UTM_Presets_Table.php:163
 msgid "<a href=\"%s\">Delete</a>"
 msgstr ""
 
@@ -815,14 +831,16 @@ msgid "<a href=\"%1$s\"  title=\"%2$s\" class=\"kc-us-group\"/>%3$s</a>"
 msgstr ""
 
 #: lite/includes/Admin/Groups_Table.php:404
-#: lite/includes/Admin/Links_Table.php:846
+#: lite/includes/Admin/Links_Table.php:855
 #: lite/language.php:46
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:130
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:313
 #: pro/includes/Admin/Domains_Table.php:263
+#: pro/includes/Admin/Tables/SavedReportsTable.php:79
+#: pro/includes/Admin/Tables/SavedReportsTable.php:304
 #: pro/includes/Admin/Tags_Table.php:271
 #: pro/includes/Admin/Tracking_Pixels_Table.php:268
-#: pro/includes/Admin/UTM_Presets_Table.php:255
+#: pro/includes/Admin/UTM_Presets_Table.php:297
 msgid "Delete"
 msgstr ""
 
@@ -861,13 +879,13 @@ msgid "Edit Group"
 msgstr ""
 
 #: lite/includes/Admin/Groups_Table.php:523
-#: lite/includes/Admin/Links_Table.php:1772
+#: lite/includes/Admin/Links_Table.php:1781
 #: lite/language.php:53
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:393
 #: pro/includes/Admin/Domains_Table.php:382
 #: pro/includes/Admin/Tags_Table.php:374
 #: pro/includes/Admin/Tracking_Pixels_Table.php:387
-#: pro/includes/Admin/UTM_Presets_Table.php:373
+#: pro/includes/Admin/UTM_Presets_Table.php:415
 msgid "Save Changes"
 msgstr ""
 
@@ -891,7 +909,7 @@ msgstr ""
 #: lite/language.php:57
 #: pro/includes/Admin/Tags_Table.php:430
 #: pro/includes/Admin/Tracking_Pixels_Table.php:472
-#: pro/includes/Admin/UTM_Presets_Table.php:463
+#: pro/includes/Admin/UTM_Presets_Table.php:505
 msgid "Please Enter Name"
 msgstr ""
 
@@ -922,14 +940,14 @@ msgstr ""
 #: lite/includes/Admin/Templates/group-stats.php:154
 #: lite/includes/Admin/Templates/link-form.php:91
 #: lite/includes/Admin/Templates/tag-stats.php:154
-#: lite/includes/Common/Export.php:90
-#: lite/includes/Common/Export.php:115
+#: lite/includes/Common/Export.php:97
+#: lite/includes/Common/Export.php:122
 #: lite/language.php:62
 msgid "Title"
 msgstr ""
 
 #: lite/includes/Admin/Links_Table.php:210
-#: lite/includes/Common/Export.php:123
+#: lite/includes/Common/Export.php:130
 #: lite/language.php:63
 msgid "Redirect Type"
 msgstr ""
@@ -969,16 +987,16 @@ msgid "<a href=\"%s\" target=\"_blank\" title=\"Visit Link\"><i class=\"fa fa-ex
 msgstr ""
 
 #: lite/includes/Admin/Links_Table.php:390
-#: lite/includes/Admin/Links_Table.php:2101
 #: lite/includes/Ajax.php:180
-#: lite/includes/Helper.php:2557
+#: lite/includes/Common/Export.php:183
+#: lite/includes/Helper.php:2565
 msgid "Enabled"
 msgstr ""
 
 #: lite/includes/Admin/Links_Table.php:390
-#: lite/includes/Admin/Links_Table.php:2101
 #: lite/includes/Ajax.php:180
-#: lite/includes/Helper.php:2558
+#: lite/includes/Common/Export.php:184
+#: lite/includes/Helper.php:2566
 #: pro/includes/Settings.php:362
 msgid "Disabled"
 msgstr ""
@@ -993,406 +1011,394 @@ msgstr ""
 msgid "Click to Enable"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:844
+#: lite/includes/Admin/Links_Table.php:853
 msgid "General Actions"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:847
+#: lite/includes/Admin/Links_Table.php:856
 msgid "Reset Stats"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:852
+#: lite/includes/Admin/Links_Table.php:861
 msgid "Group Actions"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:854
+#: lite/includes/Admin/Links_Table.php:863
 msgid "Add to group"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:855
+#: lite/includes/Admin/Links_Table.php:864
 msgid "Move to group"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:910
+#: lite/includes/Admin/Links_Table.php:919
 #: lite/language.php:68
 msgid "You do not have permission to delete this link."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:918
+#: lite/includes/Admin/Links_Table.php:927
 #: lite/language.php:69
 msgid "Link has been deleted successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:927
+#: lite/includes/Admin/Links_Table.php:936
 #: lite/language.php:70
 msgid "You do not have permission to reset statistics of this link."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:935
+#: lite/includes/Admin/Links_Table.php:944
 #: lite/language.php:71
 msgid "Link stats has been reset successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:942
-#: lite/includes/Admin/Links_Table.php:1164
-#: lite/includes/Admin/Links_Table.php:1217
-#: lite/includes/Admin/Links_Table.php:1253
+#: lite/includes/Admin/Links_Table.php:951
+#: lite/includes/Admin/Links_Table.php:1173
+#: lite/includes/Admin/Links_Table.php:1226
+#: lite/includes/Admin/Links_Table.php:1262
 msgid "This feature is available in the PRO version only."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:951
+#: lite/includes/Admin/Links_Table.php:960
 msgid "You do not have permission to duplicate this link."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:962
+#: lite/includes/Admin/Links_Table.php:971
 msgid "Link has been duplicated successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:967
+#: lite/includes/Admin/Links_Table.php:976
 msgid "Link could not be duplicated. Please try again."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:985
+#: lite/includes/Admin/Links_Table.php:994
 msgid "You do not have permission to delete link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1001
+#: lite/includes/Admin/Links_Table.php:1010
 #: lite/language.php:72
 msgid "Link(s) have been deleted successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1004
+#: lite/includes/Admin/Links_Table.php:1013
 #: lite/language.php:73
 msgid "Please select link(s) to delete."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1017
+#: lite/includes/Admin/Links_Table.php:1026
 msgid "You do not have permission to reset stats."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1034
+#: lite/includes/Admin/Links_Table.php:1043
 #: lite/language.php:74
 msgid "Link(s) stats have been reset successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1037
+#: lite/includes/Admin/Links_Table.php:1046
 #: lite/language.php:75
 msgid "Please select link(s) to reset stats."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1049
+#: lite/includes/Admin/Links_Table.php:1058
 msgid "You do not have permission to add links to group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1066
+#: lite/includes/Admin/Links_Table.php:1075
 msgid "Please select link(s) to add into group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1073
+#: lite/includes/Admin/Links_Table.php:1082
 msgid "Please select group to add links to."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1081
+#: lite/includes/Admin/Links_Table.php:1090
 msgid "Link(s) have been added to group successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1091
+#: lite/includes/Admin/Links_Table.php:1100
 msgid "You do not have permission to move links to group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1108
+#: lite/includes/Admin/Links_Table.php:1117
 msgid "Please select link(s) to move into group."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1115
+#: lite/includes/Admin/Links_Table.php:1124
 msgid "Please select group to move links to."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1123
+#: lite/includes/Admin/Links_Table.php:1132
 msgid "Link(s) have been moved to group successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1133
+#: lite/includes/Admin/Links_Table.php:1142
 msgid "You do not have permission to add expiry to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1146
+#: lite/includes/Admin/Links_Table.php:1155
 msgid "Please select expiry date."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1151
+#: lite/includes/Admin/Links_Table.php:1160
 msgid "Please select link(s) to add expiry date."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1159
+#: lite/includes/Admin/Links_Table.php:1168
 msgid "Expiry date has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1173
+#: lite/includes/Admin/Links_Table.php:1182
 msgid "You do not have permission to duplicate link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1188
+#: lite/includes/Admin/Links_Table.php:1197
 msgid "Please select link(s) to duplicate."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1203
+#: lite/includes/Admin/Links_Table.php:1212
 msgid "Link(s) could not be duplicated. Please try again."
 msgstr ""
 
 #. translators: %d: number of links which have been duplicated
-#: lite/includes/Admin/Links_Table.php:1210
+#: lite/includes/Admin/Links_Table.php:1219
 msgid "%d link has been duplicated successfully!"
 msgid_plural "%d links have been duplicated successfully!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lite/includes/Admin/Links_Table.php:1225
+#: lite/includes/Admin/Links_Table.php:1234
 msgid "You do not have permission to enable links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1240
+#: lite/includes/Admin/Links_Table.php:1249
 msgid "Please select link(s) to enable."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1248
+#: lite/includes/Admin/Links_Table.php:1257
 msgid "Link(s) have been enabled successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1261
+#: lite/includes/Admin/Links_Table.php:1270
 msgid "You do not have permission to disable links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1276
+#: lite/includes/Admin/Links_Table.php:1285
 msgid "Please select link(s) to disable."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1284
+#: lite/includes/Admin/Links_Table.php:1293
 msgid "Link(s) have been disabled successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1293
+#: lite/includes/Admin/Links_Table.php:1302
 msgid "You do not have permission to enable Nofollow parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1308
+#: lite/includes/Admin/Links_Table.php:1317
 msgid "Please select link(s) to enable nofollow."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1316
+#: lite/includes/Admin/Links_Table.php:1325
 msgid "Nofollow has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1325
+#: lite/includes/Admin/Links_Table.php:1334
 msgid "You do not have permission to disable Nofollow parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1340
+#: lite/includes/Admin/Links_Table.php:1349
 msgid "Please select link(s) to disable nofollow."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1348
+#: lite/includes/Admin/Links_Table.php:1357
 msgid "Nofollow has been disabled to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1357
+#: lite/includes/Admin/Links_Table.php:1366
 msgid "You do not have permission to disable Sponsored parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1372
+#: lite/includes/Admin/Links_Table.php:1381
 msgid "Please select link(s) to disable Sponsored."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1380
+#: lite/includes/Admin/Links_Table.php:1389
 msgid "Sponsored has been disabled to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1389
+#: lite/includes/Admin/Links_Table.php:1398
 msgid "You do not have permission to enable Sponsored parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1404
+#: lite/includes/Admin/Links_Table.php:1413
 msgid "Please select link(s) to enable Sponsored."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1412
+#: lite/includes/Admin/Links_Table.php:1421
 msgid "Sponsored has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1421
+#: lite/includes/Admin/Links_Table.php:1430
 msgid "You do not have permission to enable Tracking parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1436
+#: lite/includes/Admin/Links_Table.php:1445
 msgid "Please select link(s) to enable Tracking."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1444
-#: lite/includes/Admin/Links_Table.php:1476
+#: lite/includes/Admin/Links_Table.php:1453
+#: lite/includes/Admin/Links_Table.php:1485
 msgid "Tracking has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1453
+#: lite/includes/Admin/Links_Table.php:1462
 msgid "You do not have permission to disable Tracking parameter to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1468
+#: lite/includes/Admin/Links_Table.php:1477
 msgid "Please select link(s) to disable Tracking."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1485
+#: lite/includes/Admin/Links_Table.php:1494
 msgid "You do not have permission to enable Parameters Forwarding to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1500
+#: lite/includes/Admin/Links_Table.php:1509
 msgid "Please select link(s) to enable Parameters Forwarding."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1508
+#: lite/includes/Admin/Links_Table.php:1517
 msgid "Parameters Forwarding has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1517
+#: lite/includes/Admin/Links_Table.php:1526
 msgid "You do not have permission to disable Parameters Forwarding to links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1532
+#: lite/includes/Admin/Links_Table.php:1541
 msgid "Please select link(s) to disable Parameters Forwarding."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1540
+#: lite/includes/Admin/Links_Table.php:1549
 msgid "Params Forwarding has been added to selected links."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1548
+#: lite/includes/Admin/Links_Table.php:1557
 msgid "You do not have permission to add favorites."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1573
+#: lite/includes/Admin/Links_Table.php:1582
 msgid "Link(s) added to favorites successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1575
+#: lite/includes/Admin/Links_Table.php:1584
 msgid "Please select link(s) to add to favorites."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1583
+#: lite/includes/Admin/Links_Table.php:1592
 msgid "You do not have permission to remove favorites."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1601
+#: lite/includes/Admin/Links_Table.php:1610
 msgid "Link(s) removed from favorites successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1609
+#: lite/includes/Admin/Links_Table.php:1618
 msgid "You do not have permission to add links to tag."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1622
-#: lite/includes/Admin/Links_Table.php:1664
+#: lite/includes/Admin/Links_Table.php:1631
+#: lite/includes/Admin/Links_Table.php:1673
 msgid "Please select link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1629
-#: lite/includes/Admin/Links_Table.php:1671
+#: lite/includes/Admin/Links_Table.php:1638
+#: lite/includes/Admin/Links_Table.php:1680
 msgid "Please select a tag."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1637
+#: lite/includes/Admin/Links_Table.php:1646
 msgid "A new tag has been added successfully to all selected Link(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1647
+#: lite/includes/Admin/Links_Table.php:1656
 msgid "You do not have permission to move links to tag."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1679
+#: lite/includes/Admin/Links_Table.php:1688
 msgid "New tag has been added successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1689
+#: lite/includes/Admin/Links_Table.php:1698
 msgid "You do not have permission to remove all tag(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1701
+#: lite/includes/Admin/Links_Table.php:1710
 msgid "Please select link(s) to remove all tag(s)."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1709
+#: lite/includes/Admin/Links_Table.php:1718
 msgid "All tags from link(s) are removed successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1754
+#: lite/includes/Admin/Links_Table.php:1763
 #: lite/language.php:76
 msgid "Link data have been saved successfully!"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1771
+#: lite/includes/Admin/Links_Table.php:1780
 #: lite/language.php:77
 msgid "Edit Link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1782
+#: lite/includes/Admin/Links_Table.php:1791
 #: lite/includes/Admin/Templates/dashboard.php:117
 #: lite/language.php:78
 msgid "New Link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1783
+#: lite/includes/Admin/Links_Table.php:1792
 #: lite/language.php:79
 msgid "Save Link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1889
+#: lite/includes/Admin/Links_Table.php:1898
 #: lite/language.php:80
 msgid "You do not have permission to edit this form."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1918
+#: lite/includes/Admin/Links_Table.php:1927
 #: lite/language.php:81
 msgid "Please enter Title"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1923
+#: lite/includes/Admin/Links_Table.php:1932
 #: lite/language.php:82
 msgid "Please enter Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1926
+#: lite/includes/Admin/Links_Table.php:1935
 #: lite/language.php:83
 msgid "Please enter valid Target URL"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1929
+#: lite/includes/Admin/Links_Table.php:1938
 msgid "Short URL already exists. Please use different Short URL."
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1941
+#: lite/includes/Admin/Links_Table.php:1950
 msgid "Your link rotations weights should be equal or less than 100%"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:1951
+#: lite/includes/Admin/Links_Table.php:1960
 msgid "Split test is enable. Please select goal link"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:2053
+#: lite/includes/Admin/Links_Table.php:2062
 #: lite/language.php:84
 msgid "Search Links"
 msgstr ""
 
-#: lite/includes/Admin/Links_Table.php:2132
-#: pro/includes/Actions.php:1460
-#: pro/includes/Actions.php:1579
-#: pro/includes/Actions.php:1580
-#: pro/includes/Actions.php:2247
-#: pro/includes/Actions.php:3242
-#: pro/includes/Admin/Tags_Table.php:57
-#: pro/includes/Admin/Tags_Table.php:145
-#: pro/includes/Migration/Package.php:84
-msgid "Tags"
-msgstr ""
-
-#: lite/includes/Admin/Links_Table.php:2182
+#: lite/includes/Admin/Links_Table.php:2149
 #: lite/language.php:181
 msgid "Reset"
 msgstr ""
@@ -1442,8 +1448,8 @@ msgid "Copy coupon code"
 msgstr ""
 
 #: lite/includes/Admin/Promotions/PromoBanner.php:472
-#: lite/includes/Helper.php:929
-#: lite/includes/Helper.php:932
+#: lite/includes/Helper.php:930
+#: lite/includes/Helper.php:933
 #: lite/language.php:148
 #: pro/includes/Shortcode.php:96
 msgid "Copy"
@@ -1473,8 +1479,9 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/api-key-form.php:104
 #: lite/includes/Admin/Templates/group-form.php:56
-#: lite/includes/Common/Export.php:116
+#: lite/includes/Common/Export.php:123
 #: lite/language.php:113
+#: pro/includes/Admin/Templates/smart-report-form.php:154
 #: pro/includes/Admin/Templates/tag-form.php:56
 #: pro/includes/Admin/Templates/utm-preset-form.php:66
 msgid "Description"
@@ -1514,10 +1521,12 @@ msgstr ""
 #: lite/includes/Admin/Templates/api-key-form.php:250
 #: lite/includes/Admin/Templates/group-form.php:70
 #: lite/includes/Admin/Templates/link-form.php:457
+#: lite/includes/Admin/Templates/tools.php:362
 #: lite/language.php:114
 #: pro/includes/Admin/Templates/auto-link-keyword-form.php:220
 #: pro/includes/Admin/Templates/domain-form.php:56
 #: pro/includes/Admin/Templates/export-import.php:195
+#: pro/includes/Admin/Templates/smart-report-form.php:301
 #: pro/includes/Admin/Templates/tag-form.php:85
 #: pro/includes/Admin/Templates/tracking-pixel-form.php:163
 #: pro/includes/Admin/Templates/utm-preset-form.php:147
@@ -1529,9 +1538,10 @@ msgid "Add API Key"
 msgstr ""
 
 #: lite/includes/Admin/Templates/api-keys.php:35
-#: lite/includes/Common/Export.php:114
-#: pro/includes/Actions.php:2030
+#: lite/includes/Common/Export.php:121
+#: pro/includes/Actions.php:2062
 #: pro/includes/Admin/Templates/utm-preset-form.php:89
+#: pro/includes/Admin/UTM_Presets_Table.php:96
 msgid "ID"
 msgstr ""
 
@@ -1555,7 +1565,7 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:92
 #: lite/includes/Admin/Templates/group-stats.php:238
-#: lite/includes/Admin/Templates/link-stats.php:231
+#: lite/includes/Admin/Templates/link-stats.php:254
 #: lite/includes/Admin/Templates/tag-stats.php:238
 #: lite/language.php:94
 msgid "Refresh"
@@ -1605,14 +1615,14 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:214
 #: lite/includes/Admin/Templates/group-stats.php:206
-#: lite/includes/Admin/Templates/link-stats.php:199
+#: lite/includes/Admin/Templates/link-stats.php:222
 #: lite/includes/Admin/Templates/tag-stats.php:206
 msgid "Custom"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:221
 #: lite/includes/Admin/Templates/group-stats.php:217
-#: lite/includes/Admin/Templates/link-stats.php:210
+#: lite/includes/Admin/Templates/link-stats.php:233
 #: lite/includes/Admin/Templates/tag-stats.php:217
 msgid "Start date"
 msgstr ""
@@ -1623,42 +1633,43 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:227
 #: lite/includes/Admin/Templates/group-stats.php:223
-#: lite/includes/Admin/Templates/link-stats.php:216
+#: lite/includes/Admin/Templates/link-stats.php:239
 #: lite/includes/Admin/Templates/tag-stats.php:223
 msgid "End date"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:232
 #: lite/includes/Admin/Templates/group-stats.php:228
-#: lite/includes/Admin/Templates/link-stats.php:221
+#: lite/includes/Admin/Templates/link-stats.php:244
 #: lite/includes/Admin/Templates/tag-stats.php:228
 msgid "Apply custom date range"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:233
 #: lite/includes/Admin/Templates/group-stats.php:229
-#: lite/includes/Admin/Templates/link-stats.php:222
+#: lite/includes/Admin/Templates/link-stats.php:245
 #: lite/includes/Admin/Templates/tag-stats.php:229
 msgid "Apply"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:248
-#: lite/includes/Admin/Templates/group-stats.php:259
-#: lite/includes/Admin/Templates/link-stats.php:253
-#: lite/includes/Admin/Templates/link-stats.php:279
-#: lite/includes/Admin/Templates/tag-stats.php:259
+#: lite/includes/Admin/Templates/group-stats.php:297
+#: lite/includes/Admin/Templates/link-stats.php:276
+#: lite/includes/Admin/Templates/link-stats.php:302
+#: lite/includes/Admin/Templates/tag-stats.php:297
+#: pro/includes/Admin/Templates/smart-report-view.php:271
 msgid "Link Activity Intensity"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:262
-#: lite/includes/Admin/Templates/link-stats.php:265
+#: lite/includes/Admin/Templates/link-stats.php:288
 msgid "No clicks data available. Once your link is visited, analytics will appear here"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:278
-#: lite/includes/Admin/Templates/group-stats.php:307
-#: lite/includes/Admin/Templates/link-stats.php:312
-#: lite/includes/Admin/Templates/tag-stats.php:307
+#: lite/includes/Admin/Templates/group-stats.php:345
+#: lite/includes/Admin/Templates/link-stats.php:335
+#: lite/includes/Admin/Templates/tag-stats.php:345
 #: lite/includes/EmailReports/EmailTemplate.php:380
 #: lite/language.php:98
 msgid "Top Locations"
@@ -1670,56 +1681,56 @@ msgstr ""
 #: lite/includes/Admin/Templates/dashboard.php:392
 #: lite/includes/Admin/Templates/dashboard.php:434
 #: lite/includes/Admin/Templates/dashboard.php:477
-#: lite/includes/Admin/Templates/group-stats.php:286
-#: lite/includes/Admin/Templates/group-stats.php:326
-#: lite/includes/Admin/Templates/group-stats.php:361
-#: lite/includes/Admin/Templates/group-stats.php:401
-#: lite/includes/Admin/Templates/group-stats.php:434
-#: lite/includes/Admin/Templates/group-stats.php:468
-#: lite/includes/Admin/Templates/link-stats.php:291
-#: lite/includes/Admin/Templates/link-stats.php:331
-#: lite/includes/Admin/Templates/link-stats.php:366
-#: lite/includes/Admin/Templates/link-stats.php:406
-#: lite/includes/Admin/Templates/link-stats.php:439
-#: lite/includes/Admin/Templates/link-stats.php:472
-#: lite/includes/Admin/Templates/tag-stats.php:286
-#: lite/includes/Admin/Templates/tag-stats.php:326
-#: lite/includes/Admin/Templates/tag-stats.php:361
-#: lite/includes/Admin/Templates/tag-stats.php:401
-#: lite/includes/Admin/Templates/tag-stats.php:434
-#: lite/includes/Admin/Templates/tag-stats.php:468
+#: lite/includes/Admin/Templates/group-stats.php:324
+#: lite/includes/Admin/Templates/group-stats.php:364
+#: lite/includes/Admin/Templates/group-stats.php:399
+#: lite/includes/Admin/Templates/group-stats.php:439
+#: lite/includes/Admin/Templates/group-stats.php:472
+#: lite/includes/Admin/Templates/group-stats.php:506
+#: lite/includes/Admin/Templates/link-stats.php:314
+#: lite/includes/Admin/Templates/link-stats.php:354
+#: lite/includes/Admin/Templates/link-stats.php:389
+#: lite/includes/Admin/Templates/link-stats.php:429
+#: lite/includes/Admin/Templates/link-stats.php:462
+#: lite/includes/Admin/Templates/link-stats.php:495
+#: lite/includes/Admin/Templates/tag-stats.php:324
+#: lite/includes/Admin/Templates/tag-stats.php:364
+#: lite/includes/Admin/Templates/tag-stats.php:399
+#: lite/includes/Admin/Templates/tag-stats.php:439
+#: lite/includes/Admin/Templates/tag-stats.php:472
+#: lite/includes/Admin/Templates/tag-stats.php:506
 #: lite/language.php:99
 msgid "<a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:304
-#: lite/includes/Admin/Templates/group-stats.php:330
-#: lite/includes/Admin/Templates/link-stats.php:335
-#: lite/includes/Admin/Templates/tag-stats.php:330
+#: lite/includes/Admin/Templates/group-stats.php:368
+#: lite/includes/Admin/Templates/link-stats.php:358
+#: lite/includes/Admin/Templates/tag-stats.php:368
 #: lite/language.php:100
 msgid "Get insights about top locations from where people are clicking on your links."
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:320
-#: lite/includes/Admin/Templates/group-stats.php:343
-#: lite/includes/Admin/Templates/link-stats.php:348
-#: lite/includes/Admin/Templates/tag-stats.php:343
+#: lite/includes/Admin/Templates/group-stats.php:381
+#: lite/includes/Admin/Templates/link-stats.php:371
+#: lite/includes/Admin/Templates/tag-stats.php:381
 #: lite/language.php:101
 msgid "Referrers"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:346
-#: lite/includes/Admin/Templates/group-stats.php:365
-#: lite/includes/Admin/Templates/link-stats.php:370
-#: lite/includes/Admin/Templates/tag-stats.php:365
+#: lite/includes/Admin/Templates/group-stats.php:403
+#: lite/includes/Admin/Templates/link-stats.php:393
+#: lite/includes/Admin/Templates/tag-stats.php:403
 #: lite/language.php:102
 msgid "Know who are your top referrers."
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:368
-#: lite/includes/Admin/Templates/group-stats.php:384
-#: lite/includes/Admin/Templates/link-stats.php:389
-#: lite/includes/Admin/Templates/tag-stats.php:384
+#: lite/includes/Admin/Templates/group-stats.php:422
+#: lite/includes/Admin/Templates/link-stats.php:412
+#: lite/includes/Admin/Templates/tag-stats.php:422
 #: lite/includes/EmailReports/EmailTemplate.php:412
 #: lite/language.php:103
 msgid "Top Devices"
@@ -1730,17 +1741,17 @@ msgid "Not enough data to show device distribution yet."
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:396
-#: lite/includes/Admin/Templates/group-stats.php:405
-#: lite/includes/Admin/Templates/link-stats.php:410
-#: lite/includes/Admin/Templates/tag-stats.php:405
+#: lite/includes/Admin/Templates/group-stats.php:443
+#: lite/includes/Admin/Templates/link-stats.php:433
+#: lite/includes/Admin/Templates/tag-stats.php:443
 #: lite/language.php:104
 msgid "Want to know which devices were used to access your links?"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:410
-#: lite/includes/Admin/Templates/group-stats.php:417
-#: lite/includes/Admin/Templates/link-stats.php:422
-#: lite/includes/Admin/Templates/tag-stats.php:417
+#: lite/includes/Admin/Templates/group-stats.php:455
+#: lite/includes/Admin/Templates/link-stats.php:445
+#: lite/includes/Admin/Templates/tag-stats.php:455
 #: lite/language.php:105
 msgid "Top Browsers"
 msgstr ""
@@ -1750,17 +1761,17 @@ msgid "Not enough data to show browser distribution yet."
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:438
-#: lite/includes/Admin/Templates/group-stats.php:438
-#: lite/includes/Admin/Templates/link-stats.php:443
-#: lite/includes/Admin/Templates/tag-stats.php:438
+#: lite/includes/Admin/Templates/group-stats.php:476
+#: lite/includes/Admin/Templates/link-stats.php:466
+#: lite/includes/Admin/Templates/tag-stats.php:476
 #: lite/language.php:106
 msgid "Get information about browsers."
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:453
-#: lite/includes/Admin/Templates/group-stats.php:451
-#: lite/includes/Admin/Templates/link-stats.php:455
-#: lite/includes/Admin/Templates/tag-stats.php:451
+#: lite/includes/Admin/Templates/group-stats.php:489
+#: lite/includes/Admin/Templates/link-stats.php:478
+#: lite/includes/Admin/Templates/tag-stats.php:489
 #: lite/language.php:107
 msgid "Top Platforms"
 msgstr ""
@@ -1774,10 +1785,11 @@ msgid "Know more about which platforms people used to access your links."
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:497
-#: lite/includes/Admin/Templates/group-stats.php:522
-#: lite/includes/Admin/Templates/link-stats.php:682
-#: lite/includes/Admin/Templates/tag-stats.php:522
+#: lite/includes/Admin/Templates/group-stats.php:560
+#: lite/includes/Admin/Templates/link-stats.php:705
+#: lite/includes/Admin/Templates/tag-stats.php:560
 #: lite/language.php:109
+#: pro/includes/Admin/Templates/smart-report-view.php:389
 msgid "Clicks Details"
 msgstr ""
 
@@ -1798,8 +1810,8 @@ msgid "clicks"
 msgstr ""
 
 #: lite/includes/Admin/Templates/dashboard.php:659
-#: lite/includes/Admin/Templates/group-stats.php:581
-#: lite/includes/Admin/Templates/tag-stats.php:581
+#: lite/includes/Admin/Templates/group-stats.php:619
+#: lite/includes/Admin/Templates/tag-stats.php:619
 msgid "Enter both a start date and an end date."
 msgstr ""
 
@@ -1863,46 +1875,62 @@ msgid "%d Total Clicks"
 msgstr ""
 
 #: lite/includes/Admin/Templates/group-stats.php:219
-#: lite/includes/Admin/Templates/link-stats.php:212
+#: lite/includes/Admin/Templates/link-stats.php:235
 #: lite/includes/Admin/Templates/tag-stats.php:219
 msgid "→"
 msgstr ""
 
-#: lite/includes/Admin/Templates/group-stats.php:248
-#: lite/includes/Admin/Templates/link-stats.php:243
-#: lite/includes/Admin/Templates/tag-stats.php:248
+#: lite/includes/Admin/Templates/group-stats.php:263
+#: lite/includes/Admin/Templates/tag-stats.php:263
+msgid "Comparing links"
+msgstr ""
+
+#: lite/includes/Admin/Templates/group-stats.php:263
+#: lite/includes/Admin/Templates/tag-stats.php:263
+msgid "Compare links"
+msgstr ""
+
+#. translators: 1: number of links charted, 2: total number of links
+#: lite/includes/Admin/Templates/group-stats.php:271
+#: lite/includes/Admin/Templates/tag-stats.php:271
+msgid "Showing the top %1$d of %2$d links by clicks."
+msgstr ""
+
+#: lite/includes/Admin/Templates/group-stats.php:286
+#: lite/includes/Admin/Templates/link-stats.php:266
+#: lite/includes/Admin/Templates/tag-stats.php:286
 msgid "No clicks data available yet."
 msgstr ""
 
-#: lite/includes/Admin/Templates/group-stats.php:272
-#: lite/includes/Admin/Templates/tag-stats.php:272
+#: lite/includes/Admin/Templates/group-stats.php:310
+#: lite/includes/Admin/Templates/tag-stats.php:310
 msgid "No clicks data available. Once your links are visited, analytics will appear here."
 msgstr ""
 
-#: lite/includes/Admin/Templates/group-stats.php:290
-#: lite/includes/Admin/Templates/link-stats.php:295
-#: lite/includes/Admin/Templates/tag-stats.php:290
+#: lite/includes/Admin/Templates/group-stats.php:328
+#: lite/includes/Admin/Templates/link-stats.php:318
+#: lite/includes/Admin/Templates/tag-stats.php:328
 msgid "See when your links come alive with activity intensity heatmap."
 msgstr ""
 
-#: lite/includes/Admin/Templates/group-stats.php:472
-#: lite/includes/Admin/Templates/link-stats.php:476
-#: lite/includes/Admin/Templates/tag-stats.php:472
+#: lite/includes/Admin/Templates/group-stats.php:510
+#: lite/includes/Admin/Templates/link-stats.php:499
+#: lite/includes/Admin/Templates/tag-stats.php:510
 #: lite/language.php:108
 msgid "Know more about which devices people used to access your links."
 msgstr ""
 
-#: lite/includes/Admin/Templates/group-stats.php:486
-#: lite/includes/Admin/Templates/tag-stats.php:486
+#: lite/includes/Admin/Templates/group-stats.php:524
+#: lite/includes/Admin/Templates/tag-stats.php:524
 #: lite/language.php:119
 msgid "Links Info"
 msgstr ""
 
-#: lite/includes/Admin/Templates/group-stats.php:490
-#: lite/includes/Admin/Templates/group-stats.php:526
-#: lite/includes/Admin/Templates/link-stats.php:686
-#: lite/includes/Admin/Templates/tag-stats.php:490
-#: lite/includes/Admin/Templates/tag-stats.php:526
+#: lite/includes/Admin/Templates/group-stats.php:528
+#: lite/includes/Admin/Templates/group-stats.php:564
+#: lite/includes/Admin/Templates/link-stats.php:709
+#: lite/includes/Admin/Templates/tag-stats.php:528
+#: lite/includes/Admin/Templates/tag-stats.php:564
 msgid "Download CSV"
 msgstr ""
 
@@ -1913,7 +1941,7 @@ msgstr ""
 #: pro/includes/Admin/Templates/domains.php:16
 #: pro/includes/Admin/Templates/tags.php:16
 #: pro/includes/Admin/Templates/tracking-pixels.php:16
-#: pro/includes/Admin/Templates/utm-presets.php:16
+#: pro/includes/Admin/Templates/utm-presets.php:28
 msgid "Add New"
 msgstr ""
 
@@ -1930,9 +1958,9 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/link-form.php:112
 #: lite/includes/Admin/Templates/widgets/dashboard-widget.php:20
-#: lite/includes/Common/Export.php:118
+#: lite/includes/Common/Export.php:125
 #: lite/language.php:123
-#: pro/includes/Actions.php:2545
+#: pro/includes/Actions.php:2577
 #: pro/includes/Admin/Tables/BrokenLinksTable.php:47
 msgid "Target URL"
 msgstr ""
@@ -1956,7 +1984,7 @@ msgid "No Group found. <a href=\"%s\">Create a new Group</a> and add link to gro
 msgstr ""
 
 #: lite/includes/Admin/Templates/link-form.php:305
-#: pro/includes/Actions.php:2332
+#: pro/includes/Actions.php:2364
 msgid "Dynamic Redirection"
 msgstr ""
 
@@ -1967,7 +1995,7 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/link-form.php:346
 #: lite/language.php:130
-#: pro/includes/Actions.php:390
+#: pro/includes/Actions.php:401
 msgid "Expiration Date"
 msgstr ""
 
@@ -1979,7 +2007,7 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/link-form.php:387
 #: lite/language.php:132
-#: pro/includes/Actions.php:540
+#: pro/includes/Actions.php:551
 #: pro/includes/Shortcode.php:137
 #: pro/Templates/password.php:11
 msgid "Password"
@@ -1995,85 +2023,90 @@ msgstr ""
 msgid "Notes"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:498
-msgid "Link Rotation Results"
-msgstr ""
-
-#: lite/includes/Admin/Templates/link-stats.php:502
-#: pro/includes/Actions.php:2623
-msgid "Split Test"
-msgstr ""
-
-#: lite/includes/Admin/Templates/link-stats.php:508
-msgid "Clicks and goal conversions per variant since tracking began (2.2.0+)."
-msgstr ""
-
-#: lite/includes/Admin/Templates/link-stats.php:510
-msgid "Clicks per variant since tracking began (2.2.0+)."
+#: lite/includes/Admin/Templates/link-stats.php:202
+msgid "Compare with other links"
 msgstr ""
 
 #: lite/includes/Admin/Templates/link-stats.php:521
+msgid "Link Rotation Results"
+msgstr ""
+
+#: lite/includes/Admin/Templates/link-stats.php:525
+#: pro/includes/Actions.php:2655
+msgid "Split Test"
+msgstr ""
+
+#: lite/includes/Admin/Templates/link-stats.php:531
+msgid "Clicks and goal conversions per variant since tracking began (2.2.0+)."
+msgstr ""
+
+#: lite/includes/Admin/Templates/link-stats.php:533
+msgid "Clicks per variant since tracking began (2.2.0+)."
+msgstr ""
+
+#: lite/includes/Admin/Templates/link-stats.php:544
+#: pro/includes/Admin/Templates/smart-report-view.php:298
 msgid "#"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:522
+#: lite/includes/Admin/Templates/link-stats.php:545
 #: lite/includes/EmailReports/EmailTemplate.php:318
 msgid "Destination URL"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:523
+#: lite/includes/Admin/Templates/link-stats.php:546
 msgid "Traffic %"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:525
+#: lite/includes/Admin/Templates/link-stats.php:548
 msgid "Unique Visitors"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:526
+#: lite/includes/Admin/Templates/link-stats.php:549
 msgid "First Clicks"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:529
+#: lite/includes/Admin/Templates/link-stats.php:552
 msgid "Goal Conv. %"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:530
+#: lite/includes/Admin/Templates/link-stats.php:553
 msgid "visitors → goal"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:550
+#: lite/includes/Admin/Templates/link-stats.php:573
 msgid "Variant %s"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:567
+#: lite/includes/Admin/Templates/link-stats.php:590
 msgid "Leading"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:602
+#: lite/includes/Admin/Templates/link-stats.php:625
 msgid "conv."
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:605
+#: lite/includes/Admin/Templates/link-stats.php:628
 msgid "No goal set"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:637
+#: lite/includes/Admin/Templates/link-stats.php:660
 msgid "Variant %s is winning"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:641
+#: lite/includes/Admin/Templates/link-stats.php:664
 msgid "%s%% conversion rate · %s conversions"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:645
+#: lite/includes/Admin/Templates/link-stats.php:668
 msgid "%s total clicks"
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:661
+#: lite/includes/Admin/Templates/link-stats.php:684
 msgid "Total Conv."
 msgstr ""
 
-#: lite/includes/Admin/Templates/link-stats.php:671
+#: lite/includes/Admin/Templates/link-stats.php:694
 msgid "Overall Conv. Rate"
 msgstr ""
 
@@ -2083,6 +2116,10 @@ msgstr ""
 
 #: lite/includes/Admin/Templates/links.php:29
 msgid "Export Links"
+msgstr ""
+
+#: lite/includes/Admin/Templates/migration.php:5
+msgid "Migration"
 msgstr ""
 
 #: lite/includes/Admin/Templates/migration.php:16
@@ -2153,71 +2190,184 @@ msgstr ""
 msgid "That plugin action could not be completed. Please try again."
 msgstr ""
 
-#: lite/includes/Admin/Templates/tools.php:59
+#: lite/includes/Admin/Templates/tools.php:111
+#: lite/includes/Admin/Templates/tools.php:360
 msgid "Import CSV"
 msgstr ""
 
 #. translators: %s: URL for the Pretty Links plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:66
+#: lite/includes/Admin/Templates/tools.php:118
 #: lite/language.php:135
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">Pretty Links</a> WordPress Plugin"
 msgstr ""
 
 #. translators: %s: URL for the URL Shortener by MyThemeShop plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:74
+#: lite/includes/Admin/Templates/tools.php:126
 #: lite/language.php:136
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">URL Shortener by MyThemeShop</a> WordPress Plugin"
 msgstr ""
 
 #. translators: %s: URL for the 301 Redirect plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:82
+#: lite/includes/Admin/Templates/tools.php:134
 #: lite/language.php:137
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">301 Redirect</a> WordPress Plugin"
 msgstr ""
 
 #. translators: %s: URL for the Simple 301 Redirect plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:90
+#: lite/includes/Admin/Templates/tools.php:142
 #: lite/language.php:138
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">Simple 301 Redirect</a> WordPress Plugin"
 msgstr ""
 
 #. translators: %s: URL for the Short URL plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:98
+#: lite/includes/Admin/Templates/tools.php:150
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">Short URL</a> WordPress Plugin"
 msgstr ""
 
 #. translators: %s: URL for the Thirsty Affiliates plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:106
+#: lite/includes/Admin/Templates/tools.php:158
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">Thirsty Affiliates</a> WordPress Plugin"
 msgstr ""
 
 #. translators: %s: URL for the Redirection plugin on WordPress.org
-#: lite/includes/Admin/Templates/tools.php:114
+#: lite/includes/Admin/Templates/tools.php:166
 msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">Redirection</a> WordPress Plugin"
 msgstr ""
 
-#: lite/includes/Admin/Templates/tools.php:124
-msgid "Import successfully completed!"
-msgstr ""
-
-#: lite/includes/Admin/Templates/tools.php:126
-msgid "Error occurred!"
-msgstr ""
-
-#. translators: %s: Maximum allowed file size (e.g. "2 MB")
-#: lite/includes/Admin/Templates/tools.php:192
-msgid "File size should be less than %s"
+#. translators: %s: URL for the LinkCentral plugin on WordPress.org
+#: lite/includes/Admin/Templates/tools.php:174
+msgid "Import Short Links From <a href=\"%s\" target=\"_blank\">LinkCentral</a> WordPress Plugin"
 msgstr ""
 
 #: lite/includes/Admin/Templates/tools.php:197
-msgid "Check CSV structure"
+msgid "Links added"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:198
+msgid "Links updated"
 msgstr ""
 
 #: lite/includes/Admin/Templates/tools.php:199
-msgid "from here"
+msgid "Rows skipped"
 msgstr ""
 
-#: lite/includes/Admin/Templates/tools.php:270
+#: lite/includes/Admin/Templates/tools.php:199
+msgid "Slug already existed and the update option was off."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:200
+msgid "Rows not imported"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:200
+msgid "Missing or invalid target URL."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:209
+msgid "Import completed."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:211
+msgid "Import completed, but the file contained no rows to import."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:213
+msgid "Import completed successfully."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:215
+msgid "Import completed, with some rows skipped."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:235
+msgid "View your links"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:242
+msgid "The import could not be completed."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:244
+msgid "Check that the file is a CSV, that its first row contains the column headings, and that a Target URL column is present."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:302
+msgid "Required. Where the short link points."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:303
+msgid "Optional. Generated for you when blank."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:304
+msgid "Optional. Falls back to the target URL."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:305
+msgid "Optional."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:306
+msgid "Optional. Pipe separated: Sports|Culture. Replaces the link's groups."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:307
+msgid "Optional, PRO only. Pipe separated. Replaces the link's tags."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:308
+msgid "301, 302 or 307. Uses your default when blank."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:309
+#: lite/includes/Admin/Templates/tools.php:310
+#: lite/includes/Admin/Templates/tools.php:311
+#: lite/includes/Admin/Templates/tools.php:312
+msgid "1 or 0. Uses your default when blank."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:318
+msgid "Import links from a CSV file"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:320
+msgid "&larr; All import sources"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:331
+msgid "CSV file"
+msgstr ""
+
+#. translators: %s: Maximum allowed file size (e.g. "2 MB")
+#: lite/includes/Admin/Templates/tools.php:338
+msgid "Maximum file size %s. The first row must contain the column headings."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:346
+msgid "Existing links"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:351
+msgid "Update links that already exist"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:354
+msgid "When a row's slug matches an existing link, its target URL and any other columns in the file are applied to that link. Columns the file does not contain are left unchanged. Without this, matching rows are skipped."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:368
+msgid "Expected columns"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:370
+msgid "Headings are matched by name. Any column you leave out keeps its default. Where a row gives Groups or Tags, those replace whatever the link had; leave the column out to keep them."
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:386
+msgid "Download a sample CSV"
+msgstr ""
+
+#: lite/includes/Admin/Templates/tools.php:466
 msgid "API Key have been deleted successfully!"
 msgstr ""
 
@@ -2495,123 +2645,140 @@ msgstr ""
 msgid "A Short URL will be created on Publish"
 msgstr ""
 
-#: lite/includes/Common/Export.php:63
+#: lite/includes/Common/Export.php:70
 msgid "No data available"
 msgstr ""
 
-#: lite/includes/Common/Export.php:91
-#: lite/includes/Common/Export.php:117
+#: lite/includes/Common/Export.php:98
+#: lite/includes/Common/Export.php:124
 msgid "Slug"
 msgstr ""
 
-#: lite/includes/Common/Export.php:92
+#: lite/includes/Common/Export.php:99
 #: lite/language.php:125
-#: pro/includes/Actions.php:2184
+#: pro/includes/Actions.php:2216
 #: pro/includes/Admin/Domains_Table.php:37
 msgid "Domain"
 msgstr ""
 
-#: lite/includes/Common/Export.php:93
+#: lite/includes/Common/Export.php:100
 msgid "Referer"
 msgstr ""
 
-#: lite/includes/Common/Export.php:94
+#: lite/includes/Common/Export.php:101
 msgid "First Click"
 msgstr ""
 
-#: lite/includes/Common/Export.php:95
+#: lite/includes/Common/Export.php:102
 msgid "Robot"
 msgstr ""
 
-#: lite/includes/Common/Export.php:96
+#: lite/includes/Common/Export.php:103
 msgid "OS"
 msgstr ""
 
-#: lite/includes/Common/Export.php:97
+#: lite/includes/Common/Export.php:104
+#: pro/includes/Admin/Templates/smart-report-view.php:308
 msgid "Device"
 msgstr ""
 
-#: lite/includes/Common/Export.php:98
+#: lite/includes/Common/Export.php:105
+#: pro/includes/Admin/Templates/smart-report-view.php:309
 msgid "Browser"
 msgstr ""
 
-#: lite/includes/Common/Export.php:99
+#: lite/includes/Common/Export.php:106
 msgid "Browser Version"
 msgstr ""
 
-#: lite/includes/Common/Export.php:100
+#: lite/includes/Common/Export.php:107
 msgid "IP Address"
 msgstr ""
 
-#: lite/includes/Common/Export.php:101
-#: lite/includes/Common/Export.php:124
+#: lite/includes/Common/Export.php:108
+#: lite/includes/Common/Export.php:131
 #: pro/includes/Admin/Tracking_Pixels_Table.php:107
 msgid "Created At"
 msgstr ""
 
-#: lite/includes/Common/Export.php:120
+#: lite/includes/Common/Export.php:127
 msgid "Track"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:719
+#: lite/includes/Common/Export.php:137
+#: pro/includes/Actions.php:1471
+#: pro/includes/Actions.php:1590
+#: pro/includes/Actions.php:1591
+#: pro/includes/Actions.php:2279
+#: pro/includes/Actions.php:3334
+#: pro/includes/Admin/Tables/SavedReportsTable.php:147
+#: pro/includes/Admin/Tags_Table.php:57
+#: pro/includes/Admin/Tags_Table.php:145
+#: pro/includes/Admin/Templates/smart-report-form.php:46
+#: pro/includes/Admin/Templates/smart-report-view.php:49
+#: pro/includes/Migration/Package.php:84
+msgid "Tags"
+msgstr ""
+
+#: lite/includes/Common/Utils.php:762
 #: lite/language.php:147
 msgid "Just Now"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1006
+#: lite/includes/Common/Utils.php:1049
 msgid "Desktop"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1007
+#: lite/includes/Common/Utils.php:1050
 msgid "Tablet"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1008
+#: lite/includes/Common/Utils.php:1051
 msgid "Mobile"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1021
+#: lite/includes/Common/Utils.php:1064
 msgid "Amazon Silk"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1022
-#: lite/includes/Common/Utils.php:1041
+#: lite/includes/Common/Utils.php:1065
+#: lite/includes/Common/Utils.php:1084
 msgid "Android"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1023
+#: lite/includes/Common/Utils.php:1066
 msgid "Chrome"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1024
+#: lite/includes/Common/Utils.php:1067
 msgid "Edge"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1025
+#: lite/includes/Common/Utils.php:1068
 msgid "Firefox"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1026
+#: lite/includes/Common/Utils.php:1069
 msgid "Internet Explorer"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1027
+#: lite/includes/Common/Utils.php:1070
 msgid "Opera"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1028
+#: lite/includes/Common/Utils.php:1071
 msgid "Safari"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1042
+#: lite/includes/Common/Utils.php:1085
 msgid "Linux"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1043
+#: lite/includes/Common/Utils.php:1086
 msgid "Mac"
 msgstr ""
 
-#: lite/includes/Common/Utils.php:1044
+#: lite/includes/Common/Utils.php:1087
 msgid "Windows"
 msgstr ""
 
@@ -2873,219 +3040,219 @@ msgstr ""
 msgid "Link Disabled"
 msgstr ""
 
-#: lite/includes/Helper.php:834
+#: lite/includes/Helper.php:835
 msgid "307 (Temporary)"
 msgstr ""
 
-#: lite/includes/Helper.php:835
+#: lite/includes/Helper.php:836
 msgid "302 (Temporary)"
 msgstr ""
 
-#: lite/includes/Helper.php:836
+#: lite/includes/Helper.php:837
 msgid "301 (Permanent)"
 msgstr ""
 
-#: lite/includes/Helper.php:857
+#: lite/includes/Helper.php:858
 msgid "-- No Prefix --"
 msgstr ""
 
-#: lite/includes/Helper.php:858
+#: lite/includes/Helper.php:859
 msgid "recommends"
 msgstr ""
 
-#: lite/includes/Helper.php:859
+#: lite/includes/Helper.php:860
 msgid "go"
 msgstr ""
 
-#: lite/includes/Helper.php:887
+#: lite/includes/Helper.php:888
 msgid "All my domains"
 msgstr ""
 
-#: lite/includes/Helper.php:993
+#: lite/includes/Helper.php:994
 #: lite/language.php:149
 msgid "Unique Clicks / Total Clicks"
 msgstr ""
 
-#: lite/includes/Helper.php:1290
+#: lite/includes/Helper.php:1291
 #: lite/language.php:150
 msgid "Post"
 msgstr ""
 
-#: lite/includes/Helper.php:1295
+#: lite/includes/Helper.php:1296
 #: lite/language.php:151
 msgid "Page"
 msgstr ""
 
-#: lite/includes/Helper.php:1300
+#: lite/includes/Helper.php:1301
 #: lite/language.php:152
 msgid "WooCommerce"
 msgstr ""
 
-#: lite/includes/Helper.php:1305
+#: lite/includes/Helper.php:1306
 #: lite/language.php:153
 msgid "Easy Digital Download"
 msgstr ""
 
-#: lite/includes/Helper.php:1310
+#: lite/includes/Helper.php:1311
 #: lite/language.php:154
 msgid "Events Manager"
 msgstr ""
 
-#: lite/includes/Helper.php:1315
+#: lite/includes/Helper.php:1316
 #: lite/language.php:155
 msgid "The Events Calendar"
 msgstr ""
 
-#: lite/includes/Helper.php:1320
+#: lite/includes/Helper.php:1321
 #: lite/language.php:156
 msgid "Betterdocs"
 msgstr ""
 
-#: lite/includes/Helper.php:1325
+#: lite/includes/Helper.php:1326
 #: lite/language.php:157
 msgid "WordPress Knowledgebase"
 msgstr ""
 
-#: lite/includes/Helper.php:1330
+#: lite/includes/Helper.php:1331
 #: lite/language.php:158
 msgid "Modern Events"
 msgstr ""
 
-#: lite/includes/Helper.php:2099
+#: lite/includes/Helper.php:2107
 msgid "Off"
 msgstr ""
 
-#: lite/includes/Helper.php:2100
+#: lite/includes/Helper.php:2108
 msgid "Geo Location"
 msgstr ""
 
-#: lite/includes/Helper.php:2101
+#: lite/includes/Helper.php:2109
 msgid "Technology"
 msgstr ""
 
-#: lite/includes/Helper.php:2102
+#: lite/includes/Helper.php:2110
 msgid "Link Rotation"
 msgstr ""
 
-#: lite/includes/Helper.php:2120
+#: lite/includes/Helper.php:2128
 msgid "Any Country"
 msgstr ""
 
-#: lite/includes/Helper.php:2167
-#: lite/includes/Helper.php:2252
-#: lite/includes/Helper.php:2299
+#: lite/includes/Helper.php:2175
+#: lite/includes/Helper.php:2260
+#: lite/includes/Helper.php:2307
 msgid "Any"
 msgstr ""
 
-#: lite/includes/Helper.php:2404
+#: lite/includes/Helper.php:2412
 #: lite/language.php:163
-#: pro/includes/Actions.php:1322
+#: pro/includes/Actions.php:1333
 msgid "Facebook"
 msgstr ""
 
-#: lite/includes/Helper.php:2405
+#: lite/includes/Helper.php:2413
 msgid "Google Tag Manager"
 msgstr ""
 
-#: lite/includes/Helper.php:2406
+#: lite/includes/Helper.php:2414
 #: lite/language.php:164
-#: pro/includes/Actions.php:1329
+#: pro/includes/Actions.php:1340
 msgid "Twitter"
 msgstr ""
 
-#: lite/includes/Helper.php:2407
+#: lite/includes/Helper.php:2415
 #: lite/language.php:166
-#: pro/includes/Actions.php:1343
+#: pro/includes/Actions.php:1354
 msgid "Linkedin"
 msgstr ""
 
-#: lite/includes/Helper.php:2408
+#: lite/includes/Helper.php:2416
 #: lite/language.php:167
-#: pro/includes/Actions.php:1350
+#: pro/includes/Actions.php:1361
 msgid "Pinterest"
 msgstr ""
 
-#: lite/includes/Helper.php:2409
+#: lite/includes/Helper.php:2417
 msgid "Adwords"
 msgstr ""
 
-#: lite/includes/Helper.php:2410
+#: lite/includes/Helper.php:2418
 msgid "Bing"
 msgstr ""
 
-#: lite/includes/Helper.php:2411
+#: lite/includes/Helper.php:2419
 msgid "Quora"
 msgstr ""
 
-#: lite/includes/Helper.php:2412
+#: lite/includes/Helper.php:2420
 msgid "Adroll"
 msgstr ""
 
-#: lite/includes/Helper.php:2413
+#: lite/includes/Helper.php:2421
 msgid "Reddit"
 msgstr ""
 
-#: lite/includes/Helper.php:2414
+#: lite/includes/Helper.php:2422
 msgid "TikTok"
 msgstr ""
 
-#: lite/includes/Helper.php:2415
+#: lite/includes/Helper.php:2423
 msgid "Nexus Segment"
 msgstr ""
 
-#: lite/includes/Helper.php:2472
+#: lite/includes/Helper.php:2480
 msgid "Select Link"
 msgstr ""
 
-#: lite/includes/Helper.php:2519
+#: lite/includes/Helper.php:2527
 msgid "All Links"
 msgstr ""
 
-#: lite/includes/Helper.php:2528
+#: lite/includes/Helper.php:2536
 msgid "Not in Any Group"
 msgstr ""
 
-#: lite/includes/Helper.php:2548
+#: lite/includes/Helper.php:2556
 msgid "Redirect Types"
 msgstr ""
 
-#: lite/includes/Helper.php:2650
+#: lite/includes/Helper.php:2658
 msgid "Select User"
 msgstr ""
 
-#: lite/includes/Helper.php:2700
+#: lite/includes/Helper.php:2708
 msgid "Read"
 msgstr ""
 
-#: lite/includes/Helper.php:2701
+#: lite/includes/Helper.php:2709
 msgid "Write"
 msgstr ""
 
-#: lite/includes/Helper.php:2702
+#: lite/includes/Helper.php:2710
 msgid "Read & Write"
 msgstr ""
 
 #. Translators: %s = Consumer Key.
-#: lite/includes/Helper.php:2775
+#: lite/includes/Helper.php:2783
 msgid "Consumer Key: %s"
 msgstr ""
 
 #. Translators: %s = Consumer Secret.
-#: lite/includes/Helper.php:2778
+#: lite/includes/Helper.php:2786
 msgid "Consumer Secret: %s"
 msgstr ""
 
-#: lite/includes/Helper.php:2870
+#: lite/includes/Helper.php:2878
 msgid "Excerpt"
 msgstr ""
 
 #. translators: 1: Position (top or bottom), 2: Post type label
-#: lite/includes/Helper.php:2876
+#: lite/includes/Helper.php:2884
 msgid "At the %1$s of <b>%2$s</b>"
 msgstr ""
 
 #. translators: %s: tag name
-#: lite/includes/Helper.php:3053
+#: lite/includes/Helper.php:3061
 msgid "Filter by tag: %s"
 msgstr ""
 
@@ -3102,8 +3269,8 @@ msgid "http://wordpress.org/plugins/url-shortify"
 msgstr ""
 
 #: lite/language.php:16
-#: pro/includes/Actions.php:1587
-#: pro/includes/Actions.php:1588
+#: pro/includes/Actions.php:1598
+#: pro/includes/Actions.php:1599
 #: pro/includes/Admin/Domains_Table.php:38
 #: pro/includes/Admin/Domains_Table.php:70
 #: pro/includes/Admin/Templates/domain-form.php:19
@@ -3132,13 +3299,13 @@ msgid "Get Started"
 msgstr ""
 
 #: lite/language.php:126
-#: pro/includes/Actions.php:2212
+#: pro/includes/Actions.php:2244
 msgid "Select on which domain should this short link be accessible."
 msgstr ""
 
 #. translators: %s: URL for the upgrade/pricing page
 #: lite/language.php:128
-#: pro/includes/Actions.php:2217
+#: pro/includes/Actions.php:2249
 msgid "Want to use shortlinks with custom domains? <a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
@@ -3147,94 +3314,99 @@ msgid "Protect your short link with password using PRO version. <a href=\"%s\">U
 msgstr ""
 
 #: lite/language.php:159
-#: pro/includes/Actions.php:823
-#: pro/includes/Actions.php:885
-#: pro/includes/Actions.php:985
-#: pro/includes/Actions.php:1082
-#: pro/includes/Actions.php:1178
+#: pro/includes/Actions.php:834
+#: pro/includes/Actions.php:896
+#: pro/includes/Actions.php:996
+#: pro/includes/Actions.php:1093
+#: pro/includes/Actions.php:1189
 #: pro/includes/Admin/Widgets/PopularLinksWidget.php:50
 msgid "No Data Found"
 msgstr ""
 
 #: lite/language.php:160
-#: pro/includes/Actions.php:852
+#: pro/includes/Actions.php:863
 msgid "Count"
 msgstr ""
 
 #: lite/language.php:165
-#: pro/includes/Actions.php:1336
+#: pro/includes/Actions.php:1347
 msgid "Whatsapp"
 msgstr ""
 
 #: lite/language.php:168
-#: pro/includes/Actions.php:1357
+#: pro/includes/Actions.php:1368
 msgid "Telegram"
 msgstr ""
 
 #: lite/language.php:169
-#: pro/includes/Actions.php:1364
+#: pro/includes/Actions.php:1375
 msgid "VKontakte"
 msgstr ""
 
 #: lite/language.php:170
-#: pro/includes/Actions.php:1371
+#: pro/includes/Actions.php:1382
 msgid "Email"
 msgstr ""
 
 #: lite/language.php:171
-#: pro/includes/Actions.php:1378
+#: pro/includes/Actions.php:1389
 msgid "Hacker News"
 msgstr ""
 
 #: lite/language.php:172
-#: pro/includes/Actions.php:2954
+#: pro/includes/Actions.php:3046
 #: pro/includes/Settings.php:84
 msgid "QR Code"
 msgstr ""
 
 #: lite/language.php:173
-#: pro/includes/Actions.php:1407
+#: pro/includes/Actions.php:1418
 msgid "SVG QR Code"
 msgstr ""
 
 #: lite/language.php:174
-#: pro/includes/Actions.php:1461
+#: pro/includes/Actions.php:1472
 msgid "Share"
 msgstr ""
 
 #: lite/language.php:175
-#: pro/includes/Actions.php:1989
+#: pro/includes/Actions.php:2021
 #: pro/includes/Admin/Templates/utm-preset-form.php:82
 msgid "UTM Parameters"
 msgstr ""
 
 #: lite/language.php:176
-#: pro/includes/Actions.php:2043
+#: pro/includes/Actions.php:2075
 #: pro/includes/Admin/Templates/utm-preset-form.php:98
+#: pro/includes/Admin/UTM_Presets_Table.php:97
 msgid "Source"
 msgstr ""
 
 #: lite/language.php:177
-#: pro/includes/Actions.php:2056
+#: pro/includes/Actions.php:2088
 #: pro/includes/Admin/Templates/utm-preset-form.php:107
+#: pro/includes/Admin/UTM_Presets_Table.php:98
 msgid "Medium"
 msgstr ""
 
 #: lite/language.php:178
-#: pro/includes/Actions.php:2069
+#: pro/includes/Actions.php:2101
 #: pro/includes/Admin/Templates/utm-preset-form.php:116
+#: pro/includes/Admin/UTM_Presets_Table.php:99
 msgid "Campaign"
 msgstr ""
 
 #: lite/language.php:179
-#: pro/includes/Actions.php:2083
+#: pro/includes/Actions.php:2115
 #: pro/includes/Admin/Templates/utm-preset-form.php:125
+#: pro/includes/Admin/UTM_Presets_Table.php:100
 msgid "Term"
 msgstr ""
 
 #: lite/language.php:180
-#: pro/includes/Actions.php:2098
+#: pro/includes/Actions.php:2130
 #: pro/includes/Admin/Templates/utm-preset-form.php:135
+#: pro/includes/Admin/UTM_Presets_Table.php:101
 msgid "Content"
 msgstr ""
 
@@ -3391,33 +3563,33 @@ msgstr ""
 msgid "URL Shortify requires PHP version %s+, plugin is currently NOT RUNNING."
 msgstr ""
 
-#: pro/includes/Actions.php:416
+#: pro/includes/Actions.php:427
 msgid "Redirection After Expiration?"
 msgstr ""
 
-#: pro/includes/Actions.php:453
+#: pro/includes/Actions.php:464
 msgid "Redirection URL"
 msgstr ""
 
-#: pro/includes/Actions.php:584
+#: pro/includes/Actions.php:595
 msgid "Splash Countdown (sec)"
 msgstr ""
 
-#: pro/includes/Actions.php:598
+#: pro/includes/Actions.php:609
 msgid "Seconds to wait before automatically redirecting the visitor. Min: 1, Max: 60. Default: 10."
 msgstr ""
 
-#: pro/includes/Actions.php:1200
+#: pro/includes/Actions.php:1211
 msgid "Pixel"
 msgstr ""
 
-#: pro/includes/Actions.php:1396
+#: pro/includes/Actions.php:1407
 msgid "PNG QR Code"
 msgstr ""
 
-#: pro/includes/Actions.php:1595
-#: pro/includes/Actions.php:1596
-#: pro/includes/Actions.php:2002
+#: pro/includes/Actions.php:1606
+#: pro/includes/Actions.php:1607
+#: pro/includes/Actions.php:2034
 #: pro/includes/Admin/UTM_Presets_Table.php:36
 #: pro/includes/Admin/UTM_Presets_Table.php:37
 #: pro/includes/Admin/UTM_Presets_Table.php:69
@@ -3425,9 +3597,9 @@ msgstr ""
 msgid "UTM Presets"
 msgstr ""
 
-#: pro/includes/Actions.php:1603
-#: pro/includes/Actions.php:1604
-#: pro/includes/Actions.php:2140
+#: pro/includes/Actions.php:1614
+#: pro/includes/Actions.php:1615
+#: pro/includes/Actions.php:2172
 #: pro/includes/Admin/Templates/tracking-pixel-form.php:24
 #: pro/includes/Admin/Tracking_Pixels_Table.php:45
 #: pro/includes/Admin/Tracking_Pixels_Table.php:78
@@ -3435,9 +3607,9 @@ msgstr ""
 msgid "Tracking Pixels"
 msgstr ""
 
-#: pro/includes/Actions.php:1611
-#: pro/includes/Actions.php:1612
-#: pro/includes/Actions.php:1748
+#: pro/includes/Actions.php:1622
+#: pro/includes/Actions.php:1623
+#: pro/includes/Actions.php:1780
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:33
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:56
 #: pro/includes/Admin/Templates/auto-link-keyword-form.php:27
@@ -3446,219 +3618,231 @@ msgstr ""
 msgid "Auto Link Keywords"
 msgstr ""
 
-#: pro/includes/Actions.php:1621
-#: pro/includes/Actions.php:1622
+#: pro/includes/Actions.php:1632
+#: pro/includes/Actions.php:1633
 #: pro/includes/Admin/Tables/BrokenLinksTable.php:34
 #: pro/includes/Admin/Templates/broken-links.php:122
 #: pro/includes/Settings.php:352
 msgid "Broken Links"
 msgstr ""
 
-#: pro/includes/Actions.php:1752
+#: pro/includes/Actions.php:1643
+#: pro/includes/Actions.php:1644
+#: pro/includes/Admin/Templates/smart-report-form.php:106
+#: pro/includes/Admin/Templates/smart-reports.php:38
+msgid "Smart Reports"
+msgstr ""
+
+#: pro/includes/Actions.php:1784
 #: pro/includes/Admin/Templates/auto-link-keyword-form.php:57
 msgid "Separate multiple keywords with commas."
 msgstr ""
 
-#: pro/includes/Actions.php:1763
+#: pro/includes/Actions.php:1795
 #: pro/includes/Admin/Templates/auto-link-keyword-form.php:68
 msgid "e.g. WordPress, WP, wordpress plugin"
 msgstr ""
 
 #. translators: %s: URL to create a new tag
-#: pro/includes/Actions.php:2282
+#: pro/includes/Actions.php:2314
 msgid "No Tag found. <a href=\"%s\">Create a new Tag</a>."
 msgstr ""
 
 #. translators: %s: URL for the upgrade/pricing page
-#: pro/includes/Actions.php:2296
+#: pro/includes/Actions.php:2328
 msgid "Want to organize links with tags? <a href=\"%s\">Upgrade Now</a>"
 msgstr ""
 
-#: pro/includes/Actions.php:2549
+#: pro/includes/Actions.php:2581
 msgid "Weight"
 msgstr ""
 
-#: pro/includes/Actions.php:2657
+#: pro/includes/Actions.php:2689
+#: pro/includes/Admin/Tables/SavedReportsTable.php:61
 msgid "Goal Link"
 msgstr ""
 
-#: pro/includes/Actions.php:2826
+#: pro/includes/Actions.php:2858
 msgid "Link Status Actions"
 msgstr ""
 
-#: pro/includes/Actions.php:2828
+#: pro/includes/Actions.php:2860
 msgid "Enable Links"
 msgstr ""
 
-#: pro/includes/Actions.php:2829
+#: pro/includes/Actions.php:2861
 msgid "Disable Links"
 msgstr ""
 
-#: pro/includes/Actions.php:2834
+#: pro/includes/Actions.php:2866
 msgid "Link Attributes Actions"
 msgstr ""
 
-#: pro/includes/Actions.php:2836
+#: pro/includes/Actions.php:2868
 msgid "Enable Nofollow"
 msgstr ""
 
-#: pro/includes/Actions.php:2837
+#: pro/includes/Actions.php:2869
 msgid "Disable Nofollow"
 msgstr ""
 
-#: pro/includes/Actions.php:2838
+#: pro/includes/Actions.php:2870
 msgid "Enable Parameters Forwarding"
 msgstr ""
 
-#: pro/includes/Actions.php:2839
+#: pro/includes/Actions.php:2871
 msgid "Disable Parameters Forwarding"
 msgstr ""
 
-#: pro/includes/Actions.php:2840
+#: pro/includes/Actions.php:2872
 msgid "Enable Tracking"
 msgstr ""
 
-#: pro/includes/Actions.php:2841
+#: pro/includes/Actions.php:2873
 msgid "Disable Tracking"
 msgstr ""
 
-#: pro/includes/Actions.php:2842
+#: pro/includes/Actions.php:2874
 msgid "Enable Sponsored"
 msgstr ""
 
-#: pro/includes/Actions.php:2843
+#: pro/includes/Actions.php:2875
 msgid "Disable Sponsored"
 msgstr ""
 
-#: pro/includes/Actions.php:2848
+#: pro/includes/Actions.php:2880
 msgid "Tags Actions"
 msgstr ""
 
-#: pro/includes/Actions.php:2850
+#: pro/includes/Actions.php:2882
 msgid "Add Tag"
 msgstr ""
 
-#: pro/includes/Actions.php:2851
+#: pro/includes/Actions.php:2883
 msgid "Remove All Tags"
 msgstr ""
 
-#: pro/includes/Actions.php:2852
+#: pro/includes/Actions.php:2884
 msgid "Change Tag To"
 msgstr ""
 
-#: pro/includes/Actions.php:2857
+#: pro/includes/Actions.php:2889
 msgid "Favorite Links Actions"
 msgstr ""
 
-#: pro/includes/Actions.php:2859
+#: pro/includes/Actions.php:2891
 msgid "Add To Favorite"
 msgstr ""
 
-#: pro/includes/Actions.php:2860
+#: pro/includes/Actions.php:2892
 msgid "Remove From Favorite"
 msgstr ""
 
-#: pro/includes/Actions.php:2865
+#: pro/includes/Actions.php:2897
 msgid "Other Actions"
 msgstr ""
 
-#: pro/includes/Actions.php:2867
+#: pro/includes/Actions.php:2899
 msgid "Add Expiry"
 msgstr ""
 
-#: pro/includes/Actions.php:2868
-#: pro/includes/Actions.php:2964
+#: pro/includes/Actions.php:2900
+#: pro/includes/Actions.php:3056
 msgid "Duplicate"
 msgstr ""
 
-#: pro/includes/Actions.php:2888
+#: pro/includes/Actions.php:2901
+msgid "Compare in Smart Reports"
+msgstr ""
+
+#: pro/includes/Actions.php:2980
 msgid "Bookmarklet"
 msgstr ""
 
-#: pro/includes/Actions.php:2963
+#: pro/includes/Actions.php:3055
 msgid "Create a copy of this link with a new short link"
 msgstr ""
 
-#: pro/includes/Actions.php:3154
+#: pro/includes/Actions.php:3246
 msgid "Generate Short Link"
 msgstr ""
 
 #. translators: %d: Number of posts for which short links were generated
-#: pro/includes/Actions.php:3200
+#: pro/includes/Actions.php:3292
 msgid "Short links generated for %d posts successfully!."
 msgstr ""
 
-#: pro/includes/Actions.php:3218
+#: pro/includes/Actions.php:3310
 msgid "Additional Link Parameters"
 msgstr ""
 
-#: pro/includes/Actions.php:3220
+#: pro/includes/Actions.php:3312
 msgid "Nofollow (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3221
+#: pro/includes/Actions.php:3313
 msgid "Nofollow (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3222
+#: pro/includes/Actions.php:3314
 msgid "Sponsored (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3223
+#: pro/includes/Actions.php:3315
 msgid "Sponsored (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3224
+#: pro/includes/Actions.php:3316
 msgid "Parameter Forwarding (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3225
+#: pro/includes/Actions.php:3317
 msgid "Parameter Forwarding (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3226
+#: pro/includes/Actions.php:3318
 msgid "Tracking (Enable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3227
+#: pro/includes/Actions.php:3319
 msgid "Tracking (Disable)"
 msgstr ""
 
-#: pro/includes/Actions.php:3236
+#: pro/includes/Actions.php:3328
 msgid "No Tag Assigned"
 msgstr ""
 
-#: pro/includes/Actions.php:3250
+#: pro/includes/Actions.php:3342
 msgid "Password Protected Links"
 msgstr ""
 
-#: pro/includes/Actions.php:3252
-#: pro/includes/Actions.php:3271
+#: pro/includes/Actions.php:3344
+#: pro/includes/Actions.php:3363
 msgid "Yes"
 msgstr ""
 
-#: pro/includes/Actions.php:3253
-#: pro/includes/Actions.php:3272
+#: pro/includes/Actions.php:3345
+#: pro/includes/Actions.php:3364
 msgid "No"
 msgstr ""
 
-#: pro/includes/Actions.php:3259
+#: pro/includes/Actions.php:3351
 msgid "Time Bound Links"
 msgstr ""
 
-#: pro/includes/Actions.php:3261
+#: pro/includes/Actions.php:3353
 msgid "Expired Links"
 msgstr ""
 
-#: pro/includes/Actions.php:3262
+#: pro/includes/Actions.php:3354
 msgid "Non-Expired Links"
 msgstr ""
 
-#: pro/includes/Actions.php:3263
+#: pro/includes/Actions.php:3355
 msgid "Expiration Date Not Set"
 msgstr ""
 
-#: pro/includes/Actions.php:3269
+#: pro/includes/Actions.php:3361
 #: pro/includes/Migration/Package.php:186
 msgid "Favorite Links"
 msgstr ""
@@ -3682,6 +3866,7 @@ msgstr ""
 
 #: pro/includes/Admin/Auto_Link_Keywords_Table.php:125
 #: pro/includes/Admin/Tables/BrokenLinksTable.php:99
+#: pro/includes/Admin/Tables/SavedReportsTable.php:117
 msgid "Edit"
 msgstr ""
 
@@ -3801,6 +3986,114 @@ msgstr ""
 
 #: pro/includes/Admin/Tables/BrokenLinksTable.php:130
 msgid "Connection Error"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:47
+msgid "Saved Report"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:48
+msgid "Saved Reports"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:59
+#: pro/includes/Admin/Templates/smart-report-view.php:123
+msgid "Report"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:60
+msgid "Compares"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:62
+#: pro/includes/Admin/Templates/smart-report-form.php:188
+msgid "Date Range"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:63
+msgid "Metric"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:64
+msgid "Last Updated"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:104
+msgid "(no name)"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:116
+msgid "View report"
+msgstr ""
+
+#. translators: %s: entity name, e.g. Links
+#. translators: %s: entity name, e.g. links
+#: pro/includes/Admin/Tables/SavedReportsTable.php:154
+#: pro/includes/Admin/Templates/smart-report-view.php:158
+msgid "All %s"
+msgstr ""
+
+#. translators: 1: number selected, 2: entity name
+#: pro/includes/Admin/Tables/SavedReportsTable.php:160
+#: pro/includes/Admin/Templates/smart-report-view.php:161
+msgid "%1$d %2$s"
+msgid_plural "%1$d %2$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:186
+#: pro/includes/Admin/Templates/smart-report-view.php:172
+msgid "Deleted link"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:204
+#: pro/includes/Admin/Templates/smart-report-form.php:50
+#: pro/includes/Admin/Templates/smart-report-view.php:53
+msgid "Last 7 days"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:205
+#: pro/includes/Admin/Templates/smart-report-form.php:51
+#: pro/includes/Admin/Templates/smart-report-view.php:54
+msgid "Last 30 days"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:206
+#: pro/includes/Admin/Templates/smart-report-form.php:52
+#: pro/includes/Admin/Templates/smart-report-view.php:55
+msgid "Last 60 days"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:207
+#: pro/includes/Admin/Templates/smart-report-form.php:53
+#: pro/includes/Admin/Templates/smart-report-view.php:56
+msgid "Last 90 days"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:208
+#: pro/includes/Admin/Templates/smart-report-form.php:54
+#: pro/includes/Admin/Templates/smart-report-view.php:57
+msgid "Custom range"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:234
+#: pro/includes/Admin/Templates/smart-report-form.php:226
+#: pro/includes/Admin/Templates/smart-report-view.php:179
+msgid "Unique clicks"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:235
+#: pro/includes/Admin/Templates/smart-report-form.php:225
+#: pro/includes/Admin/Templates/smart-report-view.php:179
+msgid "Total clicks"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:303
+msgid "Delete this saved report?"
+msgstr ""
+
+#: pro/includes/Admin/Tables/SavedReportsTable.php:434
+msgid "No saved reports yet. Build a report and save it to see it listed here."
 msgstr ""
 
 #: pro/includes/Admin/Tags_Table.php:56
@@ -4209,6 +4502,223 @@ msgstr ""
 msgid "File integrity verified."
 msgstr ""
 
+#: pro/includes/Admin/Templates/smart-report-form.php:57
+#: pro/includes/Admin/Templates/smart-report-view.php:129
+msgid "Edit Report"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:57
+#: pro/includes/Admin/Templates/smart-reports.php:41
+msgid "Build New Report"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:122
+#: pro/includes/Admin/Templates/smart-report-view.php:148
+#: pro/includes/Admin/Templates/smart-reports.php:63
+msgid "The report could not be saved. Please give it a name and try again."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:142
+msgid "Report Name"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:146
+msgid "e.g. Blog funnel to signup"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:155
+msgid "Optional. What this report is for."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:159
+msgid "e.g. Which blog posts send the most trial signups."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:164
+msgid "What to measure"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:165
+msgid "Choose what this report compares and over what period. You can change any of it later."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:171
+msgid "Compare"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:172
+msgid "Changing this reloads the list below."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:204
+#: pro/includes/Shortcode.php:85
+msgid "From"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:209
+msgid "To"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:220
+msgid "Chart Metric"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:221
+msgid "What the lines on the chart measure."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:234
+msgid "Selection"
+msgstr ""
+
+#. translators: %d: maximum number of series drawn
+#: pro/includes/Admin/Templates/smart-report-form.php:239
+msgid "Leave empty to include everything. The top %d by clicks are charted."
+msgstr ""
+
+#. translators: %s: entity name, e.g. Links
+#: pro/includes/Admin/Templates/smart-report-form.php:252
+msgid "Which %s?"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:260
+msgid "Nothing to compare yet."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:269
+msgid "Hold Ctrl (Cmd on Mac) to pick several."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:275
+#: pro/includes/Admin/Templates/smart-report-view.php:180
+msgid "Goal link"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:278
+msgid "— No goal link —"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:286
+msgid "Optional. A visitor who clicks one of the selected links and then reaches this one counts as a conversion."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:297
+msgid "Update Report"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-form.php:297
+msgid "Create Report"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:134
+msgid "All Saved Reports"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:144
+#: pro/includes/Admin/Templates/smart-reports.php:55
+msgid "Report saved."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:166
+msgid "No goal link"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:176
+msgid "Comparing"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:177
+msgid "Date range"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:178
+msgid "Period"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:179
+msgid "Chart metric"
+msgstr ""
+
+#. translators: %s: the earliest date actually charted
+#: pro/includes/Admin/Templates/smart-report-view.php:198
+msgid "That range was too wide to chart. Showing from %s onwards."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:208
+msgid "No clicks in this range."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:209
+msgid "Try a wider date range, or a different selection."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:230
+#: pro/includes/Admin/Templates/smart-report-view.php:303
+msgid "Conversions"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:234
+#: pro/includes/Admin/Templates/smart-report-view.php:304
+msgid "Conversion Rate"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:242
+msgid "Clicks over time"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:247
+msgid "One line per item, unique clicks."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:248
+msgid "One line per item, total clicks."
+msgstr ""
+
+#. translators: 1: number charted, 2: total number available
+#: pro/includes/Admin/Templates/smart-report-view.php:260
+msgid "Showing the top %1$d of %2$d by clicks."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:272
+msgid "Clicks per day across the last 12 months for the links in this report."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:280
+msgid "Not enough activity to draw the heatmap yet."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:286
+msgid "Link performance"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:288
+msgid "Device, browser and platform show the most common value for each link, with its share of that link's clicks."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:292
+msgid "No links to report on."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:310
+msgid "Platform"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:324
+msgid "Goal"
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-report-view.php:390
+msgid "Every recorded click across the links in this report."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-reports.php:59
+msgid "Report deleted."
+msgstr ""
+
+#: pro/includes/Admin/Templates/smart-reports.php:67
+msgid "A saved report stores the filter behind it rather than the numbers, so opening one always shows current data. Reports are visible only to you."
+msgstr ""
+
 #: pro/includes/Admin/Templates/tag-form.php:19
 msgid "Tags "
 msgstr ""
@@ -4283,47 +4793,47 @@ msgstr ""
 msgid "Search Pixels"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:272
+#: pro/includes/Admin/UTM_Presets_Table.php:314
 msgid "You do not have permission to delete this UTM Preset."
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:281
+#: pro/includes/Admin/UTM_Presets_Table.php:323
 msgid "UTM Preset has been deleted successfully!"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:297
+#: pro/includes/Admin/UTM_Presets_Table.php:339
 msgid "You do not have permission to delete UTM Preset(s)."
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:305
+#: pro/includes/Admin/UTM_Presets_Table.php:347
 msgid "UTM Preset(s) have been deleted successfully!"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:308
+#: pro/includes/Admin/UTM_Presets_Table.php:350
 msgid "Please select UTM Preset(s) to delete."
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:354
+#: pro/includes/Admin/UTM_Presets_Table.php:396
 msgid "UTM Preset has been saved successfully!"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:372
+#: pro/includes/Admin/UTM_Presets_Table.php:414
 msgid "Edit UTM Preset"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:382
+#: pro/includes/Admin/UTM_Presets_Table.php:424
 msgid "New UTM Preset"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:383
+#: pro/includes/Admin/UTM_Presets_Table.php:425
 msgid "Save UTM Preset"
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:457
+#: pro/includes/Admin/UTM_Presets_Table.php:499
 msgid "You do not have permission to edit this UTM Preset."
 msgstr ""
 
-#: pro/includes/Admin/UTM_Presets_Table.php:503
+#: pro/includes/Admin/UTM_Presets_Table.php:545
 msgid "Search UTM Presets"
 msgstr ""
 
@@ -5109,10 +5619,6 @@ msgstr ""
 
 #: pro/includes/Shortcode.php:73
 msgid "Shorten"
-msgstr ""
-
-#: pro/includes/Shortcode.php:85
-msgid "From"
 msgstr ""
 
 #: pro/includes/Shortcode.php:92

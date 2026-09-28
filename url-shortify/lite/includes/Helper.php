@@ -1504,6 +1504,9 @@ class Helper {
             'shorten_url'          => [ 'type' => 'table',  'value' => 'pluginSL_shorturl' ],
             'thirsty_affiliates'   => [ 'type' => 'plugin', 'value' => 'thirstyaffiliates/thirstyaffiliates.php' ],
             'redirection'          => [ 'type' => 'table',  'value' => 'redirection_items' ],
+            // Link Central stores its links as posts, so there is no table or
+            // plugin file to look for - the destination postmeta is the tell.
+            'link_central'         => [ 'type' => 'postmeta', 'value' => '_lc_destination_url' ],
         ];
 
         if ( ! isset( $sources[ $source ] ) ) {
@@ -1517,6 +1520,10 @@ class Helper {
                 return (bool) US()->is_table_exists( $wpdb->prefix . $check['value'] );
             case 'plugin':
                 return in_array( $check['value'], Tracker::get_active_plugins(), true );
+            case 'postmeta':
+                return (bool) $wpdb->get_var(
+                    $wpdb->prepare( "SELECT 1 FROM {$wpdb->postmeta} WHERE meta_key = %s LIMIT 1", $check['value'] )
+                );
         }
 
         return false;

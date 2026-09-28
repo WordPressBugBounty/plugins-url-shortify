@@ -32,6 +32,7 @@ class ImportController extends BaseController {
 		'thirsty_affiliates'   => ThirstyAffiliatesImporter::class,
 		'shorten_url'          => ShortenUrlImporter::class,
 		'redirection'          => RedirectionImporter::class,
+		'link_central'         => LinkCentralImporter::class,
 	];
 
 	/**
@@ -114,18 +115,46 @@ class ImportController extends BaseController {
 	 * @param array $groups
 	 *
 	 */
-	public function add_links_to_group( $groups = [] ) {
+	public function add_links_to_group( $groups = [], $replace_for_slugs = [] ) {
+
+		$links_slug_id_map = US()->db->links->get_columns_map( 'slug', 'id' );
+
+		/*
+		 * Links whose source row supplied a Groups value get their existing
+		 * assignments cleared first, so the file decides which groups the link
+		 * is in rather than adding to whatever was there before. Rows that omit
+		 * the column pass nothing here and keep their groups.
+		 */
+		$replace_link_ids = [];
+
+		foreach ( (array) $replace_for_slugs as $slug ) {
+			$link_id = absint( Helper::get_data( $links_slug_id_map, $slug, 0 ) );
+
+			if ( $link_id ) {
+				$replace_link_ids[ $link_id ] = true;
+			}
+		}
+
+		if ( ! empty( $replace_link_ids ) ) {
+			$replace_ids_str = US()->db->links_groups->prepare_for_in_query( array_keys( $replace_link_ids ) );
+
+			if ( '' !== $replace_ids_str ) {
+				US()->db->links_groups->delete_by_condition( "link_id IN ($replace_ids_str)" );
+			}
+		}
 
 		if ( Helper::is_forechable( $groups ) ) {
 
 			$create_by_id       = \get_current_user_id();
 			$groups_name_id_map = US()->db->groups->get_columns_map( 'name', 'id' );
 
-			$links_slug_id_map = US()->db->links->get_columns_map( 'slug', 'id' );
-
 			$data_to_insert = [];
 
 			$key = 0;
+
+			// link_id => true, per group, so the same pair is never queued twice
+			// from one file.
+			$pairs = [];
 
 			foreach ( $groups as $group => $links ) {
 
@@ -137,7 +166,9 @@ class ImportController extends BaseController {
 						foreach ( $links as $slug ) {
 							$link_id = Helper::get_data( $links_slug_id_map, $slug, 0 );
 
-							if ( 0 != $link_id ) {
+							if ( 0 != $link_id && ! isset( $pairs[ $group_id ][ $link_id ] ) ) {
+								$pairs[ $group_id ][ $link_id ] = true;
+
 								$data_to_insert[ $key ]['link_id']       = $link_id;
 								$data_to_insert[ $key ]['group_id']      = $group_id;
 								$data_to_insert[ $key ]['created_by_id'] = $create_by_id;
@@ -150,6 +181,28 @@ class ImportController extends BaseController {
 			}
 
 			if ( Helper::is_forechable( $data_to_insert ) ) {
+				/*
+				 * Clear the pairs about to be written first. Importing the same
+				 * file twice used to add a second row for every link and group,
+				 * so the link then listed the same group several times over.
+				 * This mirrors Links_Groups::map_links_and_groups(), which
+				 * deletes before inserting for the same reason.
+				 */
+				foreach ( $pairs as $group_id => $link_ids ) {
+					// Links in the replace set were cleared wholesale above.
+					$remaining = array_diff_key( $link_ids, $replace_link_ids );
+
+					if ( empty( $remaining ) ) {
+						continue;
+					}
+
+					$link_ids_str = US()->db->links_groups->prepare_for_in_query( array_keys( $remaining ) );
+
+					if ( '' !== $link_ids_str ) {
+						US()->db->links_groups->delete_by_condition( "group_id = " . absint( $group_id ) . " AND link_id IN ($link_ids_str)" );
+					}
+				}
+
 				US()->db->links_groups->bulk_insert( $data_to_insert );
 			}
 		}
@@ -194,16 +247,41 @@ class ImportController extends BaseController {
 	 *
 	 * @param array $tags
 	 */
-	public function add_links_to_tag( $tags = [] ) {
+	public function add_links_to_tag( $tags = [], $replace_for_slugs = [] ) {
+		$links_slug_id_map = US()->db->links->get_columns_map( 'slug', 'id' );
+
+		// Same rule as groups above: a row that supplies Tags replaces the
+		// link's tags outright, a row that omits the column leaves them be.
+		$replace_link_ids = [];
+
+		foreach ( (array) $replace_for_slugs as $slug ) {
+			$link_id = absint( Helper::get_data( $links_slug_id_map, $slug, 0 ) );
+
+			if ( $link_id ) {
+				$replace_link_ids[ $link_id ] = true;
+			}
+		}
+
+		if ( ! empty( $replace_link_ids ) ) {
+			$replace_ids_str = US()->db->links_tags->prepare_for_in_query( array_keys( $replace_link_ids ) );
+
+			if ( '' !== $replace_ids_str ) {
+				US()->db->links_tags->delete_by_condition( "link_id IN ($replace_ids_str)" );
+			}
+		}
+
 		if ( ! Helper::is_forechable( $tags ) ) {
 			return;
 		}
 
-		$created_by_id     = \get_current_user_id();
-		$tags_name_id_map  = US()->db->tags->get_columns_map( 'name', 'id' );
-		$links_slug_id_map = US()->db->links->get_columns_map( 'slug', 'id' );
-		$data_to_insert    = [];
-		$key               = 0;
+		$created_by_id    = \get_current_user_id();
+		$tags_name_id_map = US()->db->tags->get_columns_map( 'name', 'id' );
+		$data_to_insert   = [];
+		$key              = 0;
+
+		// link_id => true, per tag, so the same pair is never queued twice from
+		// one file.
+		$pairs = [];
 
 		foreach ( $tags as $tag => $links ) {
 			$tag_id = Helper::get_data( $tags_name_id_map, $tag, 0 );
@@ -212,7 +290,9 @@ class ImportController extends BaseController {
 				foreach ( $links as $slug ) {
 					$link_id = Helper::get_data( $links_slug_id_map, $slug, 0 );
 
-					if ( 0 != $link_id ) {
+					if ( 0 != $link_id && ! isset( $pairs[ $tag_id ][ $link_id ] ) ) {
+						$pairs[ $tag_id ][ $link_id ] = true;
+
 						$data_to_insert[ $key ]['link_id']       = $link_id;
 						$data_to_insert[ $key ]['tag_id']        = $tag_id;
 						$data_to_insert[ $key ]['created_by_id'] = $created_by_id;
@@ -223,6 +303,23 @@ class ImportController extends BaseController {
 		}
 
 		if ( Helper::is_forechable( $data_to_insert ) ) {
+			// Same reasoning as the group mapping above: clear these pairs
+			// before writing them so a repeat import cannot stack duplicates.
+			foreach ( $pairs as $tag_id => $link_ids ) {
+				// Links in the replace set were cleared wholesale above.
+				$remaining = array_diff_key( $link_ids, $replace_link_ids );
+
+				if ( empty( $remaining ) ) {
+					continue;
+				}
+
+				$link_ids_str = US()->db->links_tags->prepare_for_in_query( array_keys( $remaining ) );
+
+				if ( '' !== $link_ids_str ) {
+					US()->db->links_tags->delete_by_condition( "tag_id = " . absint( $tag_id ) . " AND link_id IN ($link_ids_str)" );
+				}
+			}
+
 			US()->db->links_tags->bulk_insert( $data_to_insert );
 		}
 	}
@@ -308,124 +405,310 @@ class ImportController extends BaseController {
 		// Read the first row of the CSV file as the column names.
 		$columns = fgetcsv( $csv_file );
 
-		$columns = array_map('trim', $columns);
+		if ( ! is_array( $columns ) ) {
+			fclose( $csv_file );
+
+			wp_die( esc_html__( 'The CSV file appears to be empty.', 'url-shortify' ) );
+		}
+
+		$columns = array_map( 'trim', $columns );
+
+		// Strip a UTF-8 BOM off the first heading, or "Slug" never matches and
+		// every row looks like it has no slug.
+		if ( isset( $columns[0] ) ) {
+			$columns[0] = preg_replace( '/^\xEF\xBB\xBF/', '', $columns[0] );
+		}
 
 		$required_headings = [ 'Target URL' ];
 
 		if ( count( array_intersect( $columns, $required_headings ) ) != count( $required_headings ) ) {
-			wp_die( 'Invalid columns in CSV file. Please make sure Target URL column is available in CSV file.' );
+			fclose( $csv_file );
+
+			wp_die( esc_html__( 'Invalid columns in CSV file. Please make sure Target URL column is available in CSV file.', 'url-shortify' ) );
 		}
 
-		$links = [];
+		$column_count = count( $columns );
+
+		$links   = [];
+		$results = [
+			'created' => 0,
+			'updated' => 0,
+			'skipped' => 0,
+			'invalid' => 0,
+		];
 
 		while ( ( $data = fgetcsv( $csv_file ) ) !== false ) {
+			// A completely blank line reads as a single null cell; ignore it
+			// rather than counting it as a broken row.
+			if ( [ null ] === $data || [ '' ] === $data ) {
+				continue;
+			}
+
+			// array_combine() throws when the counts differ, so pad or trim the
+			// row to the header width instead of letting one ragged line abort
+			// the whole import. This is a repair, not a rejection - the row is
+			// only counted as unreadable if it then fails validation below.
+			if ( count( $data ) !== $column_count ) {
+				if ( count( $data ) < $column_count ) {
+					$data = array_pad( $data, $column_count, '' );
+				} else {
+					$data = array_slice( $data, 0, $column_count );
+				}
+			}
+
 			$links[] = array_combine( $columns, $data );
 		}
 
 		fclose( $csv_file );
 
-		if ( Helper::is_forechable( $links ) ) {
+		if ( ! Helper::is_forechable( $links ) ) {
+			return $results;
+		}
 
-			$settings = US()->get_settings();
+		$update_existing = 1 === (int) Helper::get_post_data( 'update_existing', 0 );
 
-			$default_nofollow          = Helper::get_data( $settings, 'links_default_link_options_enable_nofollow', 1 );
-			$default_track_me          = Helper::get_data( $settings, 'links_default_link_options_enable_tracking', 1 );
-			$default_sponsored         = Helper::get_data( $settings, 'links_default_link_options_enable_sponsored', 1 );
-			$default_params_forwarding = Helper::get_data( $settings, 'links_default_link_options_enable_paramter_forwarding', 1 );
-			$default_redirect_type     = Helper::get_data( $settings, 'links_default_link_options_redirection_type', 301 );
+		$settings = US()->get_settings();
 
-			$default_created_at = date( 'Y-m-d H:i:s' );
+		$default_nofollow          = Helper::get_data( $settings, 'links_default_link_options_enable_nofollow', 1 );
+		$default_track_me          = Helper::get_data( $settings, 'links_default_link_options_enable_tracking', 1 );
+		$default_sponsored         = Helper::get_data( $settings, 'links_default_link_options_enable_sponsored', 1 );
+		$default_params_forwarding = Helper::get_data( $settings, 'links_default_link_options_enable_paramter_forwarding', 1 );
+		$default_redirect_type     = Helper::get_data( $settings, 'links_default_link_options_redirection_type', 301 );
 
-			$current_user_id = \get_current_user_id();
+		$default_created_at = date( 'Y-m-d H:i:s' );
 
-			$existing_links = US()->db->links->get_columns_map( 'id', 'slug' );
+		$current_user_id = \get_current_user_id();
 
-			$values = [];
+		// Slug => id, so an existing link can be found and updated in place.
+		$existing_links = US()->db->links->get_columns_map( 'slug', 'id' );
 
-			$key = 0;
+		$values = [];
 
-			$groups_to_import = [];
-			$tags_to_import   = [];
+		$key = 0;
 
-			foreach ( $links as $link ) {
+		$groups_to_import = [];
+		$tags_to_import   = [];
 
-				$slug = Helper::get_data( $link, 'Slug', '', true );
+		// Slugs whose row supplied a Groups / Tags value. Those links have their
+		// assignments replaced by what the file says; a row that leaves the
+		// column out (or blank) keeps whatever it already had.
+		$slugs_replacing_groups = [];
+		$slugs_replacing_tags   = [];
 
-				$groups = $this->parse_csv_terms( Helper::get_data( $link, 'Groups', '', true ) );
-				$tags   = [];
-				if ( US()->is_pro() ) {
-					$tags = $this->parse_csv_terms( Helper::get_data( $link, 'Tags', '', true ) );
+		foreach ( $links as $link ) {
+
+			$target_url = $this->get_csv_value( $link, 'Target URL' );
+
+			// Without a destination there is nothing to redirect to, so the row
+			// is reported rather than silently written as an empty link.
+			if ( null === $target_url || ! Utils::validate_url( $target_url, true ) ) {
+				$results['invalid'] ++;
+				continue;
+			}
+
+			$slug = $this->get_csv_value( $link, 'Slug' );
+			$slug = ( null !== $slug ) ? Helper::clean( $slug ) : '';
+
+			$groups_cell = $this->get_csv_value( $link, 'Groups' );
+			$groups      = ( null !== $groups_cell ) ? $this->parse_csv_terms( Helper::clean( $groups_cell ) ) : [];
+
+			$tags_cell = null;
+			$tags      = [];
+
+			if ( US()->is_pro() ) {
+				$tags_cell = $this->get_csv_value( $link, 'Tags' );
+				$tags      = ( null !== $tags_cell ) ? $this->parse_csv_terms( Helper::clean( $tags_cell ) ) : [];
+			}
+
+			if ( empty( $slug ) ) {
+				$slug = Utils::generate_random_slug();
+				$slug = Helper::get_slug_with_prefix( $slug );
+			}
+
+			// Group and tag assignment is keyed by slug, so it applies to
+			// updated links as well as newly created ones.
+			if ( null !== $groups_cell ) {
+				$slugs_replacing_groups[ $slug ] = true;
+
+				foreach ( $groups as $group ) {
+					$groups_to_import[ $group ][] = $slug;
 				}
+			}
 
-				if ( empty( $slug ) ) {
-					$slug = Utils::generate_random_slug();
-					$slug = Helper::get_slug_with_prefix( $slug );
+			if ( US()->is_pro() && null !== $tags_cell ) {
+				$slugs_replacing_tags[ $slug ] = true;
+
+				foreach ( $tags as $tag ) {
+					$tags_to_import[ $tag ][] = $slug;
 				}
+			}
 
+			$existing_id = isset( $existing_links[ $slug ] ) ? absint( $existing_links[ $slug ] ) : 0;
 
-				if ( ! empty( $groups ) ) {
-					foreach ( $groups as $group ) {
-						$groups_to_import[ $group ][] = $slug;
-					}
-				}
-
-				if ( US()->is_pro() && ! empty( $tags ) ) {
-					foreach ( $tags as $tag ) {
-						$tags_to_import[ $tag ][] = $slug;
-					}
-				}
-
-				if ( in_array( $slug, $existing_links ) ) {
+			if ( $existing_id ) {
+				if ( ! $update_existing ) {
+					$results['skipped'] ++;
 					continue;
 				}
 
-				$values[ $key ]['slug']              = $slug;
-				$values[ $key ]['name']              = ! empty( Helper::get_data( $link, 'Title', '' ) ) ? Helper::get_data( $link, 'Title', '', true ) : Helper::get_data( $link, 'Target URL', '' );
-				$values[ $key ]['description']       = Helper::get_data( $link, 'Description', '', true );
-				$values[ $key ]['url']               = esc_url_raw( Helper::get_data( $link, 'Target URL', '' ) );
-				$values[ $key ]['nofollow']          = Helper::get_data( $link, 'Nofollow', $default_nofollow );
-				$values[ $key ]['track_me']          = Helper::get_data( $link, 'Track', $default_track_me );
-				$values[ $key ]['sponsored']         = Helper::get_data( $link, 'Sponsored', $default_sponsored );
-				$values[ $key ]['params_forwarding'] = Helper::get_data( $link, 'Parameter Forwarding', $default_params_forwarding );
-				// $values[ $key ]['params_structure']  = Helper::get_data( $link, 'params_struct', '' );
-				$values[ $key ]['redirect_type'] = Helper::get_data( $link, 'Redirect Type', $default_redirect_type );
-				$values[ $key ]['status']        = 1;
-				$values[ $key ]['type']          = 'direct';
-				$values[ $key ]['type_id']       = null;
-				$values[ $key ]['password']      = null;
-				$values[ $key ]['expires_at']    = null;
-				$values[ $key ]['cpt_id']        = null;
-				$values[ $key ]['cpt_type']      = '';
-				$values[ $key ]['rules']         = null;
-				$values[ $key ]['created_at']    = Helper::get_data( $link, 'Created At', $default_created_at );
-				$values[ $key ]['created_by_id'] = $current_user_id;
-				$values[ $key ]['updated_at']    = Helper::get_data( $link, 'Updated At', '' );
-				$values[ $key ]['updated_by_id'] = $current_user_id;
+				$update = $this->build_csv_update( $link, $target_url );
 
-				$key ++;
+				$update['updated_at']    = $this->get_csv_date( $link, 'Updated At', date( 'Y-m-d H:i:s' ) );
+				$update['updated_by_id'] = $current_user_id;
+
+				US()->db->links->update( $existing_id, $update );
+
+				$results['updated'] ++;
+				continue;
 			}
 
-			// Import Links
-			if ( Helper::is_forechable( $values ) ) {
-				US()->db->links->bulk_insert( $values );
-			}
+			$values[ $key ]['slug']              = $slug;
+			$values[ $key ]['name']              = $this->get_csv_value( $link, 'Title', $target_url );
+			$values[ $key ]['description']       = $this->get_csv_value( $link, 'Description', '' );
+			$values[ $key ]['url']               = esc_url_raw( $target_url );
+			$values[ $key ]['nofollow']          = $this->get_csv_value( $link, 'Nofollow', $default_nofollow );
+			$values[ $key ]['track_me']          = $this->get_csv_value( $link, 'Track', $default_track_me );
+			$values[ $key ]['sponsored']         = $this->get_csv_value( $link, 'Sponsored', $default_sponsored );
+			$values[ $key ]['params_forwarding'] = $this->get_csv_value( $link, 'Parameter Forwarding', $default_params_forwarding );
+			$values[ $key ]['redirect_type']     = $this->get_csv_value( $link, 'Redirect Type', $default_redirect_type );
+			$values[ $key ]['status']            = 1;
+			$values[ $key ]['type']              = 'direct';
+			$values[ $key ]['type_id']           = null;
+			$values[ $key ]['password']          = null;
+			$values[ $key ]['expires_at']        = null;
+			$values[ $key ]['cpt_id']            = null;
+			$values[ $key ]['cpt_type']          = '';
+			$values[ $key ]['rules']             = null;
+			$values[ $key ]['created_at']        = $this->get_csv_date( $link, 'Created At', $default_created_at );
+			$values[ $key ]['created_by_id']     = $current_user_id;
+			$values[ $key ]['updated_at']        = $this->get_csv_date( $link, 'Updated At', '' );
+			$values[ $key ]['updated_by_id']     = $current_user_id;
 
-			if ( ! empty( $groups_to_import ) ) {
-				$this->import_groups( $groups_to_import );
+			// Keep the map current so two rows carrying the same slug do not
+			// both insert.
+			$existing_links[ $slug ] = 0;
 
-				$this->add_links_to_group( $groups_to_import );
-			}
+			$key ++;
+		}
 
-			if ( US()->is_pro() && ! empty( $tags_to_import ) ) {
-				$this->import_tags( $tags_to_import );
+		// Import Links
+		if ( Helper::is_forechable( $values ) ) {
+			US()->db->links->bulk_insert( $values );
 
-				$this->add_links_to_tag( $tags_to_import );
+			$results['created'] = count( $values );
+		}
+
+		if ( ! empty( $groups_to_import ) || ! empty( $slugs_replacing_groups ) ) {
+			$this->import_groups( $groups_to_import );
+
+			$this->add_links_to_group( $groups_to_import, array_keys( $slugs_replacing_groups ) );
+		}
+
+		if ( US()->is_pro() && ( ! empty( $tags_to_import ) || ! empty( $slugs_replacing_tags ) ) ) {
+			$this->import_tags( $tags_to_import );
+
+			$this->add_links_to_tag( $tags_to_import, array_keys( $slugs_replacing_tags ) );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Read one cell from a CSV row.
+	 *
+	 * A column that is absent and a column that is present but blank both mean
+	 * "not supplied", and both fall back to the default. Without this a blank
+	 * Redirect Type cell was stored as an empty string, which the links list
+	 * then rendered as the literal word "Array" - Helper::get_data() returns
+	 * the whole lookup table when it is asked for an empty key.
+	 *
+	 * @param array  $row
+	 * @param string $column
+	 * @param mixed  $default
+	 *
+	 * @return mixed
+	 *
+	 * @since 2.6.1
+	 */
+	private function get_csv_value( $row, $column, $default = null ) {
+		if ( ! is_array( $row ) || ! array_key_exists( $column, $row ) ) {
+			return $default;
+		}
+
+		$value = trim( (string) $row[ $column ] );
+
+		return ( '' === $value ) ? $default : $value;
+	}
+
+	/**
+	 * Read a date cell and normalise it for a DATETIME column.
+	 *
+	 * The exporter writes dates in the site's display format, so a file that
+	 * came straight back out of URL Shortify can carry something like
+	 * "March 14, 2026 9:30 am". Writing that into created_at unchanged leaves a
+	 * zero date behind, so anything parseable is converted and anything else
+	 * falls back rather than corrupting the row.
+	 *
+	 * @param array  $row
+	 * @param string $column
+	 * @param mixed  $default
+	 *
+	 * @return mixed
+	 *
+	 * @since 2.6.1
+	 */
+	private function get_csv_date( $row, $column, $default = null ) {
+		$value = $this->get_csv_value( $row, $column );
+
+		if ( null === $value ) {
+			return $default;
+		}
+
+		$timestamp = strtotime( $value );
+
+		return ( false === $timestamp ) ? $default : date( 'Y-m-d H:i:s', $timestamp );
+	}
+
+	/**
+	 * Build the update payload for a link that already exists.
+	 *
+	 * Only columns the row actually supplies are included, so importing a file
+	 * that carries nothing but Slug and Target URL repoints the link and leaves
+	 * its title, description and options exactly as they were.
+	 *
+	 * @param array  $row
+	 * @param string $target_url
+	 *
+	 * @return array
+	 *
+	 * @since 2.6.1
+	 */
+	private function build_csv_update( $row, $target_url ) {
+		$update = [ 'url' => esc_url_raw( $target_url ) ];
+
+		$map = [
+			'Title'                => 'name',
+			'Description'          => 'description',
+			'Nofollow'             => 'nofollow',
+			'Sponsored'            => 'sponsored',
+			'Parameter Forwarding' => 'params_forwarding',
+			'Track'                => 'track_me',
+			'Redirect Type'        => 'redirect_type',
+			'Created At'           => 'created_at',
+		];
+
+		foreach ( $map as $column => $field ) {
+			$value = ( 'created_at' === $field )
+				? $this->get_csv_date( $row, $column )
+				: $this->get_csv_value( $row, $column );
+
+			if ( null !== $value ) {
+				$update[ $field ] = $value;
 			}
 		}
 
-		return true;
+		return $update;
 	}
-
 
 	/**
 	 * Import links from prettylink WordPress plugin

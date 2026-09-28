@@ -32,8 +32,15 @@ class Export {
 				foreach ( $headers as $key => $header ) {
 					$value = Helper::get_data( $d, $key, '' );
 
-					if ( 'created_at' === $key && ! empty( $value ) ) {
-						$value = Helper::get_formatted_datetime( $value );
+					if ( 'created_at' === $key ) {
+						/*
+						 * A zero date formats as "-0001-11-30", which is not a
+						 * date any importer can read back. Export an empty cell
+						 * instead so a re-import falls back to a sensible value.
+						 */
+						$value = ( empty( $value ) || '0000-00-00 00:00:00' === $value )
+							? ''
+							: Helper::get_formatted_datetime( $value );
 					}
 
 					$csv[] = $value;
@@ -110,7 +117,7 @@ class Export {
 	 * @since 1.6.5
 	 */
 	public function get_links_headers() {
-		return array(
+		$headers = array(
 			'id'                => __( 'ID', 'url-shortify' ),
 			'name'              => __( 'Title', 'url-shortify' ),
 			'description'       => __( 'Description', 'url-shortify' ),
@@ -122,6 +129,99 @@ class Export {
 			'params_forwarding' => __( 'Parameter Forwarding', 'url-shortify' ),
 			'redirect_type'     => __( 'Redirect Type', 'url-shortify' ),
 			'created_at'        => __( 'Created At', 'url-shortify' ),
+			'status'            => __( 'Status', 'url-shortify' ),
+			'groups'            => __( 'Groups', 'url-shortify' ),
 		);
+
+		if ( US()->is_pro() ) {
+			$headers['tags'] = __( 'Tags', 'url-shortify' );
+		}
+
+		return $headers;
+	}
+
+	/**
+	 * Add the status, group and tag columns to a set of link rows.
+	 *
+	 * Shared so every export of links carries the same columns. The Links
+	 * screen used to build these inline while the group and tag statistics
+	 * screens exported neither, which meant a file from one of those screens
+	 * could not be imported back without losing the assignments.
+	 *
+	 * @param array $links Link rows, by reference-safe copy.
+	 *
+	 * @return array
+	 *
+	 * @since 2.6.1
+	 */
+	public function decorate_links( $links = array() ) {
+		if ( ! Helper::is_forechable( $links ) ) {
+			return $links;
+		}
+
+		$link_ids = wp_list_pluck( $links, 'id' );
+
+		$links_ids_group_ids = US()->db->links_groups->get_group_ids_by_link_ids( $link_ids );
+
+		// Queried fresh rather than via get_all_id_name_map(), which returns a
+		// map built when the plugin booted - a group added since would be
+		// missing from it, and the link would export without that group.
+		$group_id_name_map = US()->db->groups->get_id_name_map();
+
+		$links_ids_tag_ids = array();
+		$tag_id_name_map   = array();
+
+		if ( US()->is_pro() ) {
+			$links_ids_tag_ids = US()->db->links_tags->get_tag_ids_by_link_ids( $link_ids );
+			$tag_id_name_map   = US()->db->tags->get_id_name_map();
+		}
+
+		foreach ( $links as &$link ) {
+			$link_id = Helper::get_data( $link, 'id', 0 );
+
+			$link['status'] = 1 === (int) Helper::get_data( $link, 'status', 0 )
+				? __( 'Enabled', 'url-shortify' )
+				: __( 'Disabled', 'url-shortify' );
+
+			$group_ids      = ! empty( $links_ids_group_ids[ $link_id ] ) ? $links_ids_group_ids[ $link_id ] : array();
+			$link['groups'] = $this->names_from_ids( $group_ids, $group_id_name_map );
+
+			if ( US()->is_pro() ) {
+				$tag_ids      = ! empty( $links_ids_tag_ids[ $link_id ] ) ? $links_ids_tag_ids[ $link_id ] : array();
+				$link['tags'] = $this->names_from_ids( $tag_ids, $tag_id_name_map );
+			}
+		}
+
+		unset( $link );
+
+		return $links;
+	}
+
+	/**
+	 * Join group or tag names for a CSV cell.
+	 *
+	 * Pipe separated rather than comma separated. The importer falls back to
+	 * splitting on commas, so a group genuinely named "Tips, Tricks" used to
+	 * come back as two groups on the next import.
+	 *
+	 * @param array $ids
+	 * @param array $id_name_map
+	 *
+	 * @return string
+	 *
+	 * @since 2.6.1
+	 */
+	protected function names_from_ids( $ids, $id_name_map ) {
+		$names = array();
+
+		foreach ( (array) $ids as $id ) {
+			$name = Helper::get_data( $id_name_map, $id, '' );
+
+			if ( '' !== $name ) {
+				$names[] = $name;
+			}
+		}
+
+		return implode( '|', $names );
 	}
 }

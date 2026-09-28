@@ -129,6 +129,10 @@ class Install {
 			'kc_us_update_260_add_clicks_series_index',
 			'kc_us_update_260_create_saved_reports_table',
 		],
+
+		'2.6.1' => [
+			'kc_us_update_261_dedupe_link_relations',
+		],
 	];
 
 	/**

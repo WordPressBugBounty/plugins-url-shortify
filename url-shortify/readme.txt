@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.1
-Stable tag: 2.6.0
+Stable tag: 2.6.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -280,23 +280,17 @@ If you like URL Shortify, please leave us a [⭐⭐⭐⭐⭐](https://wordpress.
 
 If you like this plugin then consider checking out our other solutions:
 
-[Update URLs](https://wordpress.org/plugins/update-urls/) - Quick and Easy way to search old links and replace them with new links in WordPress
-
-> If you move your WordPress website to a new domain name, you will find that internal links to pages and references to images are not updated. Instead, these links and references will point to your old domain name. Update URLs fixes that problem by helping you change old urls and links in your website.
+[Update URLs](https://wordpress.org/plugins/update-urls/) - Quick and Easy way to search and replace text/url in WordPress
 
 [Logify](https://wordpress.org/plugins/logify/) - Simple & Easy to use activity log plugin for monitor & record system changes
 
 [Magic Link](https://wordpress.org/plugins/magic-link/) - Simple, Easy and Secure one click login for WordPress
 
-[UtilityKit](https://wordpress.org/plugins/utility-kit/)
+[Social Linkz](https://wordpress.org/plugins/social-linkz/) - Easily place social share icon on your posts, pages etc..
 
-> UtilityKit is a powerful and versatile WordPress plugin that provides a collection of essential tools and features to enhance your website's functionality. It includes a variety of utilities such as show/hide admin bar, disable comments, enable/disable WordPress debug log and see logs inside WordPress admin and many more.  All designed to improve user experience and streamline website management.
+[UtilityKit](https://wordpress.org/plugins/utility-kit/) - It's a simple & neat plugin which helps you to customize your WordPress setup in a very elegant way
 
-> It's a simple & neat plugin which helps you to customize your WordPress setup in a very elegant way.
-
-[Social Linkz](https://wordpress.org/plugins/social-linkz/) - Lightweight and fast social media sharing plugin
-
-> Easily place social share icon on your posts, pages etc..
+[Zapify](https://wordpress.org/plugins/zapify/) - WordPress workflow automation plugin.
 
 == Installation ==
 
@@ -478,11 +472,26 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.6.0 =
+= 2.6.1 =
 
-* Adds Smart Reports: compare links, groups or tags side by side, set a goal link to measure conversions, and save reports to reopen later. Please update to the latest version to get the best experience. Learn more in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
+* Repairs Tools > Import, which imported nothing at all in 2.6.0, and adds the option to update existing links from a CSV. Please update to the latest version to get the best experience. Learn more in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
+
+= 2.6.1 - 2026-09-28 =
+
+* Fix: Nothing could be imported from Tools > Import. The screen looked for its security token in the wrong place, so every source failed the check and the page came back blank. Importing works again from all of them.
+* New: CSV import can update links that already exist. Tick "Update links that already exist" and a row whose slug matches an existing link applies its target URL along with every other column the file supplies, leaving the columns you left out as they were. Without it, matching rows are skipped as before.
+* New: A CSV row can set a link's groups and tags outright instead of only adding to them. Where a row supplies the Groups or Tags column, that list replaces whatever the link had, so a file can move a link between groups or drop a tag. Leave the column out, or leave it blank, and the link keeps its current assignments.
+* Update: Redesigned the CSV import screen. It opens with a heading and a link back to the import sources, each hint now sits under the control it belongs to, and every expected column is documented in a panel beside the form, so you no longer have to download the sample file to find out what the headings should be.
+* Update: The message shown after an import is now a panel reporting how many links were added, updated, skipped and not imported, with the skipped and not-imported figures explaining why, and a link through to your links.
+* Update: The Link Central migration has moved into Tools > Import alongside the other plugin importers, and its separate tab has been removed, so there is one place to import from another plugin.
+* Fix: A blank Redirect Type cell in a CSV was saved as an empty value instead of falling back to your default, and the links list then printed the word "Array" in that column.
+* Fix: Importing the same CSV twice listed the same group and tag against a link over and over. Assignments are now cleared before they are rewritten, so re-importing a file changes nothing, and updating clears out the duplicates earlier imports left behind.
+* Fix: Exporting links and importing the file back no longer loses data. Groups and tags are separated with a pipe rather than a comma, so a group whose name contains a comma survives the trip; the status, group and tag columns are now included in exports from the group and tag statistics screens as well as the links list; and a Created At date written in your site's display format is understood on the way back in instead of zeroing the link's date.
+* Fix: CSV files are read more carefully. A byte order mark at the start of a file no longer hides the first heading, a row with too few columns is padded instead of rejecting the file, and a row with a missing or invalid target URL is reported rather than saved as an empty link.
+* Fix: Button labels turned grey against their own background on hover throughout the admin screens, which left them hard to read. Buttons now darken on hover and keep a readable label.
+* Translations: Updated .POT file for new translations.
 
 = 2.6.0 - 2026-09-04 =
 
