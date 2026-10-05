@@ -133,6 +133,10 @@ class Install {
 		'2.6.1' => [
 			'kc_us_update_261_dedupe_link_relations',
 		],
+
+		'2.7.0' => [
+			'kc_us_update_270_add_click_source_column',
+		],
 	];
 
 	/**
@@ -729,6 +733,7 @@ class Install {
 				`visitor_id` varchar(25) default NULL,
 				`country` varchar(50) DEFAULT NULL,
 				`ip` varchar(255) DEFAULT NULL,
+				`source` varchar(20) DEFAULT NULL,
 				`created_at` DATETIME NOT NULL,
 				PRIMARY KEY  (id),
 				KEY link_id (link_id),
@@ -744,7 +749,8 @@ class Install {
 				KEY uri (uri(191)),
 				KEY is_robot (is_robot),
 				KEY is_first_click (is_first_click),
-				KEY visitor_id (visitor_id) 
+				KEY visitor_id (visitor_id),
+				KEY source (source)
 			) $collate;
         ";
 

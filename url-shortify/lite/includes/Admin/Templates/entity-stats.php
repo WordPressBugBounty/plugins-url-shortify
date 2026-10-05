@@ -1,11 +1,12 @@
 <?php
 /**
- * Dashboard.
+ * Statistics for a set of links - a group or a tag.
  *
- * The same screen as the link, group and tag statistics, asked of everything at
- * once: how is this doing, which links are carrying it, and who is clicking.
+ * The two screens were byte-identical apart from the word "group" or "tag", so
+ * they share this and differ only in $kc_us_entity.
  *
- * @var array $data Prepared by DashboardController.
+ * @var array  $data          Prepared by Group/TagStatsController.
+ * @var string $kc_us_entity  'group' or 'tag'.
  *
  * @package KaizenCoders\URL_Shortify
  * @since   2.7.0
@@ -17,18 +18,10 @@ use KaizenCoders\URL_Shortify\Admin\StatsRenderer;
 use KaizenCoders\URL_Shortify\Common\Utils;
 use KaizenCoders\URL_Shortify\Helper;
 
-// Nothing to report on yet: the landing screen explains what to do instead.
-if ( empty( $data['show_kpis'] ) ) {
-	include_once 'landing.php';
-
-	return;
-}
-
-$is_pro     = US()->is_pro();
-$show_promo = US()->can_show_premium_promotion();
+$kc_us_entity = isset( $kc_us_entity ) && 'tag' === $kc_us_entity ? 'tag' : 'group';
+$is_tag       = ( 'tag' === $kc_us_entity );
 
 $page_refresh_url = Utils::get_current_page_refresh_url();
-$export_url       = Helper::get_action_url( null, 'main', 'export' );
 
 // Resolved through the same gate the controller uses, so the pills, the table's
 // data attributes and the figures cannot describe a period this plan may not ask
@@ -47,7 +40,7 @@ $periods = [
 	'all_time'     => __( 'All time', 'url-shortify' ),
 ];
 
-if ( ! $is_pro ) {
+if ( ! US()->is_pro() ) {
 	$periods = array_intersect_key( $periods, array_flip( [ 'today', 'last_7_days' ] ) );
 }
 
@@ -61,11 +54,48 @@ foreach ( $periods as $filter => $label ) {
 	];
 }
 
+$entity_id = Helper::get_data( $data, 'id', '' );
+
+$export_url = $is_tag
+	? Helper::get_tag_action_url( $entity_id, 'export' )
+	: Helper::get_group_action_url( $entity_id, 'export' );
+
+$export_links_url = $is_tag
+	? Helper::get_tag_action_url( $entity_id, 'export_links' )
+	: Helper::get_group_action_url( $entity_id, 'export_links' );
+
+$reports     = Helper::get_data( $data, 'reports', [] );
+$clicks_data = Helper::get_data( $reports, 'clicks', [] );
+
+$click_data_for_graph = Helper::get_data( $data, 'click_data_for_graph', [] );
+$chart_data           = Helper::get_data( $data, 'chart_data', [] );
+
+$has_chart_data = ! empty( $chart_data )
+	&& ! empty( Helper::get_data( $chart_data, 'dates', [] ) )
+	&& array_sum( array_map( 'intval', Helper::get_data( $chart_data, 'total_series', [] ) ) ) > 0;
+
+$has_heatmap_data = ! empty( $chart_data )
+	&& ! empty( Helper::get_data( $chart_data, 'heatmap_series', [] ) )
+	&& ! empty( Helper::get_data( $chart_data, 'has_clicks_data', false ) );
+
+$links = Helper::get_data( $data, 'links', [] );
+
+$entity_link_ids = [];
+
+foreach ( (array) $links as $link ) {
+	$entity_link_ids[] = absint( Helper::get_data( $link, 'id', 0 ) );
+}
+
+$entity_link_ids = array_filter( $entity_link_ids );
+
 $days = 7;
 
 switch ( $time_filter ) {
 	case 'today':
 		$days = 1;
+		break;
+	case 'last_7_days':
+		$days = 7;
 		break;
 	case 'last_30_days':
 		$days = 30;
@@ -79,28 +109,24 @@ switch ( $time_filter ) {
 		break;
 }
 
-$chart_data = Helper::get_data( $data, 'chart_data', [] );
+$total_clicks = 0;
 
-$has_chart_data = ! empty( $chart_data )
-	&& ! empty( Helper::get_data( $chart_data, 'dates', [] ) )
-	&& array_sum( array_map( 'intval', Helper::get_data( $chart_data, 'total_series', [] ) ) ) > 0;
+if ( ! empty( $click_data_for_graph ) ) {
+	$total_clicks = array_sum( array_map( 'intval', array_values( $click_data_for_graph ) ) );
+}
 
-$has_heatmap_data = ! empty( $chart_data )
-	&& ! empty( Helper::get_data( $chart_data, 'heatmap_series', [] ) )
-	&& ! empty( Helper::get_data( $chart_data, 'has_clicks_data', false ) );
-
-$click_data_for_graph = Helper::get_data( $data, 'click_data_for_graph', [] );
-
-$total_clicks = ! empty( $click_data_for_graph )
-	? array_sum( array_map( 'intval', array_values( $click_data_for_graph ) ) )
-	: 0;
-
-$elapsed_time = Utils::get_elapsed_time( Helper::get_data( $data, 'last_updated_on', time() ) );
+$last_updated_on = Helper::get_data( $data, 'last_updated_on', time() );
+$elapsed_time    = Utils::get_elapsed_time( $last_updated_on );
 
 $click_history = new ClicksController();
 $click_history->set_columns( ClicksController::get_table_columns() );
 
+$is_pro     = US()->is_pro();
+$show_promo = US()->can_show_premium_promotion();
+
 $overview = Helper::get_data( $data, 'overview', [] );
+// The overview carries the period for PRO; free sites get it on its own, since
+// the standings below need to know whether a comparison window exists.
 $period   = Helper::get_data( $overview, 'period', Helper::get_data( $data, 'period', [] ) );
 $kpis     = Helper::get_data( $overview, 'kpis', [] );
 $insights = Helper::get_data( $overview, 'insights', [] );
@@ -108,12 +134,14 @@ $channels = Helper::get_data( $overview, 'channels', [] );
 $peak     = Helper::get_data( $overview, 'peak', [] );
 $members  = Helper::get_data( $data, 'members', [] );
 
+// The same icons the click log and the standings use, so a browser looks the
+// same wherever it is named on the screen.
 $device_rows   = StatsRenderer::rows_from_map( Helper::get_data( $data, 'device_info', [] ), 6, [ Utils::class, 'get_device_icon_url' ] );
 $browser_rows  = StatsRenderer::rows_from_map( Helper::get_data( $data, 'browser_info', [] ), 6, [ Utils::class, 'get_browser_icon_url' ] );
 $platform_rows = StatsRenderer::rows_from_map( Helper::get_data( $data, 'os_info', [] ), 6, [ Utils::class, 'get_platform_icon_url' ] );
 
-// Referrer URLs collapse to their host; the path is noise and one site arrives
-// under many of them. Clicks with no referrer belong in the channels card.
+// Collapse referrer URLs to the host; the path is noise and one site arrives
+// under many of them.
 $referrer_map = [];
 
 foreach ( (array) Helper::get_data( $data, 'referrers_info', [] ) as $referrer => $count ) {
@@ -125,6 +153,8 @@ foreach ( (array) Helper::get_data( $data, 'referrers_info', [] ) as $referrer =
 
 	$host = preg_replace( '/^www\./i', '', $host );
 
+	// Clicks with no referrer are bucketed under a label, not a host. They are
+	// reported as direct in the channels card, where they belong.
 	if ( '' === $host || false === strpos( $host, '.' ) ) {
 		continue;
 	}
@@ -173,9 +203,6 @@ $kc_us_close_card = function ( $unlocked, $title, $note ) {
 	echo '</div>';
 };
 
-$kc_us_links_count  = (int) Helper::get_data( $data, 'total_links', 0 );
-$kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
-
 ?>
 
 <div class="wrap">
@@ -183,30 +210,36 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
 
         <div class="kc-us-st-head">
             <div class="kc-us-st-head__main">
-                <p class="kc-us-st-eyebrow"><?php esc_html_e( 'URL Shortify', 'url-shortify' ); ?></p>
+                <p class="kc-us-st-eyebrow">
+                    <?php echo esc_html( $is_tag ? __( 'Tag statistics', 'url-shortify' ) : __( 'Group statistics', 'url-shortify' ) ); ?>
+                </p>
 
-                <h1 class="kc-us-st-title"><?php esc_html_e( 'Dashboard', 'url-shortify' ); ?></h1>
+                <h1 class="kc-us-st-title">
+                    <?php echo esc_html( stripslashes( Helper::get_data( $data, 'name', '' ) ) ); ?>
+                </h1>
 
                 <div class="kc-us-st-sub">
-                    <a href="<?php echo esc_url( Helper::get_data( $data, 'links_url', '' ) ); ?>">
-                        <?php
-                        printf(
-                            /* translators: %s: number of links. */
-                            esc_html( _n( '%s link', '%s links', $kc_us_links_count, 'url-shortify' ) ),
-                            esc_html( number_format_i18n( $kc_us_links_count ) )
-                        );
-                        ?>
-                    </a>
-
                     <span>
                         <?php
                         printf(
-                            /* translators: %s: number of groups. */
-                            esc_html( _n( '%s group', '%s groups', $kc_us_groups_count, 'url-shortify' ) ),
-                            esc_html( number_format_i18n( $kc_us_groups_count ) )
+                            /* translators: %s: number of links. */
+                            esc_html( _n( '%s link', '%s links', count( $entity_link_ids ), 'url-shortify' ) ),
+                            esc_html( number_format_i18n( count( $entity_link_ids ) ) )
                         );
                         ?>
                     </span>
+
+                    <?php if ( ! empty( $members['dormant'] ) ) : ?>
+                        <span>
+                            <?php
+                            printf(
+                                /* translators: %s: number of links with no clicks. */
+                                esc_html__( '%s with no clicks', 'url-shortify' ),
+                                esc_html( number_format_i18n( $members['dormant'] ) )
+                            );
+                            ?>
+                        </span>
+                    <?php endif; ?>
 
                     <span><?php
                         /* get_elapsed_time() returns "2 Hours ago" or "Just Now", so it supplies its own tense. */
@@ -217,78 +250,13 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
 
             <div class="kc-us-st-head__aside">
                 <?php
-                /*
-                 * Everything this plan can create, behind one control. Each entry
-                 * is gated on the same permission as its menu item, so the list
-                 * never offers a screen the person cannot open.
-                 */
-                $kc_us_create_items = [
-                    [ 'manage_links', __( 'New Link', 'url-shortify' ), [ 'page' => 'us_links', 'action' => 'new' ] ],
-                    [ 'manage_groups', __( 'New Group', 'url-shortify' ), [ 'page' => 'us_groups', 'action' => 'new' ] ],
-                    [ 'manage_tags', __( 'New Tag', 'url-shortify' ), [ 'page' => 'us_tags', 'action' => 'new' ] ],
-                    [ 'manage_custom_domains', __( 'New Domain', 'url-shortify' ), [ 'page' => 'us_domains', 'action' => 'new' ] ],
-                    [ 'manage_utm_presets', __( 'New UTM Preset', 'url-shortify' ), [ 'page' => 'us_utm_presets', 'action' => 'new' ] ],
-                    [ 'manage_tracking_pixels', __( 'New Tracking Pixel', 'url-shortify' ), [ 'page' => 'us_tracking_pixels', 'action' => 'new' ] ],
-                    [ 'manage_auto_link_keywords', __( 'New Auto Link Keyword', 'url-shortify' ), [ 'page' => 'us_auto_link_keywords', 'action' => 'new' ] ],
-                    [ 'manage_reports', __( 'New Smart Report', 'url-shortify' ), [ 'page' => 'us_smart_reports', 'view' => 'new' ] ],
-                ];
-
-                /*
-                 * A permission alone is not enough to offer a screen: can() answers
-                 * the same for a free site, where the PRO screens are never
-                 * registered, so the menu would link to pages that refuse to open.
-                 * Matching against the submenu WordPress actually built means the
-                 * list can only ever offer somewhere the person can go, and a
-                 * screen added later appears here without being listed twice.
-                 */
-                $kc_us_registered = [];
-
-                if ( ! empty( $GLOBALS['submenu']['url_shortify'] ) ) {
-                    foreach ( (array) $GLOBALS['submenu']['url_shortify'] as $kc_us_entry ) {
-                        if ( isset( $kc_us_entry[2] ) ) {
-                            $kc_us_registered[ $kc_us_entry[2] ] = true;
-                        }
-                    }
-                }
-
-                $kc_us_create_links = [];
-
-                foreach ( $kc_us_create_items as $kc_us_item ) {
-                    list( $kc_us_permission, $kc_us_label, $kc_us_args ) = $kc_us_item;
-
-                    if ( ! US()->access->can( $kc_us_permission ) ) {
-                        continue;
-                    }
-
-                    if ( empty( $kc_us_registered[ $kc_us_args['page'] ] ) ) {
-                        continue;
-                    }
-
-                    $kc_us_create_links[] = [
-                        'label' => $kc_us_label,
-                        'url'   => add_query_arg( $kc_us_args, admin_url( 'admin.php' ) ),
-                    ];
+                if ( $is_pro ) {
+                    echo StatsRenderer::export_action( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by the helper.
+                        $export_links_url,
+                        __( 'Export Links', 'url-shortify' )
+                    );
                 }
                 ?>
-
-                <?php if ( ! empty( $kc_us_create_links ) ) : ?>
-                    <div id="kc-us-create-button" class="kc-us-st-create">
-                        <button type="button" class="kc-us-primary-button kc-us-st-create__trigger">
-                            <?php esc_html_e( 'New', 'url-shortify' ); ?>
-                            <svg class="kc-us-st-create__caret" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                        </button>
-
-                        <div id="kc-us-create-dropdown" class="kc-us-st-create__menu hidden">
-                            <?php foreach ( $kc_us_create_links as $kc_us_link ) : ?>
-                                <a href="<?php echo esc_url( $kc_us_link['url'] ); ?>">
-                                    <?php echo esc_html( $kc_us_link['label'] ); ?>
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
 
@@ -304,12 +272,12 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
             <?php StatsRenderer::insights( $insights ); ?>
         <?php elseif ( ! $is_pro && $show_promo ) : ?>
             <div class="kc-us-st-card kc-us-st-locked">
-                <?php
-                StatsRenderer::locked_veil(
+                <?php StatsRenderer::locked_veil(
                     __( 'Headline figures and trends are a PRO feature', 'url-shortify' ),
-                    __( 'See clicks, unique clicks, visitors and repeat rate across every link, each against the previous period, so you can tell at a glance whether things are growing.', 'url-shortify' )
-                );
-                ?>
+                    $is_tag
+                        ? __( 'See clicks, unique clicks, visitors and repeat rate for everything carrying this tag, each against the previous period.', 'url-shortify' )
+                        : __( 'See clicks, unique clicks, visitors and repeat rate for this whole group, each against the previous period.', 'url-shortify' )
+                ); ?>
                 <div class="kc-us-st-locked__ghost p-5">
                     <div class="kc-us-st-kpis">
                         <?php foreach ( [ __( 'Clicks', 'url-shortify' ), __( 'Unique clicks', 'url-shortify' ), __( 'Visitors', 'url-shortify' ), __( 'Repeat rate', 'url-shortify' ) ] as $ghost_label ) : ?>
@@ -336,6 +304,41 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
                         );
                         ?>
                     </span>
+
+                    <?php
+                    /*
+                     * Comparison toggle. A link rather than a JS control, so the state
+                     * lives in the URL and can be bookmarked, shared and reloaded.
+                     */
+                    if ( $is_pro ) :
+                        $kc_us_comparing   = ! empty( Helper::get_data( $_GET, 'compare', '' ) );
+                        $kc_us_compare_url = $kc_us_comparing
+                            ? remove_query_arg( [ 'compare', 'compare_metric' ] )
+                            : add_query_arg( 'compare', 'links' );
+                        $kc_us_compare     = Helper::get_data( $chart_data, 'compare', [] );
+                        $kc_us_truncated   = Helper::get_data( $kc_us_compare, 'truncated', [] );
+                        ?>
+                        <span class="kc-us-st-card__note">
+                            <a class="kc-us-compare-toggle text-indigo-600 hover:text-indigo-700"
+                               href="<?php echo esc_url( $kc_us_compare_url ); ?>"
+                               aria-pressed="<?php echo $kc_us_comparing ? 'true' : 'false'; ?>">
+                                <?php echo $kc_us_comparing ? esc_html__( 'Showing a line per link — switch back to the total', 'url-shortify' ) : esc_html__( 'Compare links', 'url-shortify' ); ?>
+                            </a>
+
+                            <?php if ( $kc_us_comparing && ! empty( $kc_us_truncated['of'] ) && $kc_us_truncated['of'] > $kc_us_truncated['shown'] ) : ?>
+                                <span class="text-gray-400">
+                                    <?php
+                                    printf(
+                                        /* translators: 1: number of links charted, 2: total number of links */
+                                        esc_html__( '(top %1$d of %2$d by clicks)', 'url-shortify' ),
+                                        (int) $kc_us_truncated['shown'],
+                                        (int) $kc_us_truncated['of']
+                                    );
+                                    ?>
+                                </span>
+                            <?php endif; ?>
+                        </span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -390,100 +393,71 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
                 <?php if ( $has_chart_data ) : ?>
                     <div id="spline-area-chart" class="h-[260px] w-full"></div>
                 <?php else : ?>
-                    <?php
-                    StatsRenderer::empty_state(
-                        __( 'Once your links are clicked, the trend will appear here.', 'url-shortify' ),
+                    <?php StatsRenderer::empty_state(
+                        __( 'Once these links are clicked, the trend will appear here.', 'url-shortify' ),
                         __( 'No clicks in this period', 'url-shortify' )
-                    );
-                    ?>
+                    ); ?>
                 <?php endif; ?>
             </div>
         </div>
 
-        <?php
-        /*
-         * Ranking every link against every other is an analysis, not a listing -
-         * unlike a group's own members, which are plain information about that
-         * group - so this one is PRO.
-         */
-        if ( $is_pro || $show_promo ) :
-            ?>
-            <div class="kc-us-st-card kc-us-st-table<?php echo $is_pro ? '' : ' kc-us-st-locked'; ?>">
+        <div class="kc-us-st-card kc-us-st-table">
+            <?php StatsRenderer::card_head(
+                $is_tag ? __( 'Links with this tag', 'url-shortify' ) : __( 'Links in this group', 'url-shortify' ),
+                __( 'Ranked by clicks in this period. The ones at the bottom are the ones to look at.', 'url-shortify' )
+            ); ?>
+            <div class="kc-us-st-card__body kc-us-st-card__body--flush">
                 <?php
-                StatsRenderer::card_head(
-                    __( 'Top links', 'url-shortify' ),
-                    __( 'The busiest links in this period.', 'url-shortify' ),
-                    $is_pro
-                        ? sprintf(
-                            '<a class="kc-us-st-card__action" href="%1$s"><span>%2$s</span></a>',
-                            esc_url( Helper::get_data( $data, 'links_url', '' ) ),
-                            esc_html__( 'View all links', 'url-shortify' )
-                        )
-                        : ''
-                );
-                ?>
-                <div class="kc-us-st-card__body kc-us-st-card__body--flush <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
-                    <?php
-                    StatsRenderer::member_table(
-                        $is_pro ? $members : StatsRenderer::sample_members(),
-                        $is_pro && ! empty( $period['bounded'] ),
-                        true
-                    );
-                    ?>
-                </div>
-
-                <?php
-                if ( ! $is_pro ) {
-                    StatsRenderer::locked_veil(
-                        __( 'Top links are a PRO feature', 'url-shortify' ),
-                        __( 'See which of your links are actually carrying the traffic, what share each one takes, how it has moved since the previous period, and the audience behind it.', 'url-shortify' )
-                    );
-                }
+                /*
+                 * Which links are in here and how much each is used is the plain
+                 * answer this screen owes everyone. The audience behind those
+                 * clicks, and the change against the previous period, are PRO.
+                 */
+                StatsRenderer::member_table( $members, $is_pro && ! empty( $period['bounded'] ), $is_pro );
                 ?>
             </div>
-        <?php endif; ?>
+
+            <?php if ( ! $is_pro && $show_promo && ! empty( $members['rows'] ) ) : ?>
+                <p class="kc-us-st-card__upsell">
+                    <?php esc_html_e( 'PRO adds each link\'s share of this traffic, the devices, browsers and platforms behind it, and how it has moved since the previous period.', 'url-shortify' ); ?>
+                    <a href="<?php echo esc_url( US()->get_landing_page_url( true ) ); ?>"><?php esc_html_e( 'Upgrade to PRO', 'url-shortify' ); ?></a>
+                </p>
+            <?php endif; ?>
+        </div>
 
         <?php if ( $is_pro || $show_promo ) : ?>
         <div class="kc-us-st-grid kc-us-st-grid--2">
             <?php $kc_us_open_card( $is_pro ); ?>
-                <?php
-                StatsRenderer::card_head(
+                <?php StatsRenderer::card_head(
                     __( 'Where the clicks come from', 'url-shortify' ),
                     __( 'Grouped by the kind of source, not the individual site.', 'url-shortify' )
-                );
-                ?>
+                ); ?>
                 <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
                     <?php
                     if ( $is_pro ) {
                         StatsRenderer::bars( $channels, [ 'empty' => __( 'No clicks in this period.', 'url-shortify' ) ] );
                     } else {
-                        StatsRenderer::bars(
-                            [
-                                [ 'label' => __( 'Search', 'url-shortify' ), 'value' => 72 ],
-                                [ 'label' => __( 'Social', 'url-shortify' ), 'value' => 48 ],
-                                [ 'label' => __( 'Direct & apps', 'url-shortify' ), 'value' => 30 ],
-                            ]
-                        );
+                        StatsRenderer::bars( [
+                            [ 'label' => __( 'Search', 'url-shortify' ), 'value' => 72 ],
+                            [ 'label' => __( 'Social', 'url-shortify' ), 'value' => 48 ],
+                            [ 'label' => __( 'Direct & apps', 'url-shortify' ), 'value' => 30 ],
+                        ] );
                     }
                     ?>
                 </div>
-            <?php
-            $kc_us_close_card(
+            <?php $kc_us_close_card(
                 $is_pro,
                 __( 'Traffic channels are a PRO feature', 'url-shortify' ),
-                __( 'Know whether your links are carried by search, social, email or direct sharing, so you can put effort where it already works.', 'url-shortify' )
-            );
-            ?>
+                __( 'Know whether these links are carried by search, social, email or direct sharing, so you can put effort where it already works.', 'url-shortify' )
+            ); ?>
 
             <?php $kc_us_open_card( $is_pro ); ?>
-                <?php
-                StatsRenderer::card_head(
+                <?php StatsRenderer::card_head(
                     __( 'When your audience clicks', 'url-shortify' ),
                     ! empty( $peak['best_label'] )
                         ? sprintf( __( 'Busiest: %s, in your site timezone.', 'url-shortify' ), $peak['best_label'] )
                         : __( 'By weekday and hour, in your site timezone.', 'url-shortify' )
-                );
-                ?>
+                ); ?>
                 <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
                     <?php
                     if ( $is_pro ) {
@@ -493,13 +467,11 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
                     }
                     ?>
                 </div>
-            <?php
-            $kc_us_close_card(
+            <?php $kc_us_close_card(
                 $is_pro,
                 __( 'Peak times are a PRO feature', 'url-shortify' ),
                 __( 'See the weekday and hour your audience is most active, and time your next share for it.', 'url-shortify' )
-            );
-            ?>
+            ); ?>
         </div>
         <?php endif; ?>
 
@@ -508,38 +480,30 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
             <?php $kc_us_open_card( $is_pro ); ?>
                 <?php StatsRenderer::card_head( __( 'Top locations', 'url-shortify' ), __( 'Countries these clicks came from.', 'url-shortify' ) ); ?>
                 <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
-                    <?php
-                    StatsRenderer::bars(
+                    <?php StatsRenderer::bars(
                         $is_pro ? $country_rows : StatsRenderer::sample_rows( 'locations' ),
                         [ 'empty' => __( 'No locations recorded in this period.', 'url-shortify' ) ]
-                    );
-                    ?>
+                    ); ?>
                 </div>
-            <?php
-            $kc_us_close_card(
+            <?php $kc_us_close_card(
                 $is_pro,
                 __( 'Locations are a PRO feature', 'url-shortify' ),
                 __( 'See which countries your clicks come from, so you know who you are actually reaching.', 'url-shortify' )
-            );
-            ?>
+            ); ?>
 
             <?php $kc_us_open_card( $is_pro ); ?>
-                <?php StatsRenderer::card_head( __( 'Top referrers', 'url-shortify' ), __( 'The sites sending people to your links.', 'url-shortify' ) ); ?>
+                <?php StatsRenderer::card_head( __( 'Top referrers', 'url-shortify' ), __( 'The sites sending people to these links.', 'url-shortify' ) ); ?>
                 <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
-                    <?php
-                    StatsRenderer::bars(
+                    <?php StatsRenderer::bars(
                         $is_pro ? $referrer_rows : StatsRenderer::sample_rows( 'referrers' ),
                         [ 'empty' => __( 'No referrers recorded in this period.', 'url-shortify' ) ]
-                    );
-                    ?>
+                    ); ?>
                 </div>
-            <?php
-            $kc_us_close_card(
+            <?php $kc_us_close_card(
                 $is_pro,
                 __( 'Referrers are a PRO feature', 'url-shortify' ),
-                __( 'See exactly which sites send people to your links, and which ones are worth more of your time.', 'url-shortify' )
-            );
-            ?>
+                __( 'See exactly which sites send people here, and which ones are worth more of your time.', 'url-shortify' )
+            ); ?>
         </div>
         <?php endif; ?>
 
@@ -547,14 +511,14 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
         <div class="kc-us-st-grid kc-us-st-grid--3">
             <?php
             $kc_us_tech_panels = [
-                'devices'   => [
+                'devices' => [
                     'title' => __( 'Devices', 'url-shortify' ),
                     'rows'  => $device_rows,
                     'empty' => __( 'No devices recorded in this period.', 'url-shortify' ),
                     'lock'  => __( 'Devices are a PRO feature', 'url-shortify' ),
                     'note'  => __( 'See the split between desktop, mobile and tablet, so you know what your destination pages have to cope with.', 'url-shortify' ),
                 ],
-                'browsers'  => [
+                'browsers' => [
                     'title' => __( 'Browsers', 'url-shortify' ),
                     'rows'  => $browser_rows,
                     'empty' => __( 'No browsers recorded in this period.', 'url-shortify' ),
@@ -575,12 +539,10 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
                 StatsRenderer::card_head( $kc_us_panel['title'] );
                 ?>
                 <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
-                    <?php
-                    StatsRenderer::bars(
+                    <?php StatsRenderer::bars(
                         $is_pro ? $kc_us_panel['rows'] : StatsRenderer::sample_rows( $kc_us_panel_key ),
                         [ 'empty' => $kc_us_panel['empty'] ]
-                    );
-                    ?>
+                    ); ?>
                 </div>
                 <?php
                 $kc_us_close_card( $is_pro, $kc_us_panel['lock'], $kc_us_panel['note'] );
@@ -590,12 +552,10 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
         <?php endif; ?>
 
         <div class="kc-us-st-card">
-            <?php
-            StatsRenderer::card_head(
+            <?php StatsRenderer::card_head(
                 __( 'Activity over the past year', 'url-shortify' ),
                 __( 'Each square is a day. Darker means busier. Always the last year, whichever period is selected above.', 'url-shortify' )
-            );
-            ?>
+            ); ?>
             <div class="kc-us-st-card__body">
                 <?php if ( $has_heatmap_data ) : ?>
                     <div class="kc-us-heatmap-chart-wrapper w-full">
@@ -603,17 +563,21 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
                         <div id="heatmap-month-row" class="kc-us-heatmap-month-row" aria-hidden="true"></div>
                     </div>
                 <?php else : ?>
-                    <?php StatsRenderer::empty_state( __( 'Once your links are visited, their daily rhythm will appear here.', 'url-shortify' ) ); ?>
+                    <?php StatsRenderer::empty_state( __( 'Once these links are visited, their daily rhythm will appear here.', 'url-shortify' ) ); ?>
                 <?php endif; ?>
             </div>
         </div>
 
         <div class="kc-us-st-card kc-us-st-table">
             <?php
+            $kc_us_clicks_export = $is_pro
+                ? StatsRenderer::export_action( $export_url, __( 'Export Clicks Data', 'url-shortify' ) )
+                : '';
+
             StatsRenderer::card_head(
                 __( 'Click log', 'url-shortify' ),
-                __( 'Every recorded click across your links, newest first.', 'url-shortify' ),
-                $is_pro ? StatsRenderer::export_action( $export_url, __( 'Export Clicks Data', 'url-shortify' ) ) : ''
+                __( 'Every recorded click, newest first.', 'url-shortify' ),
+                $kc_us_clicks_export
             );
             ?>
 
@@ -621,6 +585,7 @@ $kc_us_groups_count = (int) Helper::get_data( $data, 'total_groups', 0 );
                 <table id="clicks-data"
                        class="display kc-us-clicks-table"
                        data-server-side="true"
+                       data-link-ids="<?php echo esc_attr( implode( ',', $entity_link_ids ) ); ?>"
                        data-time-filter="<?php echo esc_attr( $time_filter ); ?>"
                        data-start-date="<?php echo esc_attr( $current_start_date ); ?>"
                        data-end-date="<?php echo esc_attr( $current_end_date ); ?>"

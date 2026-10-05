@@ -112,6 +112,7 @@ class Clicks extends Base_DB {
 			'visitor_id'      => '%s',
 			'country'         => '%s',
 			'ip'              => '%s',
+			'source'          => '%s',
 			'created_at'      => '%s',
 		];
 	}
@@ -137,6 +138,7 @@ class Clicks extends Base_DB {
 			'visitor_id'      => null,
 			'country'         => null,
 			'ip'              => null,
+			'source'          => null,
 			'created_at'      => Helper::get_current_date_time(),
 		];
 	}
@@ -261,7 +263,7 @@ class Clicks extends Base_DB {
 	 * @return array
 	 *
 	 */
-	public function get_clicks_info( $days = 7, $link_ids = [] ) {
+	public function get_clicks_info( $days = 7, $link_ids = [], $start_date = '', $end_date = '' ) {
 		global $wpdb;
 
 		$clicks_table = "{$wpdb->prefix}kc_us_clicks";
@@ -269,7 +271,13 @@ class Clicks extends Base_DB {
 
 		$query = "SELECT clicks.*, links.name as name FROM {$clicks_table} as clicks, {$links_table} as links";
 
-		$where[] = 'clicks.link_id = links.id AND clicks.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)';
+		$where = [ 'clicks.link_id = links.id' ];
+
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date, 'clicks.created_at' );
+
+		if ( ! empty( $date_filter ) ) {
+			$where[] = $date_filter;
+		}
 
 		if ( ! empty( $link_ids ) ) {
 			$link_ids_str = $this->prepare_for_in_query( $link_ids );
@@ -280,8 +288,6 @@ class Clicks extends Base_DB {
 		$where_str = implode( ' AND ', $where );
 
 		$query .= " WHERE $where_str ORDER BY clicks.created_at DESC LIMIT 0, 100";
-
-		$query = $wpdb->prepare( $query, $days );
 
 		return $wpdb->get_results( $query, ARRAY_A );
 	}
@@ -372,7 +378,7 @@ class Clicks extends Base_DB {
 
 		$filter = $this->build_dashboard_where_clause( $days, $search, $link_ids, $start_date, $end_date );
 
-		$order_by    = in_array( $order_by, [ 'ip', 'uri', 'name', 'host', 'referer', 'created_at' ], true ) ? $order_by : 'created_at';
+		$order_by    = in_array( $order_by, [ 'ip', 'uri', 'name', 'host', 'referer', 'device', 'created_at' ], true ) ? $order_by : 'created_at';
 		$order_dir   = 'ASC' === strtoupper( $order_dir ) ? 'ASC' : 'DESC';
 
 		$query = "SELECT clicks.*, links.name as name FROM {$clicks_table} as clicks INNER JOIN {$links_table} as links ON clicks.link_id = links.id {$filter['where']} ORDER BY {$order_by} {$order_dir} LIMIT %d OFFSET %d";
@@ -882,27 +888,64 @@ class Clicks extends Base_DB {
 	}
 
 	/**
-	 * Get browser info
+	 * Group clicks by one of the visitor attribute columns.
 	 *
-	 * @since 1.2.1
+	 * Every breakdown on the statistics screens is the same query with a
+	 * different column, so they share one implementation. The date filter is the
+	 * point of it: without one these panels reported all time whatever period the
+	 * screen was showing.
 	 *
-	 * @param array $link_ids
+	 * @since 2.7.0
+	 *
+	 * @param string $column     Attribute column to group by.
+	 * @param array  $link_ids   Links to include.
+	 * @param int    $days       Trailing window in days, when no explicit range is given.
+	 * @param string $start_date Y-m-d.
+	 * @param string $end_date   Y-m-d.
 	 *
 	 * @return array
-	 *
 	 */
-	public function get_browser_info( $link_ids = [] ) {
+	private function get_attribute_breakdown( $column, $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		$allowed = [ 'browser_type', 'country', 'referer', 'device', 'os' ];
 
-		if ( empty( $link_ids ) ) {
+		if ( ! in_array( $column, $allowed, true ) || empty( $link_ids ) ) {
 			return [];
 		}
 
 		$link_ids_str = $this->prepare_for_in_query( $link_ids );
 
-		$columns = [ 'browser_type', 'count(*) as total' ];
-		$where   = "link_id IN ( $link_ids_str ) GROUP BY browser_type";
+		if ( '' === $link_ids_str ) {
+			return [];
+		}
 
-		$results = $this->get_columns_by_condition( $columns, $where );
+		$where = "link_id IN ( $link_ids_str )";
+
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date );
+
+		if ( ! empty( $date_filter ) ) {
+			$where .= " AND {$date_filter}";
+		}
+
+		$where .= " GROUP BY {$column}";
+
+		return $this->get_columns_by_condition( [ $column, 'count(*) as total' ], $where );
+	}
+
+	/**
+	 * Get browser info
+	 *
+	 * @since 1.2.1
+	 *
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
+	 *
+	 * @return array
+	 *
+	 */
+	public function get_browser_info( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		$results = $this->get_attribute_breakdown( 'browser_type', $link_ids, $days, $start_date, $end_date );
 
 		return $this->convert_to_associative_array( $results, 'browser_type', 'total' );
 	}
@@ -912,23 +955,16 @@ class Clicks extends Base_DB {
 	 *
 	 * @since 1.2.1
 	 *
-	 * @param array $link_ids
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
 	 *
 	 * @return array
 	 *
 	 */
-	public function get_country_info( $link_ids = [] ) {
-
-		if ( empty( $link_ids ) ) {
-			return [];
-		}
-
-		$link_ids_str = $this->prepare_for_in_query( $link_ids );
-
-		$columns = [ 'country', 'count(*) as total' ];
-		$where   = "link_id IN ( $link_ids_str ) GROUP BY country";
-
-		$results = $this->get_columns_by_condition( $columns, $where );
+	public function get_country_info( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		$results = $this->get_attribute_breakdown( 'country', $link_ids, $days, $start_date, $end_date );
 
 		return $this->convert_to_associative_array( $results, 'country', 'total' );
 	}
@@ -938,23 +974,16 @@ class Clicks extends Base_DB {
 	 *
 	 * @since 1.2.1
 	 *
-	 * @param array $link_ids
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
 	 *
 	 * @return array
 	 *
 	 */
-	public function get_referrers_info( $link_ids = [] ) {
-
-		if ( empty( $link_ids ) ) {
-			return [];
-		}
-
-		$link_ids_str = $this->prepare_for_in_query( $link_ids );
-
-		$columns = [ 'referer', 'count(*) as total' ];
-		$where   = "link_id IN ( $link_ids_str ) GROUP BY referer";
-
-		$results = $this->get_columns_by_condition( $columns, $where );
+	public function get_referrers_info( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		$results = $this->get_attribute_breakdown( 'referer', $link_ids, $days, $start_date, $end_date );
 
 		$null_label = __( 'Direct, Email, SMS', 'url-shortify' );
 
@@ -966,38 +995,139 @@ class Clicks extends Base_DB {
 	 *
 	 * @since 1.2.1
 	 *
-	 * @param array $link_ids
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
 	 *
 	 * @return array
 	 *
 	 */
-	public function get_device_info( $link_ids = [] ) {
-
-		if ( empty( $link_ids ) ) {
-			return [];
-		}
-
-		$link_ids_str = $this->prepare_for_in_query( $link_ids );
-
-		$columns = [ 'device', 'count(*) as total' ];
-		$where   = "link_id IN ( $link_ids_str ) GROUP BY device";
-
-		$results = $this->get_columns_by_condition( $columns, $where );
+	public function get_device_info( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		$results = $this->get_attribute_breakdown( 'device', $link_ids, $days, $start_date, $end_date );
 
 		return $this->convert_to_associative_array( $results, 'device', 'total' );
 	}
 
 	/**
-	 * Get Device info
+	 * Get OS info
 	 *
 	 * @since 1.2.1
 	 *
-	 * @param array $link_ids
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
 	 *
 	 * @return array
 	 *
 	 */
-	public function get_os_info( $link_ids = [] ) {
+	public function get_os_info( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		$results = $this->get_attribute_breakdown( 'os', $link_ids, $days, $start_date, $end_date );
+
+		return $this->convert_to_associative_array( $results, 'os', 'total' );
+	}
+
+	/**
+	 * Headline figures for a set of links over a period.
+	 *
+	 * One query rather than five, because the statistics screens ask for all of
+	 * these together and then ask again for the preceding period.
+	 *
+	 * @since 2.7.0
+	 *
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
+	 *
+	 * @return array
+	 */
+	public function get_stats_summary( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		global $wpdb;
+
+		$empty = [
+			'total'       => 0,
+			'unique'      => 0,
+			'visitors'    => 0,
+			'bots'        => 0,
+			'countries'   => 0,
+			'active_days' => 0,
+			'qr_scans'    => 0,
+			'first_click' => '',
+			'last_click'  => '',
+		];
+
+		if ( empty( $link_ids ) ) {
+			return $empty;
+		}
+
+		$link_ids_str = $this->prepare_for_in_query( $link_ids );
+
+		if ( '' === $link_ids_str ) {
+			return $empty;
+		}
+
+		$where = "link_id IN ( $link_ids_str )";
+
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date );
+
+		if ( ! empty( $date_filter ) ) {
+			$where .= " AND {$date_filter}";
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- ids and dates are prepared above.
+		$row = $wpdb->get_row(
+			"SELECT
+				COUNT(*) AS total,
+				COUNT( CASE WHEN is_first_click = 1 THEN 1 END ) AS uniques,
+				COUNT( DISTINCT NULLIF( visitor_id, '' ) ) AS visitors,
+				COUNT( CASE WHEN is_robot = 1 THEN 1 END ) AS bots,
+				COUNT( DISTINCT NULLIF( country, '' ) ) AS countries,
+				COUNT( DISTINCT DATE( created_at ) ) AS active_days,
+				COUNT( CASE WHEN `source` = 'qr' THEN 1 END ) AS qr_scans,
+				MIN( created_at ) AS first_click,
+				MAX( created_at ) AS last_click
+			 FROM {$this->table_name}
+			 WHERE {$where}",
+			ARRAY_A
+		);
+
+		if ( empty( $row ) ) {
+			return $empty;
+		}
+
+		return [
+			'total'       => (int) $row['total'],
+			'unique'      => (int) $row['uniques'],
+			'visitors'    => (int) $row['visitors'],
+			'bots'        => (int) $row['bots'],
+			'countries'   => (int) $row['countries'],
+			'active_days' => (int) $row['active_days'],
+			'qr_scans'    => (int) $row['qr_scans'],
+			'first_click' => (string) $row['first_click'],
+			'last_click'  => (string) $row['last_click'],
+		];
+	}
+
+	/**
+	 * Clicks grouped by traffic channel.
+	 *
+	 * A list of referring URLs says where a click came from; a channel says what
+	 * kind of effort produced it, which is the thing worth more of. Classified in
+	 * SQL so a site with thousands of distinct referrers still returns five rows.
+	 *
+	 * @since 2.7.0
+	 *
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
+	 *
+	 * @return array Channel key => clicks, highest first.
+	 */
+	public function get_channel_breakdown( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		global $wpdb;
 
 		if ( empty( $link_ids ) ) {
 			return [];
@@ -1005,12 +1135,145 @@ class Clicks extends Base_DB {
 
 		$link_ids_str = $this->prepare_for_in_query( $link_ids );
 
-		$columns = [ 'os', 'count(*) as total' ];
-		$where   = "link_id IN ( $link_ids_str ) GROUP BY os";
+		if ( '' === $link_ids_str ) {
+			return [];
+		}
 
-		$results = $this->get_columns_by_condition( $columns, $where );
+		$where = "link_id IN ( $link_ids_str )";
 
-		return $this->convert_to_associative_array( $results, 'os', 'total' );
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date );
+
+		if ( ! empty( $date_filter ) ) {
+			$where .= " AND {$date_filter}";
+		}
+
+		/*
+		 * An empty referrer is not only "direct": it is also the case for email
+		 * clients, messaging apps and anything that strips the header, which is
+		 * why the label says so rather than claiming the visitor typed the URL.
+		 * A QR scan is the one of those we can name, because the code we
+		 * generated says so.
+		 */
+		$cases = [
+			/*
+			 * First, because a scan has no referrer and would otherwise be
+			 * filed under "Direct & apps" - which is where everything we
+			 * cannot explain goes, and a scan is something we can.
+			 */
+			"WHEN `source` = 'qr' THEN 'qr'",
+			"WHEN referer IS NULL OR referer = '' THEN 'direct'",
+			"WHEN referer REGEXP 'google\\.|bing\\.|duckduckgo\\.|yahoo\\.|yandex\\.|baidu\\.|ecosia\\.|brave\\.com' THEN 'search'",
+			"WHEN referer REGEXP 'facebook\\.|instagram\\.|twitter\\.|x\\.com|linkedin\\.|t\\.co|pinterest\\.|reddit\\.|youtube\\.|tiktok\\.|whatsapp\\.|telegram\\.|t\\.me|threads\\.|mastodon' THEN 'social'",
+			"WHEN referer REGEXP 'mail\\.|outlook\\.|webmail|mailchimp|campaign-archive|sendgrid|hubspot' THEN 'email'",
+		];
+
+		$case_sql = 'CASE ' . implode( ' ', $cases ) . " ELSE 'referral' END";
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- ids and dates are prepared above; the CASE is a fixed string.
+		$results = $wpdb->get_results(
+			"SELECT {$case_sql} AS channel, COUNT(*) AS total
+			 FROM {$this->table_name}
+			 WHERE {$where}
+			 GROUP BY channel
+			 ORDER BY total DESC",
+			ARRAY_A
+		);
+
+		$channels = [];
+
+		foreach ( (array) $results as $row ) {
+			$channels[ $row['channel'] ] = (int) $row['total'];
+		}
+
+		return $channels;
+	}
+
+	/**
+	 * Clicks by weekday and hour, for the "when is my audience awake" grid.
+	 *
+	 * @since 2.7.0
+	 *
+	 * @param array  $link_ids
+	 * @param int    $days
+	 * @param string $start_date
+	 * @param string $end_date
+	 *
+	 * @return array {
+	 *     @type array $grid  1-7 (Mon-Sun) => 0-23 => clicks.
+	 *     @type int   $max   Busiest single cell.
+	 *     @type int   $total Clicks counted.
+	 * }
+	 */
+	public function get_peak_times( $link_ids = [], $days = 0, $start_date = '', $end_date = '' ) {
+		global $wpdb;
+
+		$grid = [];
+
+		for ( $day = 1; $day <= 7; $day ++ ) {
+			$grid[ $day ] = array_fill( 0, 24, 0 );
+		}
+
+		$empty = [ 'grid' => $grid, 'max' => 0, 'total' => 0 ];
+
+		if ( empty( $link_ids ) ) {
+			return $empty;
+		}
+
+		$link_ids_str = $this->prepare_for_in_query( $link_ids );
+
+		if ( '' === $link_ids_str ) {
+			return $empty;
+		}
+
+		$where = "link_id IN ( $link_ids_str )";
+
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date );
+
+		if ( ! empty( $date_filter ) ) {
+			$where .= " AND {$date_filter}";
+		}
+
+		/*
+		 * Clicks are stored in UTC. "Tuesday at 4pm" is only worth acting on in
+		 * the site's own timezone, so shift before grouping rather than after -
+		 * an offset can move a click into a different hour and a different day.
+		 * CONVERT_TZ is avoided because it needs the named timezone tables,
+		 * which plenty of MySQL installs never load.
+		 */
+		$offset_minutes = (int) round( (float) get_option( 'gmt_offset', 0 ) * 60 );
+
+		$local = $offset_minutes
+			? "DATE_ADD( created_at, INTERVAL {$offset_minutes} MINUTE )"
+			: 'created_at';
+
+		// WEEKDAY() is 0 for Monday, which keeps the grid Monday-first.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- ids and dates are prepared above; the offset is an int.
+		$results = $wpdb->get_results(
+			"SELECT WEEKDAY( {$local} ) + 1 AS dow, HOUR( {$local} ) AS hour, COUNT(*) AS total
+			 FROM {$this->table_name}
+			 WHERE {$where}
+			 GROUP BY dow, hour",
+			ARRAY_A
+		);
+
+		$max   = 0;
+		$total = 0;
+
+		foreach ( (array) $results as $row ) {
+			$day   = (int) $row['dow'];
+			$hour  = (int) $row['hour'];
+			$count = (int) $row['total'];
+
+			if ( ! isset( $grid[ $day ][ $hour ] ) ) {
+				continue;
+			}
+
+			$grid[ $day ][ $hour ] = $count;
+			$total                += $count;
+			$max                   = max( $max, $count );
+		}
+
+		return [ 'grid' => $grid, 'max' => $max, 'total' => $total ];
 	}
 
 	/**
@@ -1278,7 +1541,7 @@ class Clicks extends Base_DB {
 	 *
 	 * @return array
 	 */
-	public function get_spline_chart_data( $days = 365, $link_ids = [] ) {
+	public function get_spline_chart_data( $days = 365, $link_ids = [], $start_date = '', $end_date = '' ) {
 		global $wpdb;
 
 		$where = [];
@@ -1292,8 +1555,12 @@ class Clicks extends Base_DB {
 			$where[]      = "link_id IN ($link_ids_str)";
 		}
 
-		if ( $days > 0 ) {
-			$where[] = $wpdb->prepare( 'created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)', absint( $days ) );
+		// Callers have always passed a custom range here, and the method never
+		// accepted one, so picking custom dates left the chart unchanged.
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date );
+
+		if ( ! empty( $date_filter ) ) {
+			$where[] = $date_filter;
 		}
 
 		$query = "
@@ -1318,7 +1585,7 @@ class Clicks extends Base_DB {
 	/**
 	 * Get data for Heatmap (Last 1 year)
 	 */
-	public function get_heatmap_intensity_data( $days = 365, $link_ids = [] ) {
+	public function get_heatmap_intensity_data( $days = 365, $link_ids = [], $start_date = '', $end_date = '' ) {
 		global $wpdb;
 
 		$where = [];
@@ -1332,8 +1599,15 @@ class Clicks extends Base_DB {
 			$where[]      = "link_id IN ($link_ids_str)";
 		}
 
-		if ( $days > 0 ) {
-			$where[] = $wpdb->prepare( 'created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)', absint( $days ) );
+		/*
+		 * The callers have always passed a start and end date here; the method
+		 * did not accept them, so PHP discarded the extra arguments and the
+		 * heatmap quietly showed a trailing year whatever period was selected.
+		 */
+		$date_filter = $this->get_created_at_filter( $days, $start_date, $end_date );
+
+		if ( ! empty( $date_filter ) ) {
+			$where[] = $date_filter;
 		}
 
 		$query = "SELECT DATE(created_at) as date, COUNT(id) as count FROM {$this->table_name}";

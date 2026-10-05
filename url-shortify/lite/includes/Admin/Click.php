@@ -17,6 +17,13 @@ use KaizenCoders\URL_Shortify\Helper;
 class Click {
 
 	/**
+	 * Source recorded for a click that arrived by scanning a QR code.
+	 *
+	 * @since 2.7.0
+	 */
+	const SOURCE_QR = 'qr';
+
+	/**
 	 * @since 1.0.2
 	 * @var array|int
 	 *
@@ -129,6 +136,15 @@ class Click {
 	public $ip = null;
 
 	/**
+	 * Where the click came from, when the link itself said so.
+	 *
+	 * @since 2.7.0
+	 * @var string|null
+	 *
+	 */
+	public $source = null;
+
+	/**
 	 * @since 1.8.0
 	 * @var array
 	 *
@@ -204,6 +220,42 @@ class Click {
 
 		$this->device = $device;
 
+		$this->source = self::resolve_source();
+
+	}
+
+	/**
+	 * Where this click came from, when the link itself says so.
+	 *
+	 * A QR scan arrives with no referrer, which is also true of a click out
+	 * of a chat app, an email client or anything else that strips the header
+	 * - so there is nothing in the request that tells them apart. The only
+	 * thing that can is the code itself, which is why the short URL we encode
+	 * into a QR image carries a marker. It is stripped again before the
+	 * visitor is redirected, so the destination never sees it.
+	 *
+	 * Returns null rather than 'direct' for an ordinary click: what we know
+	 * is that nothing said otherwise, not that the visitor typed the URL.
+	 *
+	 * @since 2.7.0
+	 *
+	 * @return string|null
+	 */
+	public static function resolve_source() {
+		$source = null;
+
+		if ( US()->is_qr_scan() ) {
+			$source = self::SOURCE_QR;
+		}
+
+		/**
+		 * The source recorded against a click.
+		 *
+		 * @since 2.7.0
+		 *
+		 * @param string|null $source
+		 */
+		return apply_filters( 'kc_us_click_source', $source );
 	}
 
 	/**

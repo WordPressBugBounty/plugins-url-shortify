@@ -50,10 +50,7 @@ class TagStatsController extends StatsController {
 	public function prepare_data( $include_click_history = true ) {
 		$refresh = (int) Helper::get_request_data( 'refresh', 0 );
 
-		$time_filter = sanitize_key( Helper::get_request_data( 'time_filter', '' ) );
-		if ( empty( $time_filter ) ) {
-			$time_filter = 'all_time';
-		}
+		$time_filter = self::sanitize_time_filter( Helper::get_request_data( 'time_filter', '' ) );
 
 		$start_date = '';
 		$end_date   = '';
@@ -103,10 +100,19 @@ class TagStatsController extends StatsController {
 			$cache_suffix .= '_cmp_' . $compare . '_' . $compare_metric;
 		}
 
-		$cache_key = 'tag_stats_v1_' . $this->tag_id . '_' . $cache_suffix;
+		$cache_key = 'tag_stats_v5_' . $this->tag_id . '_' . $cache_suffix;
 
 		$data = Cache::get_transient( $cache_key );
-		if ( ! empty( $data ) && ( 1 !== $refresh ) ) {
+		/*
+		 * A payload cached by an older version of this screen can be missing
+		 * keys the template now reads, which renders as a screen with pieces
+		 * missing for up to three hours. Anything not stamped with the current
+		 * shape is rebuilt.
+		 */
+		$is_usable = ! empty( $data )
+			&& (int) Helper::get_data( $data, 'payload_version', 0 ) === self::PAYLOAD_VERSION;
+
+		if ( $is_usable && ( 1 !== $refresh ) ) {
 			return $data;
 		}
 
@@ -119,64 +125,28 @@ class TagStatsController extends StatsController {
 		}
 
 		$data['links'] = US()->db->links->get_by_ids( $link_ids );
-		$data['reports']['clicks'] = $this->get_clicks_info( $days, $link_ids, $start_date, $end_date );
-
-		$total_clicks_by_days = $this->get_clicks_count_by_days( $days, $link_ids, $start_date, $end_date );
-
-		$unique_start_date = $start_date;
-		$unique_end_date    = $end_date;
-		if ( empty( $unique_start_date ) || empty( $unique_end_date ) ) {
-			if ( 0 === (int) $days ) {
-				$unique_start_date = '2000-01-01';
-				$unique_end_date   = date( 'Y-m-d' );
-			} else {
-				$dates             = Helper::get_start_and_end_date_from_last_days( $days );
-				$unique_start_date = $dates['start_date'];
-				$unique_end_date   = $dates['end_date'];
-			}
-		}
-
-		$unique_clicks_by_days = US()->db->clicks->get_unique_clicks_count_by_days( $unique_start_date, $unique_end_date, $link_ids );
-
-		$spline_data = [];
-		foreach ( $total_clicks_by_days as $date => $count ) {
-			$spline_data[ $date ] = [
-				'date'          => $date,
-				'total_clicks'  => (int) $count,
-				'unique_clicks' => 0,
-			];
-		}
-
-		foreach ( $unique_clicks_by_days as $date => $count ) {
-			if ( ! isset( $spline_data[ $date ] ) ) {
-				$spline_data[ $date ] = [
-					'date'          => $date,
-					'total_clicks'  => 0,
-					'unique_clicks' => (int) $count,
-				];
-				continue;
-			}
-
-			$spline_data[ $date ]['unique_clicks'] = (int) $count;
-		}
-
-		$spline_data_filled = $this->fill_missing_dates_in_spline_data(
-			array_values( $spline_data ),
-			$days,
-			$start_date,
-			$end_date
+		/*
+		 * Resolve the filter to concrete dates once and hand the same window to
+		 * every panel, so the headline figures, the chart and the breakdowns
+		 * cannot describe different periods.
+		 */
+		$period = $this->resolve_stats_period(
+			[
+				'days'       => $days,
+				'start_date' => $start_date,
+				'end_date'   => $end_date,
+			]
 		);
 
-		$data['chart_data'] = [
-			'dates'         => array_column( $spline_data_filled, 'date' ),
-			'total_series'  => array_map( 'intval', array_column( $spline_data_filled, 'total_clicks' ) ),
-			'unique_series' => array_map( 'intval', array_column( $spline_data_filled, 'unique_clicks' ) ),
-		];
+		$range_start = $period['start'];
+		$range_end   = $period['end'];
 
-		$data['click_data_for_graph'] = array_combine(
-			array_column( $spline_data_filled, 'date' ),
-			array_map( 'intval', array_column( $spline_data_filled, 'total_clicks' ) )
-		) ?: [];
+		$data['reports']['clicks'] = $this->get_clicks_info( $days, $link_ids, $range_start, $range_end );
+
+		$chart = $this->build_chart_payload( $link_ids, $days, $period );
+
+		$data['chart_data']           = $chart['chart_data'];
+		$data['click_data_for_graph'] = $chart['click_data_for_graph'];
 
 
 		/*
@@ -195,29 +165,12 @@ class TagStatsController extends StatsController {
 			);
 		}
 
-		$heatmap_data = US()->db->clicks->get_heatmap_intensity_data( 365, $link_ids );
-		$heatmap_map   = [];
-		foreach ( $heatmap_data as $row ) {
-			$date = Helper::get_data( $row, 'date' );
-			if ( $date ) {
-				$heatmap_map[ $date ] = (int) Helper::get_data( $row, 'count' );
-			}
-		}
 
-		$heatmap = $this->build_heatmap_chart_data( $heatmap_map );
+		$data['browser_info'] = $this->get_browser_info_for_graph( $link_ids, 0, $range_start, $range_end );
+		$data['device_info']  = $this->get_device_info_for_graph( $link_ids, 0, $range_start, $range_end );
+		$data['os_info']      = $this->get_os_info_for_graph( $link_ids, 0, $range_start, $range_end );
 
-		$data['chart_data']['heatmap_series']       = $heatmap['heatmap_series'];
-		$data['chart_data']['has_clicks_data']      = ! empty( $heatmap_map );
-		$data['chart_data']['heatmap_week_starts']  = $heatmap['week_starts'];
-		$data['chart_data']['heatmap_day_labels']   = $heatmap['day_labels'];
-		$data['chart_data']['heatmap_month_labels'] = $heatmap['month_labels'];
-		$data['chart_data']['heatmap_color_ranges'] = $heatmap['color_ranges'];
-
-		$data['browser_info'] = $this->get_browser_info_for_graph( $link_ids );
-		$data['device_info']  = $this->get_device_info_for_graph( $link_ids );
-		$data['os_info']      = $this->get_os_info_for_graph( $link_ids );
-
-		$countries_data = $this->get_country_info_for_graph( $link_ids );
+		$countries_data = $this->get_country_info_for_graph( $link_ids, 0, $range_start, $range_end );
 		$country_info   = [];
 
 		if ( Helper::is_forechable( $countries_data ) ) {
@@ -238,8 +191,54 @@ class TagStatsController extends StatsController {
 		}
 
 		$data['country_info']   = $country_info;
-		$data['referrers_info'] = $this->get_referrers_info_for_graph( $link_ids );
+		$data['referrers_info'] = $this->get_referrers_info_for_graph( $link_ids, 0, $range_start, $range_end );
+
+		/*
+		 * The standings are the one thing on this screen that is useful without
+		 * a licence - which links are in here and how much each is used - so
+		 * they are built for everyone. The audience columns behind them are PRO,
+		 * and skipping them saves a free site three queries.
+		 */
+		$is_pro = US()->is_pro();
+
+		$data['members'] = $this->build_member_breakdown( $data['links'], $period, $is_pro );
+
+		$data['period'] = $period;
+
+		/*
+		 * Headline figures, channels and peak times are PRO, so a free site pays
+		 * none of that query cost.
+		 */
+		if ( $is_pro ) {
+			$overview = $this->build_stats_overview(
+				$link_ids,
+				[
+					'days'       => $days,
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+				]
+			);
+
+			$overview['members'] = $data['members'];
+
+			$overview['insights'] = array_slice(
+				array_merge(
+					$this->build_member_insights( $data['members'] ),
+					$overview['insights']
+				),
+				0,
+				4
+			);
+
+			$data['overview'] = $overview;
+		} else {
+			$data['overview'] = [];
+		}
+
 		$data['last_updated_on'] = time();
+
+		// Stamped so a later shape change invalidates this entry on read.
+		$data['payload_version'] = self::PAYLOAD_VERSION;
 
 		Cache::set_transient( $cache_key, $data, HOUR_IN_SECONDS * 3 );
 

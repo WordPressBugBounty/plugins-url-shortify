@@ -4,6 +4,7 @@ namespace KaizenCoders\URL_Shortify\Frontend;
 
 use KaizenCoders\URL_Shortify\Admin\Click;
 use KaizenCoders\URL_Shortify\Helper;
+use KaizenCoders\URL_Shortify\Plugin;
 
 class Redirect {
 
@@ -50,6 +51,13 @@ class Redirect {
 
 			if ( ! US()->is_qr_request() ) {
 				$params = array_map( 'sanitize_text_field', wp_unslash( $_GET ) );
+
+				/*
+				 * The QR marker is ours - it tells the click tracker this was a
+				 * scan. The destination has no business seeing it, so it never
+				 * reaches the forwarded parameters.
+				 */
+				unset( $params[ Plugin::QR_SCAN_PARAM ] );
 
 				if ( $this->can_redirect( $link_data ) ) {
 					do_action( 'kc_us_before_redirect', $link_data );
@@ -160,7 +168,19 @@ class Redirect {
 				$parsed      = wp_parse_url( $request_uri );
 
 				if ( ! empty( $parsed['query'] ) ) {
-					$param_string = ( preg_match( '#\?#', $url ) ? '&' : '?' ) . sanitize_text_field( $parsed['query'] );
+					$query = sanitize_text_field( $parsed['query'] );
+
+					/*
+					 * Surgical rather than parse_str()/http_build_query(), which
+					 * would re-encode the rest of the query and undo the bracket
+					 * handling below.
+					 */
+					$query = preg_replace( '#(?:^|&)' . preg_quote( Plugin::QR_SCAN_PARAM, '#' ) . '=[^&]*#', '', $query );
+					$query = ltrim( $query, '&' );
+
+					if ( '' !== $query ) {
+						$param_string = ( preg_match( '#\?#', $url ) ? '&' : '?' ) . $query;
+					}
 				}
 
 				$param_string = preg_replace( [ '#%5B#i', '#%5D#i' ], [ '[', ']' ], $param_string );

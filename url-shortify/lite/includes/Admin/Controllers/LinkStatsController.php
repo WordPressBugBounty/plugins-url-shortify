@@ -64,33 +64,57 @@ class LinkStatsController extends StatsController {
 
 		// If we have the data in cache, get it from it.
 		// We store data in cache for 3 hours
-		$cache_key = 'link_stats_' . $this->link_id . '_' . sanitize_key( $time_filter );
+		// The suffix is bumped whenever the shape of the cached payload changes,
+		// so an upgrade does not serve three hours of the previous structure.
+		$cache_key = 'link_stats_v2_' . $this->link_id . '_' . sanitize_key( $time_filter );
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
 			$cache_key .= '_' . sanitize_key( $start_date . '_' . $end_date );
 		}
 		$data      = Cache::get_transient( $cache_key );
 
-		if ( ! empty( $data ) && ( 1 !== $refresh ) ) {
+		/*
+		 * A payload cached by an older version of this screen can be missing
+		 * keys the template now reads, which renders as a screen with pieces
+		 * missing for up to three hours. Anything not stamped with the current
+		 * shape is rebuilt.
+		 */
+		$is_usable = ! empty( $data )
+			&& (int) Helper::get_data( $data, 'payload_version', 0 ) === self::PAYLOAD_VERSION;
+
+		if ( $is_usable && ( 1 !== $refresh ) ) {
 			return $data;
 		}
 
 		$data = US()->db->links->get_by_id( $this->link_id );
 
+		$link_ids = array( $this->link_id );
+
+		/*
+		 * Resolve the filter to concrete dates once and hand the same range to
+		 * every panel. Previously each one took its own view - some a trailing
+		 * number of days, some nothing at all - so the figures on a single
+		 * screen described different windows.
+		 */
+		$period = $this->resolve_stats_period( $filter_context );
+
+		$range_start = $period['start'];
+		$range_end   = $period['end'];
+
 		// Click History for the selected range.
 		$history_days = apply_filters( 'kc_us_clicks_info_for_days', $days );
 
-		$clicks_data = $this->get_clicks_info( $history_days, array( $this->link_id ), $start_date, $end_date );
+		$clicks_data = $this->get_clicks_info( $history_days, $link_ids, $range_start, $range_end );
 
 		$data['reports']['clicks'] = $clicks_data;
 
 		$spline_data_filled = $this->fill_missing_dates_in_spline_data(
-			US()->db->clicks->get_spline_chart_data( $days, array( $this->link_id ), $start_date, $end_date ),
+			US()->db->clicks->get_spline_chart_data( $days, $link_ids, $range_start, $range_end ),
 			$days,
 			$start_date,
 			$end_date
 		);
 
-		$heatmap_data = US()->db->clicks->get_heatmap_intensity_data( 365, array( $this->link_id ), $start_date, $end_date );
+		$heatmap_data = US()->db->clicks->get_heatmap_intensity_data( 365, $link_ids, $range_start, $range_end );
 		$heatmap_map   = [];
 		foreach ( $heatmap_data as $row ) {
 			$date = Helper::get_data( $row, 'date' );
@@ -118,11 +142,11 @@ class LinkStatsController extends StatsController {
 			array_map( 'intval', array_column( $spline_data_filled, 'total_clicks' ) )
 		) ?: [];
 
-		$data['browser_info'] = $this->get_browser_info_for_graph( array( $this->link_id ) );
-		$data['device_info']  = $this->get_device_info_for_graph( array( $this->link_id ) );
-		$data['os_info']      = $this->get_os_info_for_graph( array( $this->link_id ) );
+		$data['browser_info'] = $this->get_browser_info_for_graph( $link_ids, 0, $range_start, $range_end );
+		$data['device_info']  = $this->get_device_info_for_graph( $link_ids, 0, $range_start, $range_end );
+		$data['os_info']      = $this->get_os_info_for_graph( $link_ids, 0, $range_start, $range_end );
 
-		$countries_data = $this->get_country_info_for_graph( array( $this->link_id ) );
+		$countries_data = $this->get_country_info_for_graph( $link_ids, 0, $range_start, $range_end );
 
 		$country_info = array();
 
@@ -146,7 +170,16 @@ class LinkStatsController extends StatsController {
 
 		$data['country_info'] = $country_info;
 
-		$data['referrers_info'] = $this->get_referrers_info_for_graph( array( $this->link_id ) );
+		$data['referrers_info'] = $this->get_referrers_info_for_graph( $link_ids, 0, $range_start, $range_end );
+
+		/*
+		 * The overview - headline figures against the previous period, traffic
+		 * channels, peak times and the insight strip. PRO only, so free sites
+		 * pay none of the query cost.
+		 */
+		$data['overview'] = US()->is_pro()
+			? $this->build_stats_overview( $link_ids, $filter_context )
+			: [];
 
 		/**
 		 * Split test results — populated by PRO via the kc_us_get_split_test_results filter.
@@ -155,6 +188,9 @@ class LinkStatsController extends StatsController {
 		$data['split_test_results'] = apply_filters( 'kc_us_get_split_test_results', [], $this->link_id, $data );
 
 		$data['last_updated_on'] = time();
+
+		// Stamped so a later shape change invalidates this entry on read.
+		$data['payload_version'] = self::PAYLOAD_VERSION;
 
 		// Store data in cache for 3 hours
 		Cache::set_transient( $cache_key, $data, HOUR_IN_SECONDS * 3 );
@@ -210,11 +246,7 @@ class LinkStatsController extends StatsController {
 	 */
 	private function get_clicks_filter_context() {
 		$default_time_filter = US()->is_pro() ? 'all_time' : 'last_7_days';
-		$time_filter         = sanitize_key( Helper::get_request_data( 'time_filter', '' ) );
-
-		if ( empty( $time_filter ) ) {
-			$time_filter = $default_time_filter;
-		}
+		$time_filter         = self::sanitize_time_filter( Helper::get_request_data( 'time_filter', '' ) );
 
 		$context = [
 			'time_filter' => $time_filter,

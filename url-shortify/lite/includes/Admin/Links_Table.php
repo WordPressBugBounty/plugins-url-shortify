@@ -2136,7 +2136,7 @@ class Links_Table extends US_List_Table {
 
 				<?php
 
-				submit_button( __( 'Filter' ), '', 'filter_action', false, [
+				submit_button( __( 'Filter', 'url-shortify' ), '', 'filter_action', false, [
 					'id'      => 'post-query-submit',
 					'onclick' => 'return kcUsFilterLinks();',
 				] );

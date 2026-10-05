@@ -33,7 +33,7 @@ $permissions = Helper::get_api_permissions();
                 <thead>
                 <tr>
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"><?php _e('ID', 'url-shortify'); ?></th>
-                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"><?php _e('Description', ''); ?></th>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"><?php _e('Description', 'url-shortify'); ?></th>
                     <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"><?php _e('Consumer Key', 'url-shortify'); ?></th>
                     <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"><?php _e('User', 'url-shortify'); ?></th>
                     <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"><?php _e('Permissions', 'url-shortify'); ?></th>

@@ -72,56 +72,137 @@
 
 /* Social Share */
 
+/*
+ * The popup is a wrapping grid of 50px tiles, five to a row, so the network
+ * set can grow (or be filtered down) without the markup or the width caring
+ * how many there are. It is positioned out of flow because it opens inside a
+ * 20px-tall cell in the links table - in flow it would shove the row apart.
+ */
+.share-button.sharer {
+    height: 20px;
+    position: relative;
+}
+
+.share-button.sharer .social.us-social {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    z-index: 100;
+    width: 250px;
+    margin: 6px 0 0 -125px;
+    border-radius: 8px;
+    /* Contains the floated tiles and clips the corner tiles to the radius. */
+    overflow: hidden;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.22);
+}
+
+.share-button.sharer .social {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.share-button.sharer .social.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
 .social .fbtn {
     width: 50px;
-    display: inline-block;
+    height: 48px;
+    display: block;
+    float: left;
     color: #fff;
     text-align: center;
-    line-height:18px;
-    float: left;
+    line-height: 48px;
+    text-decoration: none;
+    box-shadow: none;
+    transition: filter 0.15s ease;
 }
-.social .fa {
-    padding:15px 0px;
+
+.social .fbtn:hover,
+.social .fbtn:focus {
+    color: #fff;
+    filter: brightness(1.18);
+    box-shadow: none;
+    outline: none;
+}
+
+.social .fbtn .fa {
+    padding: 0;
+    font-size: 18px;
+    line-height: 48px;
+}
+
+/* Inline brand marks (X, Bluesky, Threads, LINE) take the tile's text colour. */
+.social .fbtn .kc-us-share-mark {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    fill: currentColor;
 }
 
 .facebook {
-    background-color: #3b5998;
-}
-
-.gplus {
-    background-color: #dd4b39;
+    background-color: #1877f2;
 }
 
 .twitter {
-    background-color: #55acee;
+    background-color: #0f1419;
 }
 
-.stumbleupon {
-    background-color: #eb4924;
-}
-
-.pinterest {
-    background-color: #cc2127;
+.whatsapp {
+    background-color: #25d366;
 }
 
 .linkedin {
     background-color: #0077b5;
 }
 
+.telegram {
+    background-color: #0088cc;
+}
+
+.reddit {
+    background-color: #ff4500;
+}
+
+.pinterest {
+    background-color: #bd081c;
+}
+
+.bluesky {
+    background-color: #0285ff;
+}
+
+.threads {
+    background-color: #101010;
+}
+
+.tumblr {
+    background-color: #34465d;
+}
+
+.line {
+    background-color: #06c755;
+}
+
+.xing {
+    background-color: #006567;
+}
+
+.pocket {
+    background-color: #ef3f56;
+}
+
 .buffer {
     background-color: #323b43;
 }
 
-.whatsapp {
-    background-color: #25D366;
-}
-
-.pinterest {
-    background-color: #c8232c;
-}
-
-.telegram {
-    background-color: #0088cc;
+.sms {
+    background-color: #5b6270;
 }
 
 .vkontakte {
@@ -130,14 +211,6 @@
 
 .hackernews {
     background-color: #ff6600;
-}
-
-.tumblr {
-    background-color: #34465d;
-}
-
-.line {
-    background-color: #00c300;
 }
 
 .email, .svg_qrcode {
@@ -624,37 +697,6 @@
 #spline-area-chart .apexcharts-marker:hover {
     transform: scale(1.3);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.share-button.sharer {
-    height: 20px;
-}
-
-.share-button.sharer .social.active.top {
-    transform: scale(1) translateY(-10px);
-}
-
-.share-button.sharer .social.active.bottom {
-    transform: scale(1) translateY(10px);
-}
-
-.share-button.sharer .social.active {
-    opacity: 1;
-    transition: all 0.4s ease 0s;
-    visibility: visible;
-}
-.share-button.sharer .social.networks-5 {
-
-}
-.share-button.sharer .social.top {
-    margin-top: -80px;
-    transform-origin: 0 0 0;
-}
-.share-button.sharer .social {
-    margin-left: -200px;
-    opacity: 0;
-    transition: all 0.4s ease 0s;
-    visibility: hidden;
 }
 
 .us-social {

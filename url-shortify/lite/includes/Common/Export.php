@@ -105,6 +105,7 @@ class Export {
 			'browser_type'    => __( 'Browser', 'url-shortify' ),
 			'browser_version' => __( 'Browser Version', 'url-shortify' ),
 			'ip'              => __( 'IP Address', 'url-shortify' ),
+			'source'          => __( 'Source', 'url-shortify' ),
 			'created_at'      => __( 'Created At', 'url-shortify' ),
 		);
 	}

@@ -398,12 +398,40 @@ class Plugin {
 	/**
 	 * Check if this is qr request
 	 *
+	 * Note this is a request for the QR *image*, not a scan of one.
+	 *
 	 * @return boolean
 	 *
 	 * @since 1.3.6
 	 */
 	public function is_qr_request() {
 		return isset( $_GET['kc_us_source'] ) && 'qr' === Helper::clean( $_GET['kc_us_source'] );
+	}
+
+	/**
+	 * The marker a generated QR code carries so a scan can be recognised.
+	 *
+	 * Deliberately not kc_us_source=qr, which already means "hand me the QR
+	 * image": a code encoding that would answer a scan with a PNG download
+	 * instead of the destination.
+	 *
+	 * @since 2.7.0
+	 */
+	const QR_SCAN_PARAM = 'kc_us_qr';
+
+	/**
+	 * Did this request come from scanning one of our QR codes?
+	 *
+	 * @since 2.7.0
+	 *
+	 * @return bool
+	 */
+	public function is_qr_scan() {
+		if ( ! isset( $_GET[ self::QR_SCAN_PARAM ] ) ) {
+			return false;
+		}
+
+		return '1' === Helper::clean( $_GET[ self::QR_SCAN_PARAM ] );
 	}
 
 	/**

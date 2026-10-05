@@ -1,117 +1,74 @@
 <?php
 
 use KaizenCoders\URL_Shortify\Admin\Controllers\ClicksController;
+use KaizenCoders\URL_Shortify\Admin\Controllers\StatsController;
+use KaizenCoders\URL_Shortify\Admin\StatsRenderer;
 use KaizenCoders\URL_Shortify\Common\Utils;
 use KaizenCoders\URL_Shortify\Helper;
 
 $page_refresh_url = Utils::get_current_page_refresh_url();
 
+// Resolved through the same gate the controller uses, so the pills, the table's
+// data attributes and the figures cannot describe a period this plan may not ask
+// for. Clamping only the custom range here let a free site request all time
+// through the query string.
+$time_filter = StatsController::sanitize_time_filter( Helper::get_data( $_GET, 'time_filter', '' ) );
 
-$today_url        = Utils::get_stats_filter_url( array( 'time_filter' => 'today' ) );
-$last_7_days_url  = Utils::get_stats_filter_url( array( 'time_filter' => 'last_7_days' ) );
-$last_30_days_url = Utils::get_stats_filter_url( array( 'time_filter' => 'last_30_days' ) );
-$last_60_days_url = Utils::get_stats_filter_url( array( 'time_filter' => 'last_60_days' ) );
-$all_time_url     = Utils::get_stats_filter_url( array( 'time_filter' => 'all_time' ) );
-
-$time_filter = Helper::get_data( $_GET, 'time_filter', '' );
-
-if ( empty( $time_filter ) ) {
-	$time_filter = ( US()->is_pro() ) ? 'all_time' : 'last_7_days';
-}
-
-// Custom date filter is PRO-only; fall back gracefully for free users.
-if ( 'custom' === $time_filter && ! US()->is_pro() ) {
-	$time_filter = 'last_7_days';
-}
-
-$buttons = [
-	'today' => [
-		'label' => __( 'Today', 'url-shortify' ),
-		'url'   => $today_url,
-		'class' => 'today' === $time_filter ? 'active' : 'inactive',
-		'filter' => 'today',
-	],
-
-	'last_7_days' => [
-		'label' => __( '7 Days', 'url-shortify' ),
-		'url'   => $last_7_days_url,
-		'class' => 'last_7_days' === $time_filter ? 'active' : 'inactive',
-		'filter' => 'last_7_days',
-	],
+$periods = [
+	'today'        => __( 'Today', 'url-shortify' ),
+	'last_7_days'  => __( '7 days', 'url-shortify' ),
+	'last_30_days' => __( '30 days', 'url-shortify' ),
+	'last_60_days' => __( '2 months', 'url-shortify' ),
+	'all_time'     => __( 'All time', 'url-shortify' ),
 ];
 
-if ( US()->is_pro() ) {
-	$pro_buttons = [
-		'last_30_days' => [
-			'label' => __( '30 Days', 'url-shortify' ),
-			'url'   => $last_30_days_url,
-			'class' => 'last_30_days' === $time_filter ? 'active' : 'inactive',
-			'filter' => 'last_30_days',
-		],
-
-		'last_60_days' => [
-			'label' => __( '2 Months', 'url-shortify' ),
-			'url'   => $last_60_days_url,
-			'class' => 'last_60_days' === $time_filter ? 'active' : 'inactive',
-			'filter' => 'last_60_days',
-		],
-
-		'all_time' => [
-			'label' => __( 'All Time', 'url-shortify' ),
-			'url'   => $all_time_url,
-			'class' => 'all_time' === $time_filter ? 'active' : 'inactive',
-			'filter' => 'all_time',
-		],
-	];
-
-	$buttons = $buttons + $pro_buttons;
+// The longer windows are a PRO capability, so free sites see two.
+if ( ! US()->is_pro() ) {
+	$periods = array_intersect_key( $periods, array_flip( [ 'today', 'last_7_days' ] ) );
 }
 
+$buttons = [];
+
+foreach ( $periods as $filter => $label ) {
+	$buttons[ $filter ] = [
+		'label'  => $label,
+		'url'    => Utils::get_stats_filter_url( [ 'time_filter' => $filter ] ),
+		'class'  => $filter === $time_filter ? 'active' : 'inactive',
+		'filter' => $filter,
+	];
+}
 
 $short_link = esc_attr( Helper::get_data( $data, 'short_url', '' ) );
-
-$link_id = Helper::get_data( $data, 'id', '' );
-
+$link_id    = Helper::get_data( $data, 'id', '' );
 $export_url = Helper::get_link_action_url( $link_id, 'export' );
 
 $clicks_data = $data['reports']['clicks'];
 
 $click_data_for_graph = $data['click_data_for_graph'];
-$chart_data = Helper::get_data( $data, 'chart_data', [] );
+$chart_data           = Helper::get_data( $data, 'chart_data', [] );
+
 $has_chart_data = ! empty( $chart_data )
 	&& ! empty( Helper::get_data( $chart_data, 'dates', [] ) )
 	&& array_sum( array_map( 'intval', Helper::get_data( $chart_data, 'total_series', [] ) ) ) > 0;
+
 $has_heatmap_data = ! empty( $chart_data )
 	&& ! empty( Helper::get_data( $chart_data, 'heatmap_series', [] ) )
 	&& ! empty( Helper::get_data( $chart_data, 'has_clicks_data', false ) );
 
 $last_updated_on = Helper::get_data( $data, 'last_updated_on', time() );
-
-$elapsed_time = Utils::get_elapsed_time( $last_updated_on );
-
-$labels = $values = '';
-$chart_labels = [];
-$chart_values = [];
+$elapsed_time    = Utils::get_elapsed_time( $last_updated_on );
 
 $total_clicks = 0;
+
 if ( ! empty( $click_data_for_graph ) ) {
-	$chart_labels = array_keys( $click_data_for_graph );
-
-	$clicks = array_map( 'intval', array_values( $click_data_for_graph ) );
-
-	$total_clicks = array_sum( $clicks );
-
-	$chart_values = $clicks;
-
-	$labels = wp_json_encode( $chart_labels );
-
-	$values = wp_json_encode( $clicks );
+	$total_clicks = array_sum( array_map( 'intval', array_values( $click_data_for_graph ) ) );
 }
 
 $current_start_date = Helper::get_data( $_GET, 'start_date', '' );
 $current_end_date   = Helper::get_data( $_GET, 'end_date', '' );
 
 $days = 7;
+
 switch ( $time_filter ) {
 	case 'today':
 		$days = 1;
@@ -130,382 +87,435 @@ switch ( $time_filter ) {
 		break;
 }
 
-$columns = ClicksController::get_table_columns();
+$columns = ClicksController::get_table_columns( true );
 
 $click_history = new ClicksController();
 $click_history->set_columns( $columns );
 
+/*
+ * The overview is PRO. Free sites still get the redesigned layout and the
+ * breakdowns they have always had; the panels built on the new metrics show
+ * what they contain behind a veil rather than disappearing.
+ */
+$is_pro   = US()->is_pro();
+$overview = Helper::get_data( $data, 'overview', [] );
+
+/*
+ * Visitor breakdowns come from PRO. Without it the filters behind them have no
+ * handler at all, so these panels have nothing to draw - they show what they
+ * would contain instead. A site that has switched promotions off gets the
+ * panel omitted rather than an advert.
+ */
+$show_promo = US()->can_show_premium_promotion();
+
+/**
+ * Open a card that is either live or locked behind the upgrade veil.
+ *
+ * @param bool $unlocked
+ *
+ * @return void
+ */
+$kc_us_open_card = function ( $unlocked ) {
+	printf( '<div class="kc-us-st-card%s">', $unlocked ? '' : ' kc-us-st-locked' );
+};
+
+/**
+ * Close it, adding the veil when the panel is locked.
+ *
+ * @param bool   $unlocked
+ * @param string $title
+ * @param string $note
+ *
+ * @return void
+ */
+$kc_us_close_card = function ( $unlocked, $title, $note ) {
+	if ( ! $unlocked ) {
+		StatsRenderer::locked_veil( $title, $note );
+	}
+
+	echo '</div>';
+};
+
+$period   = Helper::get_data( $overview, 'period', [] );
+$kpis     = Helper::get_data( $overview, 'kpis', [] );
+$insights = Helper::get_data( $overview, 'insights', [] );
+$channels = Helper::get_data( $overview, 'channels', [] );
+$peak     = Helper::get_data( $overview, 'peak', [] );
+$summary  = Helper::get_data( $overview, 'current', [] );
+
+$period_label = Helper::get_data( $buttons, $time_filter, [] );
+$period_label = Helper::get_data( $period_label, 'label', __( 'this period', 'url-shortify' ) );
+
+$last_click = Helper::get_data( $summary, 'last_click', '' );
+
+// The same icons the click log and the standings use, so a browser looks the
+// same wherever it is named on the screen.
+$device_rows   = StatsRenderer::rows_from_map( Helper::get_data( $data, 'device_info', [] ), 6, [ Utils::class, 'get_device_icon_url' ] );
+$browser_rows  = StatsRenderer::rows_from_map( Helper::get_data( $data, 'browser_info', [] ), 6, [ Utils::class, 'get_browser_icon_url' ] );
+$platform_rows = StatsRenderer::rows_from_map( Helper::get_data( $data, 'os_info', [] ), 6, [ Utils::class, 'get_platform_icon_url' ] );
+
+// Referrer URLs are long and mostly chrome; the host is the part that identifies
+// the source, and collapsing to it merges the many paths of one site.
+$referrer_rows = [];
+$referrer_map  = [];
+
+foreach ( (array) Helper::get_data( $data, 'referrers_info', [] ) as $referrer => $count ) {
+	$host = wp_parse_url( (string) $referrer, PHP_URL_HOST );
+
+	if ( empty( $host ) ) {
+		$host = (string) $referrer;
+	}
+
+	$host = preg_replace( '/^www\./i', '', $host );
+
+	/*
+	 * Clicks with no referrer are bucketed under a label rather than a host.
+	 * They belong in the channels card, where they are counted as direct; in a
+	 * list of "sites sending people here" they are both wrong and, being the
+	 * largest bucket on most links, the loudest thing on it.
+	 */
+	if ( '' === $host || false === strpos( $host, '.' ) ) {
+		continue;
+	}
+
+	$referrer_map[ $host ] = Helper::get_data( $referrer_map, $host, 0 ) + (int) $count;
+}
+
+$referrer_rows = StatsRenderer::rows_from_map( $referrer_map, 8 );
+
+$country_rows = [];
+
+foreach ( (array) Helper::get_data( $data, 'country_info', [] ) as $country ) {
+	$country_rows[] = [
+		'label' => Helper::get_data( $country, 'name', '' ),
+		'value' => (int) Helper::get_data( $country, 'total', 0 ),
+		'share' => Helper::get_data( $country, 'percentage', null ),
+		'icon'  => Helper::get_data( $country, 'flag_url', '' ),
+	];
+}
+
 ?>
 
 <div class="wrap">
-    <div class="font-sans bg-grey-lighter flex flex-col min-h-screen w-full">
+    <div class="kc-us-st font-sans">
 
-        <div class="w-full">
-            <div class="md:block mt-3 border-b border-gray-300 pb-5">
-                <div class="container mx-auto">
-                    <div class="md:flex">
-                        <div class="flex inline -mb-px mr-8 w-11/12">
-								<span class="flex">
-									<img class="h-6 w-6 mr-2" src="<?php echo esc_url( $data['icon_url'] ); ?>" title="<?php echo esc_attr( $data['url'] ); ?>"/>
-									<strong class="text-2xl">
-										<a href="<?php echo esc_url( $data['url'] ); ?>" target="_blank">
-										 <?php echo stripslashes( $data['name'] ); ?>
-										</a>
-									</strong>
-								</span>
-							<?php
+        <div class="kc-us-st-head">
+            <div class="kc-us-st-head__main">
+                <p class="kc-us-st-eyebrow"><?php esc_html_e( 'Link statistics', 'url-shortify' ); ?></p>
 
-							echo Helper::create_copy_short_link_html( $short_link, $data['id'] );
-							?>
-                        </div>
+                <h1 class="kc-us-st-title">
+                    <img class="h-6 w-6 rounded"
+                         src="<?php echo esc_url( $data['icon_url'] ); ?>"
+                         alt=""
+                         title="<?php echo esc_attr( $data['url'] ); ?>" />
+                    <a href="<?php echo esc_url( $data['url'] ); ?>" target="_blank" rel="noopener noreferrer">
+                        <?php echo esc_html( stripslashes( $data['name'] ) ); ?>
+                    </a>
+                </h1>
 
-                        <div class="flex float-right text-center mr-2 w-1/12">
-							<?php if ( US()->is_pro() ) {
-								echo Helper::get_social_share_widget( $link_id, 2 );
-							} ?>
-                        </div>
+                <div class="kc-us-st-sub">
+                    <?php
+                    echo Helper::create_copy_short_link_html( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        $short_link,
+                        $data['id'],
+                        '<code>' . esc_html( preg_replace( '#^https?://#', '', $short_link ) ) . '</code>'
+                    );
+                    ?>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Click History Report -->
-        <div class="mt-5">
-            <div class="grid grid-cols-1">
-                <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
-                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                            <h2 class="text-2xl font-semibold leading-tight text-slate-900"><?php _e( 'Total vs Unique Links', 'url-shortify' ); ?></h2>
-                            <p class="mt-1 max-w-2xl text-sm leading-5 text-slate-500 mb-2">
-                                <span id="kc-us-total-clicks"><?php echo esc_html( sprintf( __( '%d Total Clicks', 'url-shortify' ), $total_clicks ) ); ?></span>
-                            </p>
-
+                    <?php if ( ! empty( $last_click ) ) : ?>
+                        <span>
                             <?php
-                            /*
-                             * One link on its own has nothing to compare against, so this hands
-                             * the link to Smart Reports with it already selected rather than
-                             * repeating the comparison chart here.
-                             */
+                            printf(
+                                /* translators: %s: human readable time difference, e.g. "2 hours". */
+                                esc_html__( 'Last click %s ago', 'url-shortify' ),
+                                esc_html( human_time_diff( strtotime( $last_click ), time() ) )
+                            );
                             ?>
-                            <?php if ( US()->is_pro() && ! empty( $link_id ) && US()->access->can( 'manage_reports' ) ) : ?>
-                                <p class="mt-1 mb-2 text-sm">
-                                    <a class="text-indigo-600 hover:text-indigo-700"
-                                       href="<?php echo esc_url( add_query_arg( [
-                                           'page'   => 'us_smart_reports',
-                                           'view'   => 'new',
-                                           'entity' => 'link',
-                                           'range'  => 'last_30_days',
-                                           'metric' => 'total',
-                                           'ids'    => [ absint( $link_id ) ],
-                                       ], admin_url( 'admin.php' ) ) ); ?>">
-                                        <?php esc_html_e( 'Compare with other links', 'url-shortify' ); ?>
-                                    </a>
-                                </p>
-                            <?php endif; ?>
-                        </div>
-                        <div id="kc-us-clicks-filter-controls" class="flex flex-wrap items-center gap-2">
+                        </span>
+                    <?php endif; ?>
 
-                            <!-- Segmented pill filter -->
-                            <div class="inline-flex items-center rounded-xl border border-gray-200 bg-gray-100 p-1 gap-0.5">
-                                <?php foreach ( $buttons as $key => $button ) : ?>
-                                    <button type="button"
-                                            class="kc-us-filter-pill rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 <?php echo 'active' === $button['class'] ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>"
-                                            data-filter="<?php echo esc_attr( $button['filter'] ); ?>">
-                                        <?php echo esc_html( $button['label'] ); ?>
-                                    </button>
-                                <?php endforeach; ?>
-                                <?php if ( US()->is_pro() ) : ?>
-                                <button type="button"
-                                        class="kc-us-filter-pill rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-150 <?php echo 'custom' === $time_filter ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'; ?>"
-                                        data-filter="custom">
-                                    <span class="dashicons dashicons-calendar-alt" style="width:14px;height:14px;font-size:14px;vertical-align:middle;margin-right:3px;" aria-hidden="true"></span><?php esc_html_e( 'Custom', 'url-shortify' ); ?>
-                                </button>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- Custom date range picker (PRO only, visible when Custom is active) -->
-                            <?php if ( US()->is_pro() ) : ?>
-                            <div id="kc-us-clicks-custom-control" class="<?php echo ( 'custom' === $time_filter ) ? '' : 'hidden'; ?> inline-flex flex-wrap items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 shadow-sm">
-                                <input type="text"
-                                       id="kc-us-start-date"
-                                       class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                                       placeholder="<?php esc_attr_e( 'Start date', 'url-shortify' ); ?>"
-                                       value="<?php echo esc_attr( $current_start_date ); ?>" />
-                                <span class="text-xs font-medium text-slate-400"><?php esc_html_e( '→', 'url-shortify' ); ?></span>
-                                <input type="text"
-                                       id="kc-us-end-date"
-                                       class="kc-us-date-picker w-28 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                                       placeholder="<?php esc_attr_e( 'End date', 'url-shortify' ); ?>"
-                                       value="<?php echo esc_attr( $current_end_date ); ?>" />
-                                <button type="button"
-                                        id="kc-us-clicks-custom-apply"
-                                        class="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
-                                        title="<?php esc_attr_e( 'Apply custom date range', 'url-shortify' ); ?>">
-                                    <?php esc_html_e( 'Apply', 'url-shortify' ); ?>
-                                </button>
-                            </div>
-                            <?php endif; // is_pro — custom control ?>
-
-                            <!-- Refresh -->
-                            <a href="<?php echo esc_url( $page_refresh_url ); ?>"
-                               id="kc-us-clicks-refresh"
-                               class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white p-2 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-600 transition-colors duration-150"
-                               title="<?php esc_attr_e( 'Refresh', 'url-shortify' ); ?>">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10.2 3.28c3.53 0 6.43 2.61 6.92 6h2.08l-3.5 4l-3.5-4h2.32a4.439 4.439 0 0 0-4.32-3.45c-1.45 0-2.73.71-3.54 1.78L4.95 5.66a6.965 6.965 0 0 1 5.25-2.38zm-.4 13.44c-3.52 0-6.43-2.61-6.92-6H.8l3.5-4c1.17 1.33 2.33 2.67 3.5 4H5.48a4.439 4.439 0 0 0 4.32 3.45c1.45 0 2.73-.71 3.54-1.78l1.71 1.95a6.95 6.95 0 0 1-5.25 2.38z" fill="currentColor"/></svg>
-                            </a>
-
-                        </div>
-                    </div>
-
-                    <?php if ( $has_chart_data ) { ?>
-                        <div id="spline-area-chart" class="mt-6 h-[220px] w-full"></div>
-                    <?php } else { ?>
-                        <div class="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
-                            <p class="text-base font-medium text-slate-700">
-                                <?php esc_html_e( 'No clicks data available yet.', 'url-shortify' ); ?>
-                            </p>
-                        </div>
-                    <?php } ?>
-                </section>
-
-                <?php if ( US()->is_pro() ) : ?>
-                <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)] mt-6">
-                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                            <h2 class="text-xl font-semibold text-slate-900"><?php _e( 'Link Activity Intensity', 'url-shortify' ); ?></h2>
-                        </div>
-                    </div>
-
-                    <?php if ( $has_heatmap_data ) { ?>
-                        <div class="kc-us-heatmap-chart-wrapper mt-2 w-full">
-                            <div id="activity-heatmap" class="w-full"></div>
-                            <div id="heatmap-month-row" class="kc-us-heatmap-month-row" aria-hidden="true"></div>
-                        </div>
-                    <?php } else { ?>
-                        <div class="kc-us-heatmap-empty-state mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center">
-                            <p class="text-base font-medium text-slate-700">
-                                <?php esc_html_e( 'No clicks data available. Once your link is visited, analytics will appear here', 'url-shortify' ); ?>
-                            </p>
-                        </div>
-                    <?php } ?>
-                </section>
-                <?php endif; // is_pro — custom control ?>
+                    <span><?php
+                        /* get_elapsed_time() returns "2 Hours ago" or "Just Now", so it supplies its own tense. */
+                        echo esc_html( sprintf( __( 'Updated %s', 'url-shortify' ), $elapsed_time ) );
+                    ?></span>
+                </div>
             </div>
         </div>
 
-        <?php if ( ! US()->is_pro() ) : ?>
-        <div class="mt-6">
-            <section class="kc-us-chart-card kc-us-heatmap-card bg-white relative overflow-hidden rounded-3xl border rounded-xl border-gray-200 px-6 py-8 shadow-[0_20px_45px_rgba(15,23,42,0.1)]">
-                <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div>
-                        <h2 class="text-xl font-semibold text-slate-900"><?php _e( 'Link Activity Intensity', 'url-shortify' ); ?></h2>
-                    </div>
-                </div>
-                <div class="w-full h-64 p-10 bg-green-50 rounded-2xl">
-                    <div class="">
-                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                            <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-5">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                                <?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm leading-5 text-gray-500">
-                                    <?php esc_html_e( 'See when your links come alive with activity intensity heatmap.', 'url-shortify' ); ?>
-                                </p>
+        <?php if ( $is_pro && ! empty( $kpis ) ) : ?>
+            <?php StatsRenderer::kpis( $kpis ); ?>
+
+            <?php if ( empty( $period['bounded'] ) ) : ?>
+                <p class="-mt-2 mb-5 text-sm text-gray-500">
+                    <?php esc_html_e( 'Showing all time. Pick a date range above to compare against the period before it.', 'url-shortify' ); ?>
+                </p>
+            <?php endif; ?>
+
+            <?php StatsRenderer::insights( $insights ); ?>
+        <?php elseif ( ! $is_pro ) : ?>
+            <div class="kc-us-st-card kc-us-st-locked">
+                <?php StatsRenderer::locked_veil(
+                    __( 'Headline figures and trends are a PRO feature', 'url-shortify' ),
+                    __( 'See clicks, unique clicks, visitors and repeat rate, each against the previous period, so you can tell whether a link is growing or fading.', 'url-shortify' )
+                ); ?>
+                <div class="kc-us-st-locked__ghost p-5">
+                    <div class="kc-us-st-kpis">
+                        <?php foreach ( [ __( 'Clicks', 'url-shortify' ), __( 'Unique clicks', 'url-shortify' ), __( 'Visitors', 'url-shortify' ), __( 'Repeat rate', 'url-shortify' ) ] as $ghost_label ) : ?>
+                            <div class="kc-us-st-kpi">
+                                <span class="kc-us-st-kpi__label"><?php echo esc_html( $ghost_label ); ?></span>
+                                <span class="kc-us-st-kpi__value">&mdash;</span>
                             </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-            </section>
+            </div>
+        <?php endif; ?>
+
+        <div class="kc-us-st-card">
+            <div class="kc-us-st-card__head">
+                <div>
+                    <h2 class="kc-us-st-card__title"><?php esc_html_e( 'Clicks over time', 'url-shortify' ); ?></h2>
+                    <span class="kc-us-st-card__note">
+                        <span id="kc-us-total-clicks"><?php
+                            printf(
+                                /* translators: %s: formatted number of clicks. */
+                                esc_html__( '%s clicks in this period', 'url-shortify' ),
+                                esc_html( number_format_i18n( $total_clicks ) )
+                            );
+                        ?></span>
+                    </span>
+
+                    <?php
+                    /*
+                     * One link on its own has nothing to compare against, so this hands
+                     * the link to Smart Reports with it already selected rather than
+                     * repeating the comparison chart here.
+                     */
+                    ?>
+                    <?php if ( $is_pro && ! empty( $link_id ) && US()->access->can( 'manage_reports' ) ) : ?>
+                        <span class="kc-us-st-card__note">
+                            <a class="text-indigo-600 hover:text-indigo-700"
+                               href="<?php echo esc_url( add_query_arg( [
+                                   'page'   => 'us_smart_reports',
+                                   'view'   => 'new',
+                                   'entity' => 'link',
+                                   'range'  => 'last_30_days',
+                                   'metric' => 'total',
+                                   'ids'    => [ absint( $link_id ) ],
+                               ], admin_url( 'admin.php' ) ) ); ?>">
+                                <?php esc_html_e( 'Compare with other links', 'url-shortify' ); ?>
+                            </a>
+                        </span>
+                    <?php endif; ?>
+                </div>
+
+                <div id="kc-us-clicks-filter-controls" class="flex flex-wrap items-center gap-2">
+                    <div class="kc-us-st-periods">
+                        <?php foreach ( $buttons as $key => $button ) : ?>
+                            <button type="button"
+                                    class="kc-us-filter-pill <?php echo 'active' === $button['class'] ? 'is-active' : ''; ?>"
+                                    data-filter="<?php echo esc_attr( $button['filter'] ); ?>">
+                                <?php echo esc_html( $button['label'] ); ?>
+                            </button>
+                        <?php endforeach; ?>
+
+                        <?php if ( $is_pro ) : ?>
+                            <button type="button"
+                                    class="kc-us-filter-pill <?php echo 'custom' === $time_filter ? 'is-active' : ''; ?>"
+                                    data-filter="custom">
+                                <span class="dashicons dashicons-calendar-alt" style="width:14px;height:14px;font-size:14px;vertical-align:middle;margin-right:3px;" aria-hidden="true"></span><?php esc_html_e( 'Custom', 'url-shortify' ); ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ( $is_pro ) : ?>
+                        <div id="kc-us-clicks-custom-control" class="<?php echo ( 'custom' === $time_filter ) ? '' : 'hidden'; ?> inline-flex flex-wrap items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5">
+                            <input type="text"
+                                   id="kc-us-start-date"
+                                   class="kc-us-date-picker w-28 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700"
+                                   placeholder="<?php esc_attr_e( 'Start date', 'url-shortify' ); ?>"
+                                   value="<?php echo esc_attr( $current_start_date ); ?>" />
+                            <span class="text-xs font-medium text-gray-400">&rarr;</span>
+                            <input type="text"
+                                   id="kc-us-end-date"
+                                   class="kc-us-date-picker w-28 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700"
+                                   placeholder="<?php esc_attr_e( 'End date', 'url-shortify' ); ?>"
+                                   value="<?php echo esc_attr( $current_end_date ); ?>" />
+                            <button type="button"
+                                    id="kc-us-clicks-custom-apply"
+                                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white hover:bg-indigo-700"
+                                    title="<?php esc_attr_e( 'Apply custom date range', 'url-shortify' ); ?>">
+                                <?php esc_html_e( 'Apply', 'url-shortify' ); ?>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+
+                    <a href="<?php echo esc_url( $page_refresh_url ); ?>"
+                       id="kc-us-clicks-refresh"
+                       class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                       title="<?php esc_attr_e( 'Refresh', 'url-shortify' ); ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10.2 3.28c3.53 0 6.43 2.61 6.92 6h2.08l-3.5 4l-3.5-4h2.32a4.439 4.439 0 0 0-4.32-3.45c-1.45 0-2.73.71-3.54 1.78L4.95 5.66a6.965 6.965 0 0 1 5.25-2.38zm-.4 13.44c-3.52 0-6.43-2.61-6.92-6H.8l3.5-4c1.17 1.33 2.33 2.67 3.5 4H5.48a4.439 4.439 0 0 0 4.32 3.45c1.45 0 2.73-.71 3.54-1.78l1.71 1.95a6.95 6.95 0 0 1-5.25 2.38z" fill="currentColor"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="kc-us-st-card__body">
+                <?php if ( $has_chart_data ) : ?>
+                    <div id="spline-area-chart" class="h-[260px] w-full"></div>
+                <?php else : ?>
+                    <?php StatsRenderer::empty_state(
+                        __( 'Once this link is clicked, the trend will appear here.', 'url-shortify' ),
+                        __( 'No clicks in this period', 'url-shortify' )
+                    ); ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="kc-us-st-grid kc-us-st-grid--2">
+            <div class="kc-us-st-card <?php echo $is_pro ? '' : 'kc-us-st-locked'; ?>">
+                <?php StatsRenderer::card_head(
+                    __( 'Where the clicks come from', 'url-shortify' ),
+                    __( 'Grouped by the kind of source, not the individual site.', 'url-shortify' )
+                ); ?>
+                <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
+                    <?php
+                    if ( $is_pro ) {
+                        StatsRenderer::bars( $channels, [ 'empty' => __( 'No clicks in this period.', 'url-shortify' ) ] );
+                    } else {
+                        StatsRenderer::bars( [
+                            [ 'label' => __( 'Search', 'url-shortify' ), 'value' => 72, 'share' => null ],
+                            [ 'label' => __( 'Social', 'url-shortify' ), 'value' => 48, 'share' => null ],
+                            [ 'label' => __( 'Direct & apps', 'url-shortify' ), 'value' => 30, 'share' => null ],
+                        ] );
+                    }
+                    ?>
+                </div>
+                <?php if ( ! $is_pro ) {
+                    StatsRenderer::locked_veil(
+                        __( 'Traffic channels are a PRO feature', 'url-shortify' ),
+                        __( 'Know whether a link is carried by search, social, email or direct sharing, so you can put effort where it already works.', 'url-shortify' )
+                    );
+                } ?>
+            </div>
+
+            <div class="kc-us-st-card <?php echo $is_pro ? '' : 'kc-us-st-locked'; ?>">
+                <?php StatsRenderer::card_head(
+                    __( 'When your audience clicks', 'url-shortify' ),
+                    ! empty( $peak['best_label'] )
+                        ? sprintf( __( 'Busiest: %s, in your site timezone.', 'url-shortify' ), $peak['best_label'] )
+                        : __( 'By weekday and hour, in your site timezone.', 'url-shortify' )
+                ); ?>
+                <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
+                    <?php
+                    if ( $is_pro ) {
+                        StatsRenderer::hours_grid( $peak );
+                    } else {
+                        StatsRenderer::empty_state( __( 'Mon to Sun, hour by hour.', 'url-shortify' ) );
+                    }
+                    ?>
+                </div>
+                <?php if ( ! $is_pro ) {
+                    StatsRenderer::locked_veil(
+                        __( 'Peak times are a PRO feature', 'url-shortify' ),
+                        __( 'See the weekday and hour your audience is most active, and time your next share for it.', 'url-shortify' )
+                    );
+                } ?>
+            </div>
+        </div>
+
+        <?php if ( $is_pro || $show_promo ) : ?>
+        <div class="kc-us-st-grid kc-us-st-grid--2">
+            <?php $kc_us_open_card( $is_pro ); ?>
+                <?php StatsRenderer::card_head( __( 'Top locations', 'url-shortify' ), __( 'Countries these clicks came from.', 'url-shortify' ) ); ?>
+                <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
+                    <?php StatsRenderer::bars(
+                        $is_pro ? $country_rows : StatsRenderer::sample_rows( 'locations' ),
+                        [ 'empty' => __( 'No locations recorded in this period.', 'url-shortify' ) ]
+                    ); ?>
+                </div>
+            <?php $kc_us_close_card(
+                $is_pro,
+                __( 'Locations are a PRO feature', 'url-shortify' ),
+                __( 'See which countries your clicks come from, so you know who you are actually reaching.', 'url-shortify' )
+            ); ?>
+
+            <?php $kc_us_open_card( $is_pro ); ?>
+                <?php StatsRenderer::card_head( __( 'Top referrers', 'url-shortify' ), __( 'The sites sending people to this link.', 'url-shortify' ) ); ?>
+                <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
+                    <?php StatsRenderer::bars(
+                        $is_pro ? $referrer_rows : StatsRenderer::sample_rows( 'referrers' ),
+                        [ 'empty' => __( 'No referrers recorded in this period.', 'url-shortify' ) ]
+                    ); ?>
+                </div>
+            <?php $kc_us_close_card(
+                $is_pro,
+                __( 'Referrers are a PRO feature', 'url-shortify' ),
+                __( 'See exactly which sites send people to this link, and which ones are worth more of your time.', 'url-shortify' )
+            ); ?>
         </div>
         <?php endif; ?>
 
-        <!-- Country & Referrer Info -->
-        <div class="mt-6">
-            <div class="grid md:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4">
-                <!-- Country Info -->
-                <div class="overflow-hidden  rounded-lg">
+        <?php if ( $is_pro || $show_promo ) : ?>
+        <div class="kc-us-st-grid kc-us-st-grid--3">
+            <?php
+            $kc_us_tech_panels = [
+                'devices' => [
+                    'title' => __( 'Devices', 'url-shortify' ),
+                    'rows'  => $device_rows,
+                    'empty' => __( 'No devices recorded in this period.', 'url-shortify' ),
+                    'lock'  => __( 'Devices are a PRO feature', 'url-shortify' ),
+                    'note'  => __( 'See the split between desktop, mobile and tablet, so you know what your destination page has to cope with.', 'url-shortify' ),
+                ],
+                'browsers' => [
+                    'title' => __( 'Browsers', 'url-shortify' ),
+                    'rows'  => $browser_rows,
+                    'empty' => __( 'No browsers recorded in this period.', 'url-shortify' ),
+                    'lock'  => __( 'Browsers are a PRO feature', 'url-shortify' ),
+                    'note'  => __( 'See which browsers your visitors use, and which ones are worth testing against.', 'url-shortify' ),
+                ],
+                'platforms' => [
+                    'title' => __( 'Platforms', 'url-shortify' ),
+                    'rows'  => $platform_rows,
+                    'empty' => __( 'No platforms recorded in this period.', 'url-shortify' ),
+                    'lock'  => __( 'Platforms are a PRO feature', 'url-shortify' ),
+                    'note'  => __( 'See the operating systems behind your clicks, from Windows and macOS to iOS and Android.', 'url-shortify' ),
+                ],
+            ];
 
-                    <div class="mb-4">
-                        <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Top Locations', 'url-shortify' ); ?></span>
-                    </div>
-
-                    <div class="bg-white border-2">
-						<?php
-						if ( US()->is_pro() ) {
-							do_action( 'kc_us_render_country_info', $data );
-						} else {
-                        if( US()->can_show_premium_promotion() ) {
-							?>
-                            <div class="w-full h-64 p-10 bg-green-50">
-                                <div class="">
-                                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                                        <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="mt-3 text-center sm:mt-5">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
-                                        </h3>
-                                        <div class="mt-2">
-                                            <p class="text-sm leading-5 text-gray-500">
-												<?php _e( 'Get insights about top locations from where people are clicking on your links.', 'url-shortify' ); ?>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-						<?php } } ?>
-                    </div>
+            foreach ( $kc_us_tech_panels as $kc_us_panel_key => $kc_us_panel ) :
+                $kc_us_open_card( $is_pro );
+                StatsRenderer::card_head( $kc_us_panel['title'] );
+                ?>
+                <div class="kc-us-st-card__body <?php echo $is_pro ? '' : 'kc-us-st-locked__ghost'; ?>">
+                    <?php StatsRenderer::bars(
+                        $is_pro ? $kc_us_panel['rows'] : StatsRenderer::sample_rows( $kc_us_panel_key ),
+                        [ 'empty' => $kc_us_panel['empty'] ]
+                    ); ?>
                 </div>
+                <?php
+                $kc_us_close_card( $is_pro, $kc_us_panel['lock'], $kc_us_panel['note'] );
+            endforeach;
+            ?>
+        </div>
+        <?php endif; ?>
 
-                <!-- Referrer Info -->
-                <div class="overflow-hidden rounded-lg h-px-400">
-                    <div class="mb-4">
-                        <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Referrers', 'url-shortify' ); ?></span>
+        <div class="kc-us-st-card">
+            <?php StatsRenderer::card_head(
+                __( 'Activity over the past year', 'url-shortify' ),
+                __( 'Each square is a day. Darker means busier. Always the last year, whichever period is selected above.', 'url-shortify' )
+            ); ?>
+            <div class="kc-us-st-card__body">
+                <?php if ( $has_heatmap_data ) : ?>
+                    <div class="kc-us-heatmap-chart-wrapper w-full">
+                        <div id="activity-heatmap" class="w-full"></div>
+                        <div id="heatmap-month-row" class="kc-us-heatmap-month-row" aria-hidden="true"></div>
                     </div>
-                    <div class="bg-white border-2" id="">
-						<?php
-						if ( US()->is_pro() ) {
-							do_action( 'kc_us_render_referrer_info', $data );
-						} else {
-                        if( US()->can_show_premium_promotion() ) {
-							?>
-                            <div class="w-full h-64 p-10 bg-green-50">
-                                <div class="">
-                                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                                        <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="mt-3 text-center sm:mt-5">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-											<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
-                                        </h3>
-                                        <div class="mt-2">
-                                            <p class="text-sm leading-5 text-gray-500">
-												<?php _e( 'Know who are your top referrers.', 'url-shortify' ); ?>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-						<?php } } ?>
-                    </div>
-                </div>
+                <?php else : ?>
+                    <?php StatsRenderer::empty_state( __( 'Once this link is visited, its daily rhythm will appear here.', 'url-shortify' ) ); ?>
+                <?php endif; ?>
             </div>
         </div>
 
-        <!-- Device Info, Browser Info & Platforms Info -->
-        <div class="mt-6">
-            <div class="grid md:grid-cols-3 sm:grid-cols-1 gap-4">
-
-                <!-- Device Info -->
-                <div class="overflow-hidden rounded-lg h-px-400">
-                    <div class="mb-4">
-                        <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Top Devices', 'url-shortify' ); ?></span>
-                    </div>
-					<?php
-					if ( US()->is_pro() ) {
-						do_action( 'kc_us_render_device_info', $data );
-					} else {
-                    if( US()->can_show_premium_promotion() ) {
-						?>
-                        <div class="w-full h-64 p-10 bg-green-50">
-                            <div class="">
-                                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                                    <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                </div>
-                                <div class="mt-3 text-center sm:mt-5">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
-                                    </h3>
-                                    <div class="mt-2">
-                                        <p class="text-sm leading-5 text-gray-500">
-											<?php _e( 'Want to know which devices were used to access your links?', 'url-shortify' ); ?>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-					<?php } } ?>
-                </div>
-
-                <!-- Browser Info -->
-                <div class="overflow-hidden rounded-lg h-px-400">
-                    <div class="mb-4">
-                        <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Top Browsers', 'url-shortify' ); ?></span>
-                    </div>
-					<?php
-					if ( US()->is_pro() ) {
-						do_action( 'kc_us_render_browser_info', $data );
-					} else {
-                    if( US()->can_show_premium_promotion() ) {
-						?>
-                        <div class="w-full h-64 p-10 bg-green-50">
-                            <div class="">
-                                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                                    <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                </div>
-                                <div class="mt-3 text-center sm:mt-5">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
-                                    </h3>
-                                    <div class="mt-2">
-                                        <p class="text-sm leading-5 text-gray-500">
-											<?php _e( 'Get information about browsers.', 'url-shortify' ); ?>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-					<?php } } ?>
-                </div>
-
-                <!-- OS Info -->
-                <div class="overflow-hidden rounded-lg h-px-400">
-                    <div class="mb-4">
-                        <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Top Platforms', 'url-shortify' ); ?></span>
-                    </div>
-					<?php
-					if ( US()->is_pro() ) {
-						do_action( 'kc_us_render_os_info', $data );
-					} else {
-                    if( US()->can_show_premium_promotion() ) {
-						?>
-                        <div class="w-full h-64 p-10 bg-green-50">
-                            <div class="">
-                                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-                                    <svg class="h-12 w-12 text-green-600" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                </div>
-                                <div class="mt-3 text-center sm:mt-5">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-										<?php echo sprintf( __( '<a href="%s">Upgrade Now</a>', 'url-shortify' ), US()->get_landing_page_url( true ) ); ?>
-                                    </h3>
-                                    <div class="mt-2">
-                                        <p class="text-sm leading-5 text-gray-500">
-											<?php _e( 'Know more about which devices people used to access your links.', 'url-shortify' ); ?>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-					<?php } }  ?>
-                </div>
-            </div>
-        </div>
 
         <!-- Split Test Results -->
 		<?php
@@ -699,25 +709,22 @@ $click_history->set_columns( $columns );
         </div>
 		<?php endif; ?>
 
-        <!-- Clicks Info -->
-        <div class="mt-10 flex w-full">
-            <div class="w-11/12">
-                <span class="text-xl leading-6 font-medium text-gray-900"><?php _e( 'Clicks Details', 'url-shortify' ); ?></span>
-            </div>
-	        <?php if ( US()->is_pro() ) { ?>
-                <div class="w-1/12 py-2 pl-8">
-                    <a href="<?php echo $export_url; ?>" class="text-white hover:text-white" title="<?php _e('Download CSV', 'url-shortify'); ?>">
-                        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8 text-indigo-600 hover:text-indigo-500 active:text-indigo-600"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </a>
-                </div>
-            <?php } ?>
-        </div>
-        <div class="bg-white flex-grow sm:px-4 mt-4 pt-6 pb-8">
+        <div class="kc-us-st-card kc-us-st-table">
+            <?php
+            $kc_us_clicks_export = $is_pro
+                ? StatsRenderer::export_action( $export_url, __( 'Export Clicks Data', 'url-shortify' ) )
+                : '';
 
-            <div>
+            StatsRenderer::card_head(
+                __( 'Click log', 'url-shortify' ),
+                __( 'Every recorded click, newest first.', 'url-shortify' ),
+                $kc_us_clicks_export
+            );
+            ?>
+
+            <div class="kc-us-st-card__body kc-us-st-card__body--flush">
                 <table id="clicks-data"
-                       class="display"
+                       class="display kc-us-clicks-table"
                        data-server-side="true"
                        data-link-id="<?php echo esc_attr( $link_id ); ?>"
                        data-time-filter="<?php echo esc_attr( $time_filter ); ?>"
@@ -726,10 +733,9 @@ $click_history->set_columns( $columns );
                        data-days="<?php echo esc_attr( $days ); ?>"
                        style="width:100%">
                     <thead>
-				<?php $click_history->render_header(); ?>
+                        <?php $click_history->render_header(); ?>
                     </thead>
-                    <tbody>
-                    </tfoot>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>

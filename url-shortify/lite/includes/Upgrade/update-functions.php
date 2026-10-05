@@ -597,3 +597,44 @@ function kc_us_update_261_dedupe_link_relations() {
 
 	return false;
 }
+
+/**************** 2.7.0 *******************/
+
+/**
+ * Record where a click came from, so QR scans can be told apart.
+ *
+ * A QR scan arrives with no referrer, exactly like a click from a chat app
+ * or an email client, so until now it was indistinguishable from any other
+ * direct hit. The QR images we hand out now carry a marker and this column
+ * is where that marker lands.
+ *
+ * Nullable with no backfill on purpose: clicks recorded before this - and
+ * scans of QR codes printed before this - genuinely are unknown, and
+ * guessing would put numbers on a screen that nobody can reproduce.
+ *
+ * @since 2.7.0
+ * @return bool
+ */
+function kc_us_update_270_add_click_source_column() {
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'kc_us_clicks';
+
+	if ( ! $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+		return false;
+	}
+
+	$columns = $wpdb->get_col( "SHOW COLUMNS FROM {$table}", 0 );
+
+	if ( ! in_array( 'source', (array) $columns, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD COLUMN `source` varchar(20) DEFAULT NULL AFTER `ip`" );
+	}
+
+	$indexes = $wpdb->get_col( "SHOW INDEX FROM {$table}", 2 );
+
+	if ( ! in_array( 'source', (array) $indexes, true ) ) {
+		$wpdb->query( "ALTER TABLE {$table} ADD INDEX `source` (`source`)" );
+	}
+
+	return false;
+}

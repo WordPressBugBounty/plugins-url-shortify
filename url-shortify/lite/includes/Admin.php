@@ -426,170 +426,27 @@ class Admin {
 	}
 
 	/**
-	 * Render apexcharts for dashboard
-	 * 
-	 * @since 2.1.1
+	 * Dashboard chart data used to be assembled here and localised as
+	 * us_chart_data.
+	 *
+	 * It was a third copy of the series and heatmap builder, and because the
+	 * admin script is enqueued in the footer its variable landed after the
+	 * template's own and silently won - so the dashboard chart was drawn from
+	 * this, not from the figures around it. For a free site it skipped the
+	 * period entirely and always drew a year, which is why the dashboard filter
+	 * looked like it did nothing.
+	 *
+	 * DashboardController builds that payload now, once, against the selected
+	 * period and cached with the rest of the screen.
+	 *
+	 * @since      2.1.1
+	 * @deprecated 2.7.0 Kept as a no-op so the hook registration stays valid.
+	 *
+	 * @param string $hook
+	 *
+	 * @return void
 	 */
 	public function enqueue_admin_scripts( $hook ) {
-		if ( ! Helper::is_plugin_admin_screen() ) {
-			return;
-		}
-
-		// Only the main dashboard requires the aggregated chart dataset.
-		if ( 'url_shortify' !== Helper::get_request_data( 'page' ) ) {
-			return;
-		}
-
-		$dashboard_time_filter = US()->is_pro() ? sanitize_key( Helper::get_request_data( 'time_filter', 'all_time' ) ) : '';
-		$dashboard_start_date  = US()->is_pro() ? sanitize_text_field( Helper::get_request_data( 'start_date', '' ) ) : '';
-		$dashboard_end_date    = US()->is_pro() ? sanitize_text_field( Helper::get_request_data( 'end_date', '' ) ) : '';
-
-		$spline_data  = US()->db->clicks->get_spline_chart_data();
-		$heatmap_data = US()->db->clicks->get_heatmap_intensity_data();
-
-		$heatmap_map = [];
-		foreach ( $heatmap_data as $row ) {
-			$date = Helper::get_data( $row, 'date' );
-			if ( $date ) {
-				$heatmap_map[ $date ] = intval( Helper::get_data( $row, 'count' ) );
-			}
-		}
-
-		$end_date = ( new \DateTimeImmutable( 'today' ) )->setTime( 0, 0 );
-		$start_date = $end_date->sub( new \DateInterval( 'P364D' ) )->modify( 'last monday' );
-		$current_week_end = $end_date->modify( 'monday this week' );
-
-		$week_starts = [];
-		$day_labels = [ __( 'Mon', 'url-shortify' ), __( 'Tue', 'url-shortify' ), __( 'Wed', 'url-shortify' ), __( 'Thu', 'url-shortify' ), __( 'Fri', 'url-shortify' ), __( 'Sat', 'url-shortify' ), __( 'Sun', 'url-shortify' ) ];
-		$heatmap_series = array_map( function ( $label ) {
-			return [
-				'name' => $label,
-				'data' => [],
-			];
-		}, $day_labels );
-
-		$current_week = $start_date;
-		while ( $current_week <= $current_week_end ) {
-			$week_start_label = $current_week->format( 'Y-m-d' );
-			$week_starts[] = $week_start_label;
-			for ( $day = 0; $day < 7; $day ++ ) {
-				$day_date = $current_week->add( new \DateInterval( "P{$day}D" ) );
-				$date_key = $day_date->format( 'Y-m-d' );
-				$is_future = $day_date > $end_date;
-				$heatmap_series[ $day ]['data'][] = [
-					'x'      => $week_start_label,
-					'y'      => isset( $heatmap_map[ $date_key ] ) ? $heatmap_map[ $date_key ] : 0,
-					'meta'   => $date_key,
-					'future' => $is_future,
-				];
-			}
-			$current_week = $current_week->add( new \DateInterval( 'P1W' ) );
-		}
-
-		$heatmap_month_labels = $this->build_heatmap_month_labels( $week_starts, $end_date );
-
-		// Generate dynamic heatmap color ranges based on actual data
-		$heatmap_color_ranges = $this->generate_dynamic_heatmap_color_ranges( $heatmap_map );
-
-		// Fill missing dates in spline chart data with 0 values.
-		if ( US()->is_pro() ) {
-			$allowed_time_filters = [ 'today', 'last_7_days', 'last_30_days', 'last_60_days', 'all_time', 'custom' ];
-			if ( ! in_array( $dashboard_time_filter, $allowed_time_filters, true ) ) {
-				$dashboard_time_filter = 'all_time';
-			}
-
-			if ( 'custom' === $dashboard_time_filter ) {
-				$start = \DateTimeImmutable::createFromFormat( 'Y-m-d', $dashboard_start_date );
-				$end   = \DateTimeImmutable::createFromFormat( 'Y-m-d', $dashboard_end_date );
-
-				if ( $start && $end ) {
-					if ( $start > $end ) {
-						$swap  = $start;
-						$start = $end;
-						$end   = $swap;
-					}
-
-					$dashboard_start_date = $start->format( 'Y-m-d' );
-					$dashboard_end_date   = $end->format( 'Y-m-d' );
-
-					$total_clicks_by_days  = US()->db->clicks->get_clicks_count_by_days( $dashboard_start_date, $dashboard_end_date );
-					$unique_clicks_by_days = US()->db->clicks->get_unique_clicks_count_by_days( $dashboard_start_date, $dashboard_end_date );
-
-					$spline_data = [];
-					foreach ( $total_clicks_by_days as $date => $count ) {
-						$spline_data[] = [
-							'date'          => $date,
-							'total_clicks'  => (int) $count,
-							'unique_clicks' => 0,
-						];
-					}
-
-					foreach ( $unique_clicks_by_days as $date => $count ) {
-						$found = false;
-						foreach ( $spline_data as &$row ) {
-							if ( $row['date'] === $date ) {
-								$row['unique_clicks'] = (int) $count;
-								$found = true;
-								break;
-							}
-						}
-						unset( $row );
-
-						if ( ! $found ) {
-							$spline_data[] = [
-								'date'          => $date,
-								'total_clicks'  => 0,
-								'unique_clicks' => (int) $count,
-							];
-						}
-					}
-
-					$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data, 0, $dashboard_start_date, $dashboard_end_date );
-				} else {
-					$dashboard_time_filter = 'all_time';
-					$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data );
-				}
-			} else {
-				$dashboard_days = 0;
-				switch ( $dashboard_time_filter ) {
-					case 'today':
-						$dashboard_days = 1;
-						break;
-					case 'last_7_days':
-						$dashboard_days = 7;
-						break;
-					case 'last_30_days':
-						$dashboard_days = 30;
-						break;
-					case 'last_60_days':
-						$dashboard_days = 60;
-						break;
-					case 'all_time':
-					default:
-						$dashboard_days = 0;
-						break;
-				}
-
-				$spline_data = US()->db->clicks->get_spline_chart_data( $dashboard_days );
-				$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data, $dashboard_days );
-			}
-		} else {
-			$spline_data_filled = $this->fill_missing_dates_in_spline_data( $spline_data );
-		}
-
-		$chart_vars = [
-			'dates'               => array_column( $spline_data_filled, 'date' ),
-			'total_series'        => array_map( 'intval', array_column( $spline_data_filled, 'total_clicks' ) ),
-			'unique_series'       => array_map( 'intval', array_column( $spline_data_filled, 'unique_clicks' ) ),
-			'heatmap_series'      => $heatmap_series,
-			'has_clicks_data'     => ! empty( $heatmap_map ),
-			'heatmap_week_starts' => $week_starts,
-			'heatmap_day_labels'  => $day_labels,
-			'heatmap_month_labels'=> $heatmap_month_labels,
-			'heatmap_color_ranges'=> $heatmap_color_ranges,
-		];
-
-		wp_localize_script( 'url-shortify-admin', 'us_chart_data', $chart_vars );
 	}
 
 	/**

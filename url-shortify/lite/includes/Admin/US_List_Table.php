@@ -148,10 +148,10 @@ class US_List_Table extends \WP_List_Table {
 
 		echo '<label for="bulk-action-selector-' . esc_attr( $which ) . '" class="screen-reader-text">' .
 			 /* translators: Hidden accessibility text. */
-			 __( 'Select bulk action' ) .
+			 __( 'Select bulk action', 'url-shortify' ) .
 			 '</label>';
 		echo '<select name="action' . $two . '" id="bulk-action-selector-' . esc_attr( $which ) . "\">\n";
-		echo '<option value="-1">' . __( 'Bulk actions' ) . "</option>\n";
+		echo '<option value="-1">' . __( 'Bulk actions', 'url-shortify' ) . "</option>\n";
 
 		foreach ( $this->_actions as $key => $group ) {
 			if ( is_array( $group ) && isset( $group['values'] ) ) {
@@ -165,7 +165,7 @@ class US_List_Table extends \WP_List_Table {
 			}
 		}
 		echo "</select>\n";
-		submit_button( __( 'Apply' ), 'action', '', false, [ 'id' => 'doaction' . $two ] );
+		submit_button( __( 'Apply', 'url-shortify' ), 'action', '', false, [ 'id' => 'doaction' . $two ] );
 	}
 
 	/**

@@ -1439,7 +1439,10 @@ class Helper {
     }
 
     /**
-     * Prpeare Social share widget
+     * Prepare the social share widget.
+     *
+     * The tiles are laid out five to a row by CSS, so the set can grow or be
+     * filtered down without the markup caring how many there are.
      *
      * @param  string  $share_icon_size
      *
@@ -1459,16 +1462,31 @@ class Helper {
 
         if ( Helper::is_forechable( $socials ) ) {
             $html .= '<div class="share-button sharer pointer" style="display: block;">';
-            $html .= '<span class="fa fa-share-alt text-indigo-600 fa-' . $share_icon_size . 'x share-btn cursor-pointer"></span>';
-            $html .= '<div class="social bottom center networks-5 us-social" >';
+            $html .= '<span class="fa fa-share-alt text-indigo-600 fa-' . $share_icon_size . 'x share-btn cursor-pointer" title="' . esc_attr__( 'Share', 'url-shortify' ) . '"></span>';
+            // networks-5 is what the admin script looks for to open and close this.
+            $html .= '<div class="social bottom center networks-5 us-social">';
 
             foreach ( $socials as $social => $data ) {
                 $url   = Helper::get_data( $data, 'url', '' );
                 $icon  = Helper::get_data( $data, 'icon', '' );
                 $title = Helper::get_data( $data, 'title', '' );
 
-                $html .= sprintf( '<a class="fbtn share %s" href="%s" title="%s" target="_blank">%s</i></a>', $social,
-                        $url, $title, $icon );
+                if ( empty( $url ) ) {
+                    continue;
+                }
+
+                /*
+                 * $icon is markup by design - either a FontAwesome <i> or an
+                 * inline <svg> for the brands FontAwesome 4 never had - and it
+                 * comes from the filtered set, not from a request.
+                 */
+                $html .= sprintf(
+                        '<a class="fbtn share %1$s" href="%2$s" title="%3$s" aria-label="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a>',
+                        esc_attr( $social ),
+                        esc_url( $url ),
+                        esc_attr( $title ),
+                        $icon
+                );
             }
 
             $html .= '</div></div>';

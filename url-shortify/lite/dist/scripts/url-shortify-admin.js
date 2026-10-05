@@ -166,17 +166,19 @@ function usChartIsCompare(chartData) {
             }
         });
 
-        // When we click outside, close the dropdown
-        $(document).on("click", function (event) {
-            var $trigger = $("#kc-us-create-button");
-            if ($trigger !== event.target && !$trigger.has(event.target).length) {
-                $("#kc-us-create-dropdown").hide();
+        /*
+         * The "New" menu. It is hidden by a class rather than an inline style,
+         * so toggle the class: jQuery's .toggle() only clears inline display and
+         * leaves a class-hidden element exactly as hidden as it found it.
+         */
+        $(document).on('click', function (event) {
+            if (!$(event.target).closest('#kc-us-create-button').length) {
+                $('#kc-us-create-dropdown').addClass('hidden');
             }
         });
 
-        // Toggle Dropdown
-        $('#kc-us-create-button').click(function () {
-            $('#kc-us-create-dropdown').toggle();
+        $('#kc-us-create-button').on('click', function () {
+            $('#kc-us-create-dropdown').toggleClass('hidden');
         });
 
         // Clicks Reports Datatable.
@@ -227,9 +229,7 @@ function usChartIsCompare(chartData) {
             function syncFilterStyles() {
                 $filterPills.each(function () {
                     var isActive = $(this).data('filter') === currentTimeFilter;
-                    $(this)
-                        .toggleClass('bg-white text-slate-900 shadow-sm', isActive)
-                        .toggleClass('text-slate-500 hover:text-slate-700 hover:bg-white/60', !isActive);
+                    $(this).toggleClass('is-active', isActive);
                 });
 
                 if ($customControl.length) {
@@ -470,6 +470,21 @@ function usChartIsCompare(chartData) {
             setTableState();
             syncRefreshHref();
 
+            /*
+             * The column set differs per screen - a single link's statistics
+             * drops the Link column - so read it off the rendered header rather
+             * than hardcoding positions here.
+             */
+            var clicksColumns = $clicksTable.find('thead th').map(function (index) {
+                return { data: index, orderable: true };
+            }).get();
+
+            var clicksSortIndex = $clicksTable.find("th[data-key='clicked_on']").index();
+
+            if (clicksSortIndex < 0) {
+                clicksSortIndex = Math.max(0, clicksColumns.length - 1);
+            }
+
             if (serverSide) {
                 clicksDataTable = $clicksTable.DataTable({
                     serverSide: true,
@@ -529,23 +544,116 @@ function usChartIsCompare(chartData) {
                             }
                         });
                     },
-                    order: [[5, 'desc']],
-                    columns: [
-                        { data: 0, orderable: false },
-                        { data: 1, orderable: false },
-                        { data: 2, orderable: true },
-                        { data: 3, orderable: false },
-                        { data: 4, orderable: false },
-                        { data: 5, orderable: true },
-                        { data: 6, orderable: false },
-                    ],
+                    order: [[clicksSortIndex, 'desc']],
+                    columns: clicksColumns,
                 });
             } else {
-                var sortIndex = $clicksTable.find("th[data-key='clicked_on']")[0] ? $clicksTable.find("th[data-key='clicked_on']")[0].cellIndex : 0;
                 $clicksTable.DataTable({
-                    order: [[sortIndex, 'desc']]
+                    order: [[clicksSortIndex, 'desc']]
                 });
             }
+        }
+
+        /*
+         * Group / tag member standings. Paged only when the server marked the
+         * table as long enough to need it - below that the controls would be
+         * more chrome than table.
+         *
+         * Ordering is off on purpose: the rows arrive ranked by clicks and the
+         * first column shows that rank, so letting the reader re-sort would
+         * leave a shuffled column of positions behind.
+         */
+        var $membersTable = $('#members-data');
+
+        if ($membersTable.get(0)) {
+            var membersPaged = $membersTable.data('paginate') === true || $membersTable.data('paginate') === 'true';
+
+            $membersTable.DataTable({
+                // Paging, search and the row count only appear once the table is
+                // long enough to need them; below that they are more chrome than
+                // table. Sorting is always on, as it is on the report.
+                paging: membersPaged,
+                searching: membersPaged,
+                info: membersPaged,
+                lengthChange: false,
+                pageLength: parseInt($membersTable.data('page-length'), 10) || 10,
+
+                // Arrives ordered by total clicks; say so in the header.
+                order: [[2, 'desc']],
+
+                columnDefs: [
+                    // Rank is a position, not a value, and the audience columns
+                    // hold a label plus a share - neither sorts meaningfully.
+                    // Targeted by class because the free table has four columns
+                    // and the PRO one eight, so fixed indexes would miss.
+                    { targets: 'kc-us-st-nosort', orderable: false },
+                ],
+
+                // The rank column is a position in what you are looking at, so it
+                // follows the sort and continues across pages rather than being
+                // stuck to the row it was rendered with.
+                drawCallback: function () {
+                    var info = this.api().page.info();
+
+                    $(this.api().table().body())
+                        .find('td.kc-us-st-members__rank')
+                        .each(function (index) {
+                            $(this).text(info.start + index + 1);
+                        });
+                },
+            });
+        }
+
+        /*
+         * Custom date range on the dashboard, group and tag screens. The link
+         * screen has its own because it refreshes over ajax; these three reload,
+         * so the range lives in the URL and the whole page follows it.
+         *
+         * Lived as a copy of itself inline in each template before this.
+         */
+        var $rangePill    = $('#kc-us-range-pill');
+        var $rangeControl = $('#kc-us-range-control');
+        var $rangeApply   = $('#kc-us-range-apply');
+        var $rangeStart   = $('#kc-us-range-start');
+        var $rangeEnd     = $('#kc-us-range-end');
+
+        if ($rangePill.length) {
+            $rangePill.on('click', function () {
+                $rangeControl.toggleClass('hidden');
+            });
+        }
+
+        if ($rangeApply.length) {
+            var applyRange = function () {
+                var start = $.trim($rangeStart.val());
+                var end = $.trim($rangeEnd.val());
+
+                if (!start || !end) {
+                    if (typeof window.kcUsNotice === 'function') {
+                        window.kcUsNotice($rangeApply.data('error'), 'error', $rangeApply.closest('div'));
+                    }
+
+                    return;
+                }
+
+                var url = new URL(window.location.href);
+
+                url.searchParams.set('time_filter', 'custom');
+                url.searchParams.set('start_date', start);
+                url.searchParams.set('end_date', end);
+                url.searchParams.set('refresh', '1');
+
+                window.location.href = url.toString();
+            };
+
+            $rangeApply.on('click', applyRange);
+
+            $rangeStart.add($rangeEnd).on('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyRange();
+                }
+            });
         }
 
         // Clicks Reports Datatable.

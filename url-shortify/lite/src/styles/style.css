@@ -396,4 +396,609 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before, table.dataT
     color: #ffffff !important;
 }
 
+
+/* ---------------------------------------------------------------------------
+ * Statistics screens
+ *
+ * One vocabulary shared by the link, group and tag statistics pages: a card, a
+ * KPI tile with its change against the previous period, horizontal bars for
+ * every breakdown, and the weekday/hour grid. Prefixed kc-us-st- so nothing
+ * here collides with core's admin styles or with another plugin's.
+ * ------------------------------------------------------------------------ */
+
+.kc-us-st {
+    @apply w-full pb-10;
+    --kc-us-st-accent: #4f46e5;
+    --kc-us-st-good: #047857;
+    --kc-us-st-bad: #b91c1c;
+}
+
+/* Page header ------------------------------------------------------------- */
+
+.kc-us-st-head {
+    @apply flex flex-wrap items-start justify-between gap-4 pt-4 pb-5;
+}
+
+.kc-us-st-head__main {
+    @apply min-w-0 flex-1;
+}
+
+.kc-us-st-eyebrow {
+    @apply flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1;
+}
+
+.kc-us-st-title {
+    @apply flex items-center gap-2 text-2xl font-semibold text-gray-900 m-0 leading-tight;
+}
+
+.kc-us-st-title a {
+    @apply text-gray-900 no-underline;
+}
+
+.kc-us-st-title a:hover {
+    @apply text-indigo-700;
+}
+
+.kc-us-st-sub {
+    @apply flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-sm text-gray-500;
+}
+
+.kc-us-st-sub code {
+    @apply bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 text-xs;
+}
+
+.kc-us-st-head__aside {
+    @apply flex items-center gap-2 shrink-0;
+}
+
+/* Period control ---------------------------------------------------------- */
+
+.kc-us-st-periods {
+    @apply inline-flex items-center rounded-lg bg-gray-100 p-1 gap-0.5;
+}
+
+.kc-us-st-periods a,
+.kc-us-st-periods button {
+    @apply px-3 py-1.5 text-sm font-medium text-gray-600 rounded-md no-underline whitespace-nowrap bg-transparent border-0 cursor-pointer;
+}
+
+.kc-us-st-periods a:hover,
+.kc-us-st-periods button:hover {
+    @apply text-gray-900 bg-white/70;
+}
+
+.kc-us-st-periods a.is-active,
+.kc-us-st-periods button.is-active {
+    @apply bg-white text-indigo-700 shadow-sm;
+}
+
+/* KPI tiles --------------------------------------------------------------- */
+
+.kc-us-st-kpis {
+    @apply grid gap-4 mb-5;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.kc-us-st-kpi {
+    @apply bg-white border border-gray-200 rounded-xl px-5 py-4;
+}
+
+.kc-us-st-kpi__label {
+    @apply block text-xs font-semibold uppercase tracking-wider text-gray-500;
+}
+
+.kc-us-st-kpi__value {
+    @apply block mt-2 text-3xl font-semibold text-gray-900 leading-none;
+    font-variant-numeric: tabular-nums;
+}
+
+.kc-us-st-kpi__foot {
+    @apply flex items-center gap-1.5 mt-2 text-xs;
+}
+
+.kc-us-st-kpi__help {
+    @apply text-gray-400 leading-snug;
+}
+
+.kc-us-st-delta {
+    @apply inline-flex items-center gap-1 font-semibold rounded-full px-1.5 py-0.5;
+}
+
+.kc-us-st-delta--good {
+    color: var(--kc-us-st-good);
+    @apply bg-emerald-50;
+}
+
+.kc-us-st-delta--bad {
+    color: var(--kc-us-st-bad);
+    @apply bg-red-50;
+}
+
+.kc-us-st-delta--neutral {
+    @apply text-gray-600 bg-gray-100;
+}
+
+.kc-us-st-delta__vs {
+    @apply text-gray-400 font-normal;
+}
+
+/* Insight strip ----------------------------------------------------------- */
+
+.kc-us-st-insights {
+    @apply flex flex-wrap gap-2 mb-5;
+}
+
+.kc-us-st-insight {
+    @apply inline-flex items-start gap-2 text-sm rounded-lg border px-3 py-2 bg-white border-gray-200 text-gray-700;
+}
+
+.kc-us-st-insight__dot {
+    @apply mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 bg-gray-400;
+}
+
+.kc-us-st-insight--good .kc-us-st-insight__dot {
+    background: var(--kc-us-st-good);
+}
+
+.kc-us-st-insight--bad .kc-us-st-insight__dot {
+    background: var(--kc-us-st-bad);
+}
+
+/* Cards ------------------------------------------------------------------- */
+
+.kc-us-st-card {
+    @apply bg-white border border-gray-200 rounded-xl mb-5;
+}
+
+.kc-us-st-card__head {
+    @apply flex flex-wrap items-start justify-between gap-3 px-5 py-4 border-b border-gray-100;
+}
+
+.kc-us-st-card__title {
+    @apply text-base font-semibold text-gray-900 m-0 leading-tight;
+}
+
+.kc-us-st-card__note {
+    @apply block mt-1 text-sm text-gray-500 leading-snug;
+}
+
+.kc-us-st-card__body {
+    @apply p-5;
+}
+
+.kc-us-st-card__body--flush {
+    @apply p-0;
+}
+
+.kc-us-st-grid {
+    @apply grid gap-5 mb-5;
+}
+
+.kc-us-st-grid > .kc-us-st-card {
+    @apply mb-0;
+}
+
+@media (min-width: 1024px) {
+    .kc-us-st-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kc-us-st-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Horizontal bars --------------------------------------------------------- */
+
+.kc-us-st-bars {
+    @apply list-none m-0 p-0 flex flex-col gap-3;
+}
+
+.kc-us-st-bar {
+    @apply grid items-center gap-3 m-0;
+    grid-template-columns: minmax(0, 11rem) 1fr auto;
+}
+
+.kc-us-st-bar__label {
+    @apply flex items-center gap-2 text-sm text-gray-700 truncate;
+}
+
+.kc-us-st-bar__label img {
+    @apply h-4 w-4 rounded-sm shrink-0;
+}
+
+.kc-us-st-bar__track {
+    @apply h-2 rounded-full bg-gray-100 overflow-hidden;
+}
+
+.kc-us-st-bar__fill {
+    @apply block h-full rounded-full;
+    background: var(--kc-us-st-accent);
+}
+
+.kc-us-st-bar__value {
+    @apply text-sm text-gray-900 font-medium whitespace-nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.kc-us-st-bar__share {
+    @apply text-gray-400 font-normal ml-1;
+}
+
+@media (max-width: 782px) {
+    .kc-us-st-bar {
+        grid-template-columns: 1fr auto;
+    }
+
+    .kc-us-st-bar__track {
+        grid-column: 1 / -1;
+        order: 3;
+    }
+}
+
+/* Weekday / hour grid ----------------------------------------------------- */
+
+.kc-us-st-hours {
+    @apply grid gap-0.5;
+    grid-template-columns: auto repeat(24, minmax(0, 1fr));
+}
+
+.kc-us-st-hours__day {
+    @apply text-xs text-gray-500 pr-2 self-center whitespace-nowrap;
+}
+
+.kc-us-st-hours__hour {
+    @apply text-[10px] text-gray-400 text-center leading-none pt-1;
+}
+
+.kc-us-st-cell {
+    @apply rounded-sm bg-gray-100;
+    aspect-ratio: 1 / 1;
+    min-height: 10px;
+}
+
+.kc-us-st-cell--1 { background: #e0e7ff; }
+.kc-us-st-cell--2 { background: #a5b4fc; }
+.kc-us-st-cell--3 { background: #818cf8; }
+.kc-us-st-cell--4 { background: #6366f1; }
+.kc-us-st-cell--5 { background: #4338ca; }
+
+.kc-us-st-legend {
+    @apply flex items-center justify-end gap-1 mt-3 text-xs text-gray-400;
+}
+
+.kc-us-st-legend .kc-us-st-cell {
+    @apply h-2.5 w-2.5;
+    min-height: 0;
+}
+
+/* Empty and locked states ------------------------------------------------- */
+
+.kc-us-st-empty {
+    @apply flex flex-col items-center justify-center text-center py-10 px-5 text-sm text-gray-500;
+}
+
+.kc-us-st-empty strong {
+    @apply block text-gray-700 font-medium mb-1;
+}
+
+.kc-us-st-locked {
+    @apply relative overflow-hidden;
+}
+
+.kc-us-st-locked__veil {
+    @apply absolute inset-0 flex flex-col items-center justify-center text-center gap-2 p-5 z-10;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(2px);
+}
+
+.kc-us-st-locked__title {
+    @apply text-sm font-semibold text-gray-900;
+}
+
+.kc-us-st-locked__note {
+    @apply text-xs text-gray-500 max-w-xs leading-snug;
+}
+
+.kc-us-st-locked__ghost {
+    @apply select-none pointer-events-none opacity-60;
+}
+
+
+/* Card action link (export, etc.) ---------------------------------------- */
+
+.kc-us-st-card__action {
+    @apply inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 no-underline rounded-md px-2 py-1 whitespace-nowrap;
+}
+
+.kc-us-st-card__action:hover {
+    @apply text-indigo-700 bg-indigo-50;
+}
+
+.kc-us-st-card__action-icon {
+    @apply h-4 w-4 shrink-0;
+}
+
+/* Two export actions sit side by side in the group and tag header. */
+.kc-us-st-head__aside {
+    @apply flex-wrap gap-1;
+}
+
+/* Sample year grid behind the locked activity panel ---------------------- */
+
+.kc-us-st-yearmap {
+    @apply grid gap-0.5;
+    grid-template-columns: repeat(53, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+}
+
+/* Click log --------------------------------------------------------------
+ *
+ * DataTables brings its own chrome; this reins it in so the table reads as
+ * part of the card rather than a widget dropped into one.
+ * --------------------------------------------------------------------- */
+
+.kc-us-st-table .dataTables_wrapper {
+    @apply p-0;
+}
+
+.kc-us-st-table .dataTables_length,
+.kc-us-st-table .dataTables_filter {
+    @apply px-5 pt-3 pb-3 text-sm text-gray-500;
+}
+
+.kc-us-st-table .dataTables_filter input,
+.kc-us-st-table .dataTables_length select {
+    @apply rounded-md border-gray-200 text-sm text-gray-700 shadow-none;
+}
+
+.kc-us-st-table .dataTables_filter input:focus,
+.kc-us-st-table .dataTables_length select:focus {
+    @apply border-indigo-400 ring-2 ring-indigo-100;
+}
+
+.kc-us-clicks-table {
+    @apply w-full border-collapse;
+}
+
+.kc-us-clicks-table thead th {
+    @apply text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 px-5 py-3 border-y border-gray-100 whitespace-nowrap;
+}
+
+.kc-us-clicks-table tbody td {
+    @apply px-5 py-3 align-middle border-b border-gray-100 text-sm text-gray-700;
+}
+
+.kc-us-clicks-table tbody tr:hover td {
+    @apply bg-indigo-50/40;
+}
+
+.kc-us-clicks-table tbody tr:last-child td {
+    @apply border-b-0;
+}
+
+/* Two-line cells: the thing you read, and the detail under it. */
+.kc-us-clicks__visitor,
+.kc-us-clicks__device {
+    @apply flex items-center gap-2.5;
+}
+
+.kc-us-clicks__stack {
+    @apply flex flex-col leading-tight min-w-0;
+}
+
+.kc-us-clicks__primary {
+    @apply text-sm text-gray-800 truncate;
+}
+
+.kc-us-clicks__muted {
+    @apply text-xs text-gray-400 truncate;
+    font-variant-numeric: tabular-nums;
+}
+
+.kc-us-clicks__flag {
+    @apply h-5 w-5 rounded-sm shrink-0;
+}
+
+.kc-us-clicks__icon {
+    @apply h-4 w-4 shrink-0;
+}
+
+.kc-us-clicks__link {
+    @apply text-indigo-600 no-underline;
+}
+
+.kc-us-clicks__link:hover {
+    @apply text-indigo-700 underline;
+}
+
+.kc-us-clicks__badge {
+    @apply inline-flex items-center rounded-full bg-amber-100 text-amber-800 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 ml-1;
+}
+
+.kc-us-clicks__when {
+    @apply whitespace-nowrap;
+}
+
+.kc-us-st-table .dataTables_info,
+.kc-us-st-table .dataTables_paginate {
+    @apply px-5 py-4 text-sm text-gray-500;
+}
+
+
+/* Member standings (links inside a group or tag) -------------------------
+ *
+ * The column structure of the Smart Report performance table - rank, link with
+ * its slug beneath, the figures, then the audience behind them - with Share
+ * kept, since here the links are a defined set and a percentage of it means
+ * something.
+ * --------------------------------------------------------------------- */
+
+.kc-us-st-members-wrap {
+    @apply w-full overflow-x-auto;
+}
+
+.kc-us-st-members {
+    @apply w-full border-collapse;
+}
+
+.kc-us-st-members thead th {
+    @apply text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 px-3 py-3 border-y border-gray-100 whitespace-nowrap;
+}
+
+.kc-us-st-members tbody td {
+    @apply px-3 py-2.5 align-top border-b border-gray-100 text-sm text-gray-700;
+}
+
+.kc-us-st-members tbody tr:last-child td {
+    @apply border-b-0;
+}
+
+.kc-us-st-members tbody tr:hover td {
+    @apply bg-gray-50;
+}
+
+/* A link with nothing against it is the point of the table, not a defect -
+   muted enough to read as "nothing here", not so faint it disappears. */
+.kc-us-st-members tbody tr.is-dormant td {
+    @apply text-gray-400;
+}
+
+.kc-us-st-members__rank {
+    @apply text-gray-400 w-11 text-right;
+    font-variant-numeric: tabular-nums;
+}
+
+.kc-us-st-members__num {
+    @apply text-right whitespace-nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Breathing room between the figures and the audience columns. */
+.kc-us-st-members__gap-after {
+    @apply pr-6;
+    border-right: 1px solid theme('colors.gray.100');
+}
+
+.kc-us-st-members__value {
+    @apply block font-medium text-gray-900 leading-tight;
+}
+
+.kc-us-st-members tbody tr.is-dormant .kc-us-st-members__value {
+    @apply font-normal text-gray-400;
+}
+
+.kc-us-st-members__name {
+    @apply block font-medium text-gray-900 no-underline leading-tight;
+}
+
+.kc-us-st-members__name:hover {
+    @apply text-indigo-700;
+}
+
+.kc-us-st-members__sub {
+    @apply block text-xs text-gray-400 leading-tight mt-0.5;
+}
+
+.kc-us-st-members__sub a {
+    @apply text-gray-400 no-underline;
+}
+
+.kc-us-st-members__sub a:hover {
+    @apply text-indigo-600 underline;
+}
+
+.kc-us-st-members__sub--good { @apply text-emerald-700; }
+.kc-us-st-members__sub--bad { @apply text-red-700; }
+
+.kc-us-st-members__muted {
+    @apply text-gray-300;
+}
+
+.kc-us-st-members__share-value {
+    @apply block font-medium text-gray-900 leading-tight;
+    font-variant-numeric: tabular-nums;
+}
+
+.kc-us-st-members tbody tr.is-dormant .kc-us-st-members__share-value {
+    @apply font-normal text-gray-400;
+}
+
+.kc-us-st-members__share-value + .kc-us-st-bar__track {
+    @apply block w-20 ml-auto mt-1.5;
+}
+
+.kc-us-st-members__attr {
+    @apply flex items-start gap-2;
+}
+
+.kc-us-st-members__icon {
+    @apply h-4 w-4 shrink-0 mt-0.5;
+}
+
+/* Sorting affordance, matching the Smart Report performance table. */
+.kc-us-st-members thead th.sorting,
+.kc-us-st-members thead th.sorting_asc,
+.kc-us-st-members thead th.sorting_desc {
+    @apply cursor-pointer select-none;
+}
+
+.kc-us-st-members thead th.sorting_asc,
+.kc-us-st-members thead th.sorting_desc {
+    @apply text-gray-900;
+}
+
+
+/* Copy control sitting beside the slug in the standings. */
+.kc-us-st-members__sub .kc-us-copy-to-clipboard {
+    @apply inline-flex items-center align-middle ml-1.5 cursor-pointer text-gray-300;
+}
+
+.kc-us-st-members__sub .kc-us-copy-to-clipboard:hover {
+    @apply text-indigo-600;
+}
+
+.kc-us-st-members__sub .kc-us-link-icon {
+    @apply h-3.5 w-3.5;
+}
+
+.kc-us-st-members__sub .kc-us-copy-to-clipboard p {
+    @apply m-0 ml-1 text-xs text-emerald-600;
+}
+
+/* Note under a table whose fuller version is a PRO feature. */
+.kc-us-st-card__upsell {
+    @apply m-0 px-5 py-3 text-xs text-gray-500 border-t border-gray-100 leading-snug;
+}
+
+.kc-us-st-card__upsell a {
+    @apply text-indigo-600 font-medium no-underline;
+}
+
+.kc-us-st-card__upsell a:hover {
+    @apply underline;
+}
+
+
+/* "New" menu in the dashboard header ------------------------------------ */
+
+.kc-us-st-create {
+    @apply relative inline-block text-left;
+}
+
+.kc-us-st-create__trigger {
+    @apply inline-flex items-center gap-1 px-3 py-1.5 text-sm cursor-pointer;
+}
+
+.kc-us-st-create__caret {
+    @apply h-4 w-4 -mr-1;
+}
+
+.kc-us-st-create__menu {
+    @apply absolute right-0 z-20 mt-1 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg;
+}
+
+.kc-us-st-create__menu a {
+    @apply block px-4 py-2 text-sm text-gray-700 no-underline;
+}
+
+.kc-us-st-create__menu a:hover {
+    @apply bg-indigo-50 text-indigo-700;
+}
+
 @tailwind utilities;

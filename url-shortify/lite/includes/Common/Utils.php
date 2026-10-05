@@ -588,10 +588,22 @@ class Utils {
 	 * @sicne 1.0.4
 	 */
 	public static function get_device_icon_url( $device = '' ) {
+		$device = strtolower( trim( (string) $device ) );
 
-		$icon = ! empty( $device ) ? strtolower( $device ) . '.svg' : 'desktop.svg';
+		/*
+		 * The device set holds exactly these four. Anything else - an "Others"
+		 * bucket, or a device string the tracker did not recognise - used to be
+		 * turned into a filename that does not exist and rendered as a broken
+		 * image, so unknown values fall back to the generic mark the browser and
+		 * platform icons already share.
+		 */
+		$known = [ 'desktop', 'laptop', 'mobile', 'tablet' ];
 
-		return KC_US_PLUGIN_ASSETS_DIR_URL . "/images/devices/{$icon}";
+		if ( in_array( $device, $known, true ) ) {
+			return KC_US_PLUGIN_ASSETS_DIR_URL . "/images/devices/{$device}.svg";
+		}
+
+		return KC_US_PLUGIN_ASSETS_DIR_URL . '/images/browsers/default.svg';
 	}
 
 	/**

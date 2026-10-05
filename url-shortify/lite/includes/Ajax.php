@@ -15,6 +15,7 @@ namespace KaizenCoders\URL_Shortify;
 use KaizenCoders\URL_Shortify\Admin\Controllers\ClicksController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\ImportController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\LinksController;
+use KaizenCoders\URL_Shortify\Admin\Controllers\StatsController;
 use KaizenCoders\URL_Shortify\Admin\DB\Links;
 
 /**
@@ -217,6 +218,24 @@ class Ajax {
 				$days = apply_filters( 'kc_us_clicks_info_for_days', 365 );
 			}
 
+			/*
+			 * Resolve to the same explicit dates the statistics screens use.
+			 * Without this the table counted a rolling window - the last N times
+			 * 24 hours - while the figures above it counted N calendar days, so
+			 * the log and the headline clicks disagreed by a few hundred on the
+			 * same screen.
+			 */
+			$period = StatsController::resolve_stats_period(
+				[
+					'days'       => $days,
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+				]
+			);
+
+			$start_date = $period['start'];
+			$end_date   = $period['end'];
+
 			$link_id = absint( Helper::get_data( $params, 'link_id', 0 ) );
 			$link_ids = Helper::get_data( $params, 'link_ids', '' );
 
@@ -226,15 +245,15 @@ class Ajax {
 				$link_ids = array_filter( array_map( 'absint', explode( ',', $link_ids ) ) );
 			}
 
-			$column_map = [
-				0 => 'ip',
-				1 => 'uri',
-				2 => 'name',
-				3 => 'host',
-				4 => 'referer',
-				5 => 'created_at',
-				6 => 'created_at',
-			];
+			/*
+			 * A single link_id means the request came from that link's own
+			 * statistics screen, which drops the Link column; the map has to
+			 * follow the columns actually rendered or sorting picks the wrong
+			 * one.
+			 */
+			$single_link = ( $link_id > 0 );
+
+			$column_map = ClicksController::get_order_column_map( $single_link );
 
 			$order_by = isset( $column_map[ $order_index ] ) ? $column_map[ $order_index ] : 'created_at';
 
@@ -242,7 +261,7 @@ class Ajax {
 			$filtered_records = US()->db->clicks->count_clicks_for_dashboard( $days, $search_term, $link_ids, $start_date, $end_date );
 			$items            = US()->db->clicks->get_clicks_for_dashboard( $days, $length, $start, $search_term, $order_by, $order_dir, $link_ids, $start_date, $end_date );
 
-			$columns       = ClicksController::get_table_columns();
+			$columns       = ClicksController::get_table_columns( $single_link );
 			$click_history = new ClicksController();
 			$click_history->set_columns( $columns );
 
