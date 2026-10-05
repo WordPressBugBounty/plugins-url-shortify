@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.1
-Stable tag: 2.7.0
+Stable tag: 2.7.1
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -472,13 +472,13 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.7.0 =
+= 2.7.1 =
 
 * Rebuilds every statistics screen around the figures that tell you whether a link is working, adds a Deep link redirect type that opens your destination in its own app on mobile, counts QR scans separately, and widens the share menu to twenty networks. Please update to the latest version to get the best experience. Learn more in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
 
-= 2.7.0 - 2026-10-05 =
+= 2.7.1 - 2026-10-05 =
 
 * New: Rebuilt the statistics screens for links, groups, tags and the dashboard. Each now opens with the figures that answer "is this link working?" - clicks, unique clicks, visitors, repeat rate and clicks per day, each carrying its change against the period immediately before it - followed by a short strip of plain-language observations about what the numbers are doing. **PRO**
 * New: Traffic channels. Referrers are grouped into search, social, email, other websites and direct, so you can see what kind of effort is bringing people in rather than reading a list of individual URLs. **PRO**
@@ -508,65 +508,6 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 * Fix: The dashboard's New dropdown never opened - the control had been inert - and its outside-click handler never fired.
 * Fix: Sorting the click log by a column could silently order by a different one, because the table kept its own copy of the column positions.
 * Fix: Saved Smart Reports could open on "No clicks in this range" with a goal link reading "Deleted link".
-* Translations: Updated .POT file for new translations.
-
-= 2.6.1 - 2026-09-28 =
-
-* Fix: Nothing could be imported from Tools > Import. The screen looked for its security token in the wrong place, so every source failed the check and the page came back blank. Importing works again from all of them.
-* New: CSV import can update links that already exist. Tick "Update links that already exist" and a row whose slug matches an existing link applies its target URL along with every other column the file supplies, leaving the columns you left out as they were. Without it, matching rows are skipped as before.
-* New: A CSV row can set a link's groups and tags outright instead of only adding to them. Where a row supplies the Groups or Tags column, that list replaces whatever the link had, so a file can move a link between groups or drop a tag. Leave the column out, or leave it blank, and the link keeps its current assignments.
-* Update: Redesigned the CSV import screen. It opens with a heading and a link back to the import sources, each hint now sits under the control it belongs to, and every expected column is documented in a panel beside the form, so you no longer have to download the sample file to find out what the headings should be.
-* Update: The message shown after an import is now a panel reporting how many links were added, updated, skipped and not imported, with the skipped and not-imported figures explaining why, and a link through to your links.
-* Update: The Link Central migration has moved into Tools > Import alongside the other plugin importers, and its separate tab has been removed, so there is one place to import from another plugin.
-* Fix: A blank Redirect Type cell in a CSV was saved as an empty value instead of falling back to your default, and the links list then printed the word "Array" in that column.
-* Fix: Importing the same CSV twice listed the same group and tag against a link over and over. Assignments are now cleared before they are rewritten, so re-importing a file changes nothing, and updating clears out the duplicates earlier imports left behind.
-* Fix: Exporting links and importing the file back no longer loses data. Groups and tags are separated with a pipe rather than a comma, so a group whose name contains a comma survives the trip; the status, group and tag columns are now included in exports from the group and tag statistics screens as well as the links list; and a Created At date written in your site's display format is understood on the way back in instead of zeroing the link's date.
-* Fix: CSV files are read more carefully. A byte order mark at the start of a file no longer hides the first heading, a row with too few columns is padded instead of rejecting the file, and a row with a missing or invalid target URL is reported rather than saved as an empty link.
-* Fix: Button labels turned grey against their own background on hover throughout the admin screens, which left them hard to read. Buttons now darken on hover and keep a readable label.
-* Translations: Updated .POT file for new translations.
-
-= 2.6.0 - 2026-09-04 =
-
-* New: Smart Reports. A new screen under URL Shortify for comparing links, groups or tags against each other over a date range. Reports are listed like the rest of the plugin's screens, with View report, Edit and Delete actions. Building a report and reading one are separate steps: you give it a name and description, choose what to measure, and the report opens once it is saved. **PRO**
-* New: Every report shows clicks over time with a line per item, the activity heatmap for the links it covers, a per-link table of total clicks, unique clicks, conversions, conversion rate and the most common device, browser and platform, and the full click log underneath. The per-link table sorts on any of its figures. **PRO**
-* New: Goal links. Choose a goal link and each link in the report shows how many visitors went on to reach that goal, and what share of its clicks that represents. A visitor is counted once, and only when the goal click came after the link click, so the same person reloading a page does not read as ten conversions. **PRO**
-* New: Saved reports. Save the settings behind a report under a name and description, then reopen it whenever you like. A saved report stores the filter rather than the numbers, so it always shows current data. Reports are private to the person who saved them. **PRO**
-* New: Compare mode on the Group and Tag statistics pages. The chart normally adds every link in the group together and draws one line; switching on Compare draws a line per link instead, so you can see which links are actually carrying the group. The top 8 links by clicks are charted and the page says how many were left out. **PRO**
-* New: Links can be sent straight to Smart Reports. Select links on the Links screen and choose "Compare in Smart Reports" from the bulk actions, or follow "Compare with other links" on any single link's statistics page. **PRO**
-* New: The UTM Presets list now shows the ID, source, medium, campaign, term and content of each preset, along with its description, instead of only the name and the date it was created. **PRO**
-* Update: Links are listed with their short slug wherever a report asks you to pick one, so two links with similar names can be told apart. **PRO**
-* Update: Added an index on the clicks table covering link and date together, so the per-link charts stay fast on sites with a large click history.
-* Fix: Sorting the UTM Presets list did nothing. Every column fell back to the creation date, because the list checked the sort column against a list of columns belonging to another screen. **PRO**
-* Fix: Searching the UTM Presets list sent you to the Groups screen. The search now stays on the page and matches the description and every UTM field as well as the name. **PRO**
-* Translations: Updated .POT file for new translations.
-
-= 2.5.2 - 2026-08-24 =
-
-* Update: Replaced every browser alert in the admin with a standard, dismissible WordPress notice shown next to the control it refers to. This covers the Quick Add widget, custom date ranges on the Dashboard and the Group and Tag stats pages, link rotation weights, favourites, enabling and disabling links, the link preview, and plugin install actions. Confirmation prompts on destructive actions are unchanged.
-* Update: Redesigned the public link Shortener form. It now sits in a self-contained card, shows the original URL above the short link it produced, has a proper field label, an inline error message instead of a browser alert, a loading state on the button, and stacks on narrow screens. Colours can be retuned with the custom property. **PRO**
-* Update: WordPress 7.1 compatibility.
-* Fix: The link rotation weight warning could appear several times for a single edit, because the total was checked inside the loop that added it up. It is now checked once. **PRO**
-* Fix: The Copy button on the public Shortener used the deprecated document.execCommand API. It now uses the Clipboard API where available, falls back for sites served over http, and tells the visitor to press Ctrl+C or Cmd+C if the browser blocks both. **PRO**
-* Fix: The [url-shortify-form] shortcode printed its output instead of returning it, so the public shortener form appeared at the very top of the page rather than where the shortcode was placed. **PRO**
-* Fix: The front-end stylesheet and script were loaded on every public page, pulling in jQuery with them. They are now registered up front and only loaded on pages that actually render the public link shortener form, so most sites no longer load them at all. Reported by a user — thank you.
-* Fix: When importing plugin settings from another site, the default domain used to display links set to "All my domains" kept the source site's domain ID. Short links could then be shown on the wrong custom domain, or on none at all. Both custom domain settings are now repointed at the matching domain on the destination, falling back to your own site's domain when that domain was not part of the import. **PRO**
-* Translations: Updated .POT file for new translations.
-
-= 2.5.1 - 2026-08-11 =
-
-* New: Option to restrict a short link to the domain assigned to it, so a link on a custom domain no longer shadows a page using the same slug on your main site. Enable it under Settings > Display Options. **PRO**
-* New: Setup check for custom domains. A new Setup column on the Domains page tells you whether each domain reaches WordPress as an alias or is redirected to your main site, and the same check is shown on the settings page before the option above. **PRO**
-* Update: The host of an incoming request is now resolved reliably.
-* Fix: Auto-generated slugs could duplicate an existing short link, so the new link silently redirected to the older link's destination. On sites using a link prefix the duplicate check never matched at all, because it compared the slug without the prefix against links stored with it. The check now uses the stored form, a slug that collides is regenerated, and if two links are created at the same instant the newer one moves so the existing link keeps working.
-* Fix: A link prefix could corrupt the slug it was applied to. **PRO**
-* Fix: Slug generation no longer loads every existing slug into memory on each request, and can no longer loop indefinitely when the configured slug length is short and the site has many links.
-* Security: Added a permission check to the short-link creation AJAX command. It could previously be reached by anyone holding the plugin's general AJAX nonce, which is printed publicly whenever the public shortener shortcode is enabled. Creating a link from a post now requires edit rights on that post, and creating one from a URL requires the create-links permission unless the public shortener is switched on.
-* Security: The broken-link checker no longer requests local, loopback or private-network addresses, so a stored link cannot be used to probe internal hosts. Such links are skipped rather than reported as broken. **PRO**
-* Security: Link passwords are no longer written to the cached links JSON file under wp-content/uploads.
-* Fix: Escaped the referring-site link on the Link Stats page.
-* Fix: Searching the links list while a group, tag, redirect-type or status filter was active could return the wrong rows, and a search term containing a percent sign could break the query.
-* Security: Fixed a reflected cross-site scripting issue on the Dashboard. The Refresh link was rebuilt from the current request URL and printed without escaping, so a crafted admin URL could run JavaScript when an administrator opened it. Query strings are now rebuilt with parameter names encoded, and the link is escaped on output. Reported responsibly — thank you.
-* Fix: Custom domain matching failed for any domain starting with the letters h, t, p or s (e.g. `shop.example.com`, `store.example.com`, `t.co`), and ignored letter case, ports and trailing dots.
 * Translations: Updated .POT file for new translations.
 
 [See changelog for all versions](https://kaizencoders.com/docs/url-shortify/changelog) file.
