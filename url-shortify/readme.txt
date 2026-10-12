@@ -4,7 +4,7 @@ Author URI: https://www.kaizencoders.com
 Tags: url shortener, short links, link branding, affiliate links, cloaking
 Requires at least: 5.0.0
 Tested up to: 7.1
-Stable tag: 2.7.1
+Stable tag: 2.7.2
 Requires PHP: 5.6
 License: GPL-3.0+
 License URI: http://www.gnu.org/licenses
@@ -472,11 +472,15 @@ Yes, we have added this functionality in URL Shortify PRO where you can mention 
 
 == Upgrade Notice ==
 
-= 2.7.1 =
+= 2.7.2 =
 
 * Rebuilds every statistics screen around the figures that tell you whether a link is working, adds a Deep link redirect type that opens your destination in its own app on mobile, counts QR scans separately, and widens the share menu to twenty networks. Please update to the latest version to get the best experience. Learn more in the [changelog](https://kaizencoders.com/docs/url-shortify/changelog).
 
 == Changelog ==
+
+= 2.7.2 - 2026-10-12 =
+
+* Update: Minor bug fixes and improvements.
 
 = 2.7.1 - 2026-10-05 =
 

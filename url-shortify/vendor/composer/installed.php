@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'kaizen-coders/url-shortify',
-        'pretty_version' => '2.7.1',
-        'version' => '2.7.1.0',
-        'reference' => 'cf057692b3df7bc1603ecfe9437e23edfb81852b',
+        'pretty_version' => '2.7.2',
+        'version' => '2.7.2.0',
+        'reference' => '9d7f718cb1ef75e58b9e4b8a8b168dc5785b3aa2',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'kaizen-coders/url-shortify' => array(
-            'pretty_version' => '2.7.1',
-            'version' => '2.7.1.0',
-            'reference' => 'cf057692b3df7bc1603ecfe9437e23edfb81852b',
+            'pretty_version' => '2.7.2',
+            'version' => '2.7.2.0',
+            'reference' => '9d7f718cb1ef75e58b9e4b8a8b168dc5785b3aa2',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
