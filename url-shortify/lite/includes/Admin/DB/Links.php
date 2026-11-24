@@ -609,9 +609,19 @@ class Links extends Base_DB {
 			$status = 1;
 		}
 
+		/*
+		 * Every save path ends here (admin form, AJAX, REST, import), so refuse
+		 * targets a browser would execute rather than navigate to. Deep links
+		 * with custom schemes stay allowed.
+		 */
+		$target_url = Helper::get_data( $data, 'url', '' );
+		if ( Utils::has_unsafe_scheme( $target_url ) ) {
+			$target_url = '';
+		}
+
 		$form_data = [
 			'name'              => Helper::get_data( $data, 'name', '', true ),
-			'url'               => Helper::get_data( $data, 'url', '' ),
+			'url'               => $target_url,
 			'slug'              => trim( $slug, '/' ),
 			'redirect_type'     => Helper::get_data( $data, 'redirect_type', $default_redirection_type, true ),
 			'description'       => sanitize_textarea_field( Helper::get_data( $data, 'description', '' ) ),

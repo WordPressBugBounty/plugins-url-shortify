@@ -80,6 +80,11 @@ class EmailSender {
 		$site_name = ! empty( $data['site_name'] ) ? $data['site_name'] : get_bloginfo( 'name' );
 		$subject   = sprintf( 'URL Shortify %s Report — %s', $frequency, $site_name );
 
+		$campaign = \KaizenCoders\URL_Shortify\Admin\Promotions\PromoBanner::get_email_campaign();
+		if ( $campaign && ! empty( $campaign['email_subject_tag'] ) ) {
+			$subject .= ' · ' . $campaign['email_subject_tag'];
+		}
+
 		if ( ! empty( $data['is_preview'] ) ) {
 			$subject = '[Preview] ' . $subject;
 		}

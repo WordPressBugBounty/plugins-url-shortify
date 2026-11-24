@@ -124,6 +124,18 @@ class Authentication {
 
 		if ( $this->api_key ) {
 
+			/*
+			 * An API key only ever authenticates URL Shortify routes. The user
+			 * was already set from the key at determine_current_user, so refuse
+			 * here if the route actually dispatched is anyone else's.
+			 */
+			$is_plugin_route = apply_filters( 'kc_us_api_key_route_allowed',
+				self::is_plugin_route( $request->get_route() ), $request );
+
+			if ( ! $is_plugin_route ) {
+				return $this->rest_authorization_required_error( '', false );
+			}
+
 			$allowed = Helper::has_permissions( $this->api_key, $request->get_method() );
 
 			if ( ! $allowed ) {
@@ -208,15 +220,84 @@ class Authentication {
 		}
 
 		$request = esc_url_raw( wp_unslash( $request ) );
-		$prefix  = trailingslashit( rest_get_url_prefix() );
 
-		$core = ( false !== strpos( $request, $prefix . 'url-shortify/' ) );
+		/*
+		 * Decide from the route alone. Matching anywhere in REQUEST_URI let a
+		 * query string such as `?x=/wp-json/url-shortify/` switch key
+		 * authentication on for core routes and for admin-ajax.php.
+		 */
+		$route = $this->get_requested_route( $request );
 
-		// Allow 3rd parties to use core auth.
-		$external = ( false !== strpos( $request, $prefix . 'url-shortify-' ) );
+		$is_ours = ( null !== $route ) && self::is_plugin_route( $route );
 
-		return apply_filters( 'kc_us_is_rest_request', $core || $external, $request );
+		return apply_filters( 'kc_us_is_rest_request', $is_ours, $request );
+	}
 
+	/**
+	 * Work out the REST route a request URI addresses.
+	 *
+	 * Pretty permalinks put it in the path after the REST prefix; plain
+	 * permalinks pass it as `rest_route`, which WordPress also honours over the
+	 * path, so it wins when present.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @param  string  $request_uri
+	 *
+	 * @return string|null Route with a leading slash, or null when the URI is not a REST request.
+	 */
+	protected function get_requested_route( $request_uri ) {
+		$path = wp_parse_url( $request_uri, PHP_URL_PATH );
+		$path = is_string( $path ) ? rawurldecode( $path ) : '';
+
+		$home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+		$home_path = is_string( $home_path ) ? rtrim( $home_path, '/' ) : '';
+
+		/*
+		 * `rest_route` is only a REST request on the front controller. On any
+		 * other script (admin-ajax.php, wp-login.php…) it is just a query
+		 * argument and must not switch key authentication on.
+		 */
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['rest_route'] ) && is_string( $_GET['rest_route'] ) ) {
+			$front_paths = [ $home_path, $home_path . '/', $home_path . '/index.php' ];
+
+			if ( ! in_array( $path, $front_paths, true ) ) {
+				return null;
+			}
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return '/' . ltrim( sanitize_text_field( wp_unslash( $_GET['rest_route'] ) ), '/' );
+		}
+
+		if ( '' === $path ) {
+			return null;
+		}
+
+		// The REST prefix must come straight after the site's own path.
+		$prefix = $home_path . '/' . trim( rest_get_url_prefix(), '/' ) . '/';
+
+		if ( 0 !== strpos( $path, $prefix ) ) {
+			return null;
+		}
+
+		return '/' . ltrim( substr( $path, strlen( $prefix ) ), '/' );
+	}
+
+	/**
+	 * Is this route served by URL Shortify (or a third party using its auth)?
+	 *
+	 * @since 2.7.3
+	 *
+	 * @param  string  $route  Route with or without a leading slash.
+	 *
+	 * @return bool
+	 */
+	public static function is_plugin_route( $route ) {
+		$route = '/' . ltrim( (string) $route, '/' );
+
+		// `url-shortify/...` is ours; `url-shortify-.../...` lets 3rd parties use this auth.
+		return 0 === strpos( $route, '/url-shortify/' ) || 0 === strpos( $route, '/url-shortify-' );
 	}
 
 	/**

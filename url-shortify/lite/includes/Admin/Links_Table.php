@@ -1931,7 +1931,7 @@ class Links_Table extends US_List_Table {
 			if ( empty( $target_url ) ) {
 				$messages[] = __( 'Please enter Target URL', 'url-shortify' );
 				$error      = true;
-			} elseif ( ! Utils::validate_url( $target_url, true ) ) {
+			} elseif ( Utils::has_unsafe_scheme( $target_url ) || ! Utils::validate_url( $target_url, true ) ) {
 				$messages[] = __( 'Please enter valid Target URL', 'url-shortify' );
 				$error      = true;
 			} elseif ( $no_equal_slug && Utils::is_slug_exists( $prefixed_slug ) ) {

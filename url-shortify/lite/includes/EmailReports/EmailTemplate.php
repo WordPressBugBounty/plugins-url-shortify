@@ -65,6 +65,23 @@ $website_url = \KaizenCoders\URL_Shortify\Helper::get_utm_url(
 );
 $is_pro           = US()->is_pro();
 
+// A seasonal offer (e.g. Black Friday) replaces the standard upgrade block
+// while it runs. Null for PRO users, with Disable Promotion, or out of season.
+$email_campaign = \KaizenCoders\URL_Shortify\Admin\Promotions\PromoBanner::get_email_campaign();
+$campaign_url   = '';
+if ( $email_campaign ) {
+	$campaign_url = US()->get_pricing_url(
+		'annual',
+		array_merge(
+			$email_utm,
+			[
+				'campaign' => str_replace( '_', '-', $email_campaign['id'] ),
+				'content'  => 'email-digest-offer',
+			]
+		)
+	);
+}
+
 // Total clicks for percentage calculations.
 $locations_total = 0;
 foreach ( $top_locations as $loc ) {
@@ -492,7 +509,42 @@ if ( null !== $click_trend ) {
 			<!-- ====================================================== -->
 			<!-- CTA BUTTON                                              -->
 			<!-- ====================================================== -->
-            <?php if ( ! $is_pro ) : ?>
+            <?php if ( $email_campaign ) : ?>
+                <!-- ====================================================== -->
+                <!-- SEASONAL OFFER — free users only, while it runs          -->
+                <!-- ====================================================== -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 2px;">
+                    <tr>
+                        <td style="background-color:#111827;background:linear-gradient(135deg,#0b0b0f 0%,#1f1b2e 65%,#3b2a0a 100%);border-radius:8px;padding:26px 28px;text-align:center;">
+                            <span style="display:inline-block;background:#fbbf24;color:#111827;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:10px;">
+                                <?php esc_html_e( 'Limited time offer', 'url-shortify' ); ?>
+                            </span>
+                            <p style="font-size:20px;font-weight:700;color:#ffffff;margin:12px 0 6px;line-height:1.3;">
+                                <?php echo esc_html( $email_campaign['headline'] ); ?>
+                            </p>
+                            <?php if ( ! empty( $email_campaign['subhead'] ) ) : ?>
+                            <p style="font-size:13px;color:rgba(255,255,255,0.85);margin:0 0 16px;line-height:1.6;">
+                                <?php echo esc_html( $email_campaign['subhead'] ); ?>
+                            </p>
+                            <?php endif; ?>
+                            <?php if ( ! empty( $email_campaign['coupon'] ) ) : ?>
+                            <p style="margin:0 0 18px;">
+                                <span style="font-size:11px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1px;"><?php esc_html_e( 'Coupon code', 'url-shortify' ); ?></span><br>
+                                <span style="display:inline-block;margin-top:6px;border:2px dashed #fbbf24;color:#fbbf24;font-family:Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:2px;padding:8px 18px;border-radius:6px;"><?php echo esc_html( $email_campaign['coupon'] ); ?></span>
+                            </p>
+                            <?php endif; ?>
+                            <a href="<?php echo esc_url( $campaign_url ); ?>" style="display:inline-block;background:#fbbf24;color:#111827;font-size:14px;font-weight:700;text-decoration:none;padding:12px 26px;border-radius:6px;">
+                                <?php echo esc_html( $email_campaign['cta_text'] ); ?> &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                <div style="text-align:center;padding:2px 0 8px;">
+                    <a href="<?php echo esc_url( $analytics_url ); ?>" style="display:inline-block;font-size:12px;color:#6b7280;text-decoration:none;margin-top:10px;">
+                        <?php esc_html_e( 'View basic analytics &rarr;', 'url-shortify' ); ?>
+                    </a>
+                </div>
+            <?php elseif ( ! $is_pro ) : ?>
                 <!-- ====================================================== -->
                 <!-- UPGRADE BANNER — free users only                        -->
                 <!-- ====================================================== -->

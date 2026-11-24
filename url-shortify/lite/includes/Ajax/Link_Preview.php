@@ -416,6 +416,8 @@ jQuery( function( $ ) {
 		var description = escapeHtml( data.og_description || i18n.noDescription || 'No description is available for this destination.' );
 		var siteName = escapeHtml( data.og_site_name || '' );
 		var openUrl = escapeHtml( targetUrl );
+		// Only offer a clickable link for plain web addresses; never a javascript: or data: href.
+		var canOpen = /^https?:\/\//i.test( String( targetUrl ).trim() );
 
 		var html =
 			'<div class="kc-us-preview-modal__backdrop" data-kc-us-preview-close="true"></div>' +
@@ -430,7 +432,7 @@ jQuery( function( $ ) {
 						( siteName ? '<div class="kc-us-preview-card__site">' + siteName + '</div>' : '' ) +
 						'<div class="kc-us-preview-card__actions">' +
 							'<button type="button" class="kc-us-preview-btn kc-us-preview-copy" data-target-url="' + openUrl + '">' + escapeHtml( i18n.copyTargetUrl || 'Copy Target URL' ) + '</button>' +
-							( targetUrl ? '<a class="kc-us-preview-link" href="' + openUrl + '" target="_blank" rel="noopener noreferrer">' + escapeHtml( i18n.openInNewTab || 'Open in New Tab' ) + '</a>' : '' ) +
+							( canOpen ? '<a class="kc-us-preview-link" href="' + openUrl + '" target="_blank" rel="noopener noreferrer">' + escapeHtml( i18n.openInNewTab || 'Open in New Tab' ) + '</a>' : '' ) +
 						'</div>' +
 					'</div>' +
 				'</div>' +

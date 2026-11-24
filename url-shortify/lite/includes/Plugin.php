@@ -486,10 +486,12 @@ class Plugin {
 			'KaizenCoders\URL_Shortify\Common\Actions',
 			'KaizenCoders\URL_Shortify\Shortcode',
 			'KaizenCoders\URL_Shortify\Feedback',
+			'KaizenCoders\URL_Shortify\Admin\ReviewPrompt',
 			'KaizenCoders\URL_Shortify\Uninstall',
 			'KaizenCoders\URL_Shortify\API\Authentication',
 			'KaizenCoders\URL_Shortify\API\Init',
 			'KaizenCoders\URL_Shortify\EmailReports\Init',
+			'KaizenCoders\URL_Shortify\EmailReports\ReviewRequestEmail',
 			'KaizenCoders\URL_Shortify\PRO\Init',
 			'KaizenCoders\URL_Shortify\Addons\Init',
 		];

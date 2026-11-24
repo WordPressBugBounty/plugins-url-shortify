@@ -17,6 +17,7 @@ use KaizenCoders\URL_Shortify\Admin\Controllers\ImportController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\LinksController;
 use KaizenCoders\URL_Shortify\Admin\Controllers\StatsController;
 use KaizenCoders\URL_Shortify\Admin\DB\Links;
+use KaizenCoders\URL_Shortify\Common\Utils;
 
 /**
  * Class Ajax
@@ -126,6 +127,17 @@ class Ajax {
 			// The public form only ever submits a target URL. Choosing the slug or
 			// the domain stays with users who hold the capability.
 			unset( $data['slug'], $data['domain'] );
+
+			// Anonymous visitors may only shorten plain web addresses.
+			$data['url'] = Utils::sanitize_http_url( Helper::get_data( $data, 'url', '' ) );
+
+			if ( empty( $data['url'] ) ) {
+				wp_send_json_error( [ 'message' => __( 'Please enter a valid http or https URL.', 'url-shortify' ) ], 400 );
+			}
+		}
+
+		if ( Utils::has_unsafe_scheme( Helper::get_data( $data, 'url', '' ) ) ) {
+			wp_send_json_error( [ 'message' => __( 'Please enter valid Target URL', 'url-shortify' ) ], 400 );
 		}
 
 		$link_controller = new LinksController();
@@ -190,8 +202,8 @@ class Ajax {
 	 */
 	public function get_dashboard_clicks_page( $params = [] ) {
 		try {
-			if ( ! current_user_can( 'read' ) ) {
-				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ] );
+			if ( ! $this->can_view_click_data() ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ], 403 );
 			}
 
 			$draw = absint( Helper::get_data( $params, 'draw', 0 ) );
@@ -245,6 +257,32 @@ class Ajax {
 				$link_ids = array_filter( array_map( 'absint', explode( ',', $link_ids ) ) );
 			}
 
+			if ( ! is_array( $link_ids ) ) {
+				$link_ids = [];
+			}
+
+			/*
+			 * An empty list means "every link" to the query below, so users who
+			 * may only see their own links get their own IDs in its place and
+			 * are refused when nothing they asked for is theirs.
+			 */
+			$requested_specific = ! empty( $link_ids );
+			$link_ids           = $this->restrict_link_ids_to_current_user( $link_ids );
+
+			if ( false === $link_ids && ! $requested_specific && $this->can_view_click_data() ) {
+				// A creator with no links yet: an empty log, not an error.
+				wp_send_json_success( [
+					'draw'            => $draw,
+					'recordsTotal'    => 0,
+					'recordsFiltered' => 0,
+					'data'            => [],
+				] );
+			}
+
+			if ( false === $link_ids ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ], 403 );
+			}
+
 			/*
 			 * A single link_id means the request came from that link's own
 			 * statistics screen, which drops the Link column; the map has to
@@ -295,13 +333,17 @@ class Ajax {
 	 */
 	public function get_link_stats_chart_data( $params = [] ) {
 		try {
-			if ( ! current_user_can( 'read' ) ) {
-				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ] );
+			if ( ! $this->can_view_click_data() ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ], 403 );
 			}
 
 			$link_id = absint( Helper::get_data( $params, 'link_id', 0 ) );
 			if ( $link_id <= 0 ) {
 				wp_send_json_error( [ 'message' => __( 'Invalid link selected.', 'url-shortify' ) ] );
+			}
+
+			if ( false === $this->restrict_link_ids_to_current_user( [ $link_id ] ) ) {
+				wp_send_json_error( [ 'message' => __( 'Permission denied.', 'url-shortify' ) ], 403 );
 			}
 
 			$controller = new \KaizenCoders\URL_Shortify\Admin\Controllers\LinkStatsController( $link_id );
@@ -316,6 +358,55 @@ class Ajax {
 			}
 			wp_send_json_error( [ 'message' => $message ] );
 		}
+	}
+
+	/**
+	 * May the current user read click records at all?
+	 *
+	 * Mirrors who gets the URL Shortify Dashboard and Links screens. The AJAX
+	 * nonce is not enough on its own: it is printed in the posts list for
+	 * anyone who can open edit.php.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @return bool
+	 */
+	protected function can_view_click_data() {
+		return US()->access->can( 'manage_links' ) || US()->access->can( 'create_links' );
+	}
+
+	/**
+	 * Limit link IDs to the ones the current user may see.
+	 *
+	 * Users who manage links see everything, so the list comes back unchanged.
+	 * Anyone else only sees links they created, the same rule the Links list
+	 * and the status toggle apply.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @param  int[]  $link_ids  Requested IDs; empty means all links.
+	 *
+	 * @return int[]|false Permitted IDs (never empty for restricted users), or false when none are permitted.
+	 */
+	protected function restrict_link_ids_to_current_user( $link_ids = [] ) {
+		if ( US()->access->can( 'manage_links' ) ) {
+			return $link_ids;
+		}
+
+		if ( ! US()->access->can( 'create_links' ) ) {
+			return false;
+		}
+
+		global $wpdb;
+
+		$own_ids = US()->db->links->get_column_by_condition( 'id',
+			$wpdb->prepare( 'created_by_id = %d', get_current_user_id() ) );
+		$own_ids = array_map( 'absint', (array) $own_ids );
+
+		$permitted = empty( $link_ids ) ? $own_ids : array_intersect( array_map( 'absint', $link_ids ), $own_ids );
+		$permitted = array_values( array_filter( $permitted ) );
+
+		return empty( $permitted ) ? false : $permitted;
 	}
 
 	/**

@@ -275,11 +275,15 @@ class Click {
 		// Set Visitor Cookie
 		$visitor_cookie             = 'kc_us_visitor';
 		$visitor_cookie_expire_time = time() + 60 * 60 * 24 * 365; // Expire in 1 year
-		if ( ! isset( $_COOKIE[ $visitor_cookie ] ) ) {
+		$existing_visitor_id = isset( $_COOKIE[ $visitor_cookie ] ) && is_string( $_COOKIE[ $visitor_cookie ] ) ? $_COOKIE[ $visitor_cookie ] : '';
+
+		// Visitor IDs are always uniqid() output (13 hex characters). Anything
+		// else came from the client, so replace it rather than store it.
+		if ( preg_match( '/^[a-f0-9]{13}$/', $existing_visitor_id ) ) {
+			$this->visitor_id = $existing_visitor_id;
+		} else {
 			$this->visitor_id = $this->generate_unique_visitor_id();
 			setcookie( $visitor_cookie, $this->visitor_id, $visitor_cookie_expire_time, '/' );
-		} else {
-			$this->visitor_id = $_COOKIE[ $visitor_cookie ];
 		}
 
 		$this->created_at = Helper::get_current_date_time();

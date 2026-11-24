@@ -41,13 +41,14 @@ class GeoLocation {
 	 * @since 1.4.4
 	 */
 	public static function get_external_ip_address() {
-		$external_ip_address = '0.0.0.0';
-
-		$transient_name = '';
-		if ( 'UNKNOWN' !== Helper::get_ip() ) {
-			$transient_name      = 'external_ip_address_' . Helper::get_ip();
-			$external_ip_address = get_transient( $transient_name );
-		}
+		/*
+		 * This is the server's own public address, which does not depend on
+		 * who is visiting. Keying the cache on the visitor IP let a client
+		 * rotating a forwarded header create a transient and outbound lookups
+		 * per address.
+		 */
+		$transient_name      = 'kc_us_external_ip_address';
+		$external_ip_address = get_transient( $transient_name );
 
 		if ( false === $external_ip_address ) {
 			$external_ip_address     = '0.0.0.0';
@@ -69,6 +70,52 @@ class GeoLocation {
 		}
 
 		return $external_ip_address;
+	}
+
+	/**
+	 * Is this a public address worth sending to a geolocation API?
+	 *
+	 * Private and reserved ranges never resolve to a country, so looking them
+	 * up only costs an outbound request and a cache entry.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @param  string  $ip_address
+	 *
+	 * @return bool
+	 */
+	private static function is_public_ip( $ip_address ) {
+		return false !== filter_var( $ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+	}
+
+	/**
+	 * Take one API lookup from the hourly budget.
+	 *
+	 * The visitor IP can come from a forwarded header the client controls, so
+	 * without a cap every made-up address meant another outbound request and
+	 * another week-long transient.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @return bool False when the budget for this hour is spent.
+	 */
+	private static function consume_lookup_budget() {
+		$limit = (int) apply_filters( 'kc_us_geolocation_api_lookups_per_hour', 200 );
+
+		if ( $limit <= 0 ) {
+			return false;
+		}
+
+		$key   = 'kc_us_geoip_lookups_' . gmdate( 'YmdH' );
+		$count = (int) get_transient( $key );
+
+		if ( $count >= $limit ) {
+			return false;
+		}
+
+		set_transient( $key, $count + 1, HOUR_IN_SECONDS );
+
+		return true;
 	}
 
 	/**
@@ -167,9 +214,17 @@ class GeoLocation {
 	 * @return string
 	 */
 	private static function geolocate_via_api( $ip_address ) {
+		if ( ! self::is_public_ip( $ip_address ) ) {
+			return '';
+		}
+
 		$country_code = get_transient( 'geoip_' . $ip_address );
 
 		if ( false === $country_code ) {
+			if ( ! self::consume_lookup_budget() ) {
+				return '';
+			}
+
 			$geoip_services = self::$geoip_apis;
 
 			if ( empty( $geoip_services ) ) {

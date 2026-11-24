@@ -73,6 +73,9 @@ class PromoBanner {
 			'compare_url'  => '',
 			'image'        => '',
 
+			// Visual style: '' for the default purple, 'dark' for seasonal sales.
+			'variant'      => '',
+
 			// Calendar window. Empty means unbounded in that direction, which is
 			// how an evergreen lifecycle campaign is expressed.
 			'start'        => '',
@@ -84,7 +87,53 @@ class PromoBanner {
 			// Days since the plugin was installed, inclusive.
 			'min_age_days' => 0,
 			'max_age_days' => 0,
+
+			// Also feature this campaign in the email digest while it runs, and
+			// optionally add a short tag to the digest subject line.
+			'email'        => false,
+			'email_subject_tag' => '',
 		];
+	}
+
+	/**
+	 * The campaign to feature in the email digest right now, if any.
+	 *
+	 * Only campaigns flagged `email` qualify, and only inside their calendar
+	 * window. Screen, dismissal and lifecycle rules are admin-page concerns and
+	 * do not apply to an email, but the free-user / Disable Promotion check
+	 * does.
+	 *
+	 * @param int|null  $now         Unix timestamp, defaults to now.
+	 * @param bool|null $can_promote Free user without Disable Promotion; looked up when null.
+	 *
+	 * @return array|null Prepared campaign.
+	 *
+	 * @since 2.7.3
+	 */
+	public static function get_email_campaign( $now = null, $can_promote = null ) {
+		if ( null === $can_promote ) {
+			$can_promote = US()->can_show_premium_promotion();
+		}
+
+		if ( ! $can_promote ) {
+			return null;
+		}
+
+		$now = null === $now ? time() : (int) $now;
+
+		foreach ( self::get_campaigns() as $id => $config ) {
+			$campaign = self::prepare_campaign( $id, $config );
+
+			if ( empty( $campaign['email'] ) ) {
+				continue;
+			}
+
+			if ( self::is_in_window( $now, (string) $campaign['start'], (string) $campaign['end'] ) ) {
+				return $campaign;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -99,6 +148,22 @@ class PromoBanner {
 	 */
 	public static function get_campaigns() {
 		$campaigns = [
+
+			// Black Friday & Cyber Monday 2026. Dated, so it outranks the
+			// evergreen campaigns below while it runs and disappears after.
+			// The email digest shows the same offer, see get_email_campaign().
+			'bfcm_2026' => [
+				'headline'     => __( '🖤 Black Friday & Cyber Monday: Flat 50% off all URL Shortify PRO plans', 'url-shortify' ),
+				'subhead'      => __( 'Our biggest discount of the year, on every plan. Use the coupon at checkout. Ends December 1.', 'url-shortify' ),
+				'coupon'       => 'BFCM26',
+				'cta_text'     => __( 'Get 50% Off', 'url-shortify' ),
+				'start'        => '2026-11-24',
+				'end'          => '2026-12-01',
+				'min_links'    => 1,
+				'variant'      => 'dark',
+				'email'        => true,
+				'email_subject_tag' => __( 'Black Friday: 50% off PRO', 'url-shortify' ),
+			],
 
 			// Evergreen fallback once the free history limit starts to bite.
 			'unlock_history' => [
@@ -440,7 +505,7 @@ class PromoBanner {
 
 		$nonce = wp_create_nonce( self::NONCE_ACTION );
 		?>
-		<div id="kc-us-promo-banner" class="kc-us-promo-banner<?php echo empty( $campaign['image'] ) ? '' : ' kc-us-promo-banner--image'; ?>"
+		<div id="kc-us-promo-banner" class="kc-us-promo-banner<?php echo empty( $campaign['image'] ) ? '' : ' kc-us-promo-banner--image'; ?><?php echo empty( $campaign['variant'] ) ? '' : ' kc-us-promo-banner--' . esc_attr( sanitize_html_class( $campaign['variant'] ) ); ?>"
 			role="region" data-campaign="<?php echo esc_attr( $campaign['id'] ); ?>"
 			aria-label="<?php esc_attr_e( 'URL Shortify promotion', 'url-shortify' ); ?>">
 
@@ -509,6 +574,14 @@ class PromoBanner {
 				position: relative;
 				overflow: hidden;
 			}
+			.kc-us-promo-banner--dark {
+				background: linear-gradient(90deg, #0b0b0f 0%, #1f1b2e 60%, #3b2a0a 100%);
+				box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+			}
+			.kc-us-promo-banner--dark .kc-us-promo-coupon { border-color: rgba(251, 191, 36, .7); background: rgba(251, 191, 36, .12); }
+			.kc-us-promo-banner--dark .kc-us-promo-coupon-code { color: #fbbf24; }
+			.kc-us-promo-banner--dark .kc-us-promo-cta { background: #fbbf24; color: #111827; }
+			.kc-us-promo-banner--dark .kc-us-promo-cta:hover { color: #111827; }
 			.kc-us-promo-banner--image { padding: 0; background: none; box-shadow: none; }
 			.kc-us-promo-banner--image img { display: block; width: 100%; height: auto; border-radius: 8px; }
 			.kc-us-promo-inner {

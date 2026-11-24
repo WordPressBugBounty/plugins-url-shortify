@@ -1137,4 +1137,64 @@ class Utils {
 
 		return false;
 	}
+
+	/**
+	 * Is the target URL using a scheme that runs script or carries a document?
+	 *
+	 * Deep links (`myapp://…`) are a supported target, so an allow-list would
+	 * break them. These are the schemes a browser executes or renders inline
+	 * instead of navigating, and no short link has a legitimate use for them.
+	 *
+	 * Browsers drop ASCII whitespace and control characters anywhere in a URL
+	 * and decode HTML entities in attributes, so `java&#x09;script:` and
+	 * "java\tscript:" are normalised before the scheme is read.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @param  string  $url
+	 *
+	 * @return bool
+	 */
+	public static function has_unsafe_scheme( $url = '' ) {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return false;
+		}
+
+		$normalized = html_entity_decode( $url, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$normalized = preg_replace( '/[\x00-\x20\x7f]+/', '', $normalized );
+
+		if ( ! preg_match( '/^([a-z][a-z0-9+.\-]*):/i', $normalized, $matches ) ) {
+			return false;
+		}
+
+		$unsafe = apply_filters( 'kc_us_unsafe_url_schemes', [ 'javascript', 'data', 'vbscript' ] );
+
+		return in_array( strtolower( $matches[1] ), (array) $unsafe, true );
+	}
+
+	/**
+	 * Return the URL only when it is an absolute http or https URL.
+	 *
+	 * Used where the target comes from someone without link permissions (the
+	 * public shortener), so nothing but a plain web address is accepted.
+	 *
+	 * @since 2.7.3
+	 *
+	 * @param  string  $url
+	 *
+	 * @return string Sanitised URL, or an empty string when it is not http(s).
+	 */
+	public static function sanitize_http_url( $url = '' ) {
+		if ( ! is_string( $url ) ) {
+			return '';
+		}
+
+		$url = trim( $url );
+
+		if ( ! preg_match( '#^https?://#i', $url ) || self::has_unsafe_scheme( $url ) ) {
+			return '';
+		}
+
+		return esc_url_raw( $url, [ 'http', 'https' ] );
+	}
 }
